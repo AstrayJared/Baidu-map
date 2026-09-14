@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "unique_cases": 60,
+  "http_success": 60,
+  "strict_valid": 55,
+  "counts": {
+    "tp": 13,
+    "tn": 27,
+    "fp": 7,
+    "fn": 8,
+    "unknown": 5
+  },
+  "csv_matches_json": true,
+  "geometry_membership_verified": true,
+  "endpoint_gate_recomputed": true,
+  "exact_credential_scan_passed": true,
+  "html_images_exist": true,
+  "old_zero_response_report_removed": true
+}
