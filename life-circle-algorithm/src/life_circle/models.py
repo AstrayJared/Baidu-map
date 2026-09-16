@@ -79,8 +79,14 @@ class RouteObservation:
     request_origin: Point | None = None
     distance_m: float | None = None
     route_path: list = field(default_factory=list)
+    # Route evidence survives rejection at the requested coordinate.
+    observed_duration: float | None = None
+    origin_offset_m: float | None = None
+    destination_offset_m: float | None = None
 
     def __post_init__(self):
+        raw = self.observed_duration if self.observed_duration is not None else self.duration
+        object.__setattr__(self, "observed_duration", raw if type(raw) in (int, float) and math.isfinite(raw) and raw >= 0 else None)
         if type(self.duration) not in (int, float) or not math.isfinite(self.duration) or self.duration < 0:
             object.__setattr__(self, "duration", None)
             object.__setattr__(self, "reason", self.reason or "invalid_duration")
