@@ -102,6 +102,7 @@ class BaiduProvider:
         if not isinstance(result, dict) or not isinstance(result.get("routes"), list):
             return unknown("invalid_response")
         valid = []
+        offset_routes = []
         reason = "no_result" if not result["routes"] else "invalid_duration"
         projection = LocalProjection(origin)
         for route in result["routes"]:
@@ -115,9 +116,9 @@ class BaiduProvider:
             if isinstance(steps, list) and steps and isinstance(steps[0], dict) and isinstance(steps[-1], dict):
                 start = self._endpoint(steps[0].get("start_location"))
                 end = self._endpoint(steps[-1].get("end_location"))
-            if (start and math.dist(projection.to_local(start), projection.to_local(origin)) > 50) or (end and math.dist(projection.to_local(end), projection.to_local(destination)) > 50):
-                reason = "endpoint_offset"
-                continue
+            origin_shift = math.dist(projection.to_local(start), projection.to_local(origin)) if start else None
+            destination_shift = math.dist(projection.to_local(end), projection.to_local(destination)) if end else None
+            offset = (origin_shift is not None and origin_shift > 50) or (destination_shift is not None and destination_shift > 50)
             distance = route.get("distance")
             if type(distance) not in (int, float) or not math.isfinite(distance) or distance < 0:
                 distance = None
@@ -133,8 +134,13 @@ class BaiduProvider:
             if self.route_metric == "distance" and distance is None:
                 reason = "invalid_distance"
                 continue
-            valid.append(RouteObservation(destination, observation.duration, endpoint_verified=start is not None and end is not None, route_origin=start, route_destination=end, distance_m=distance, route_path=path))
-        return min(valid, key=lambda o: o.distance_m if self.route_metric == "distance" else o.duration) if valid else unknown(reason)
+            item = RouteObservation(destination, observation.duration, reason="endpoint_offset" if offset else None,
+                observed_duration=observation.duration, endpoint_verified=start is not None and end is not None,
+                route_origin=start, route_destination=end, distance_m=distance, route_path=path,
+                origin_offset_m=origin_shift, destination_offset_m=destination_shift)
+            (offset_routes if offset else valid).append(item)
+        candidates = valid or offset_routes
+        return min(candidates, key=lambda o: o.distance_m if self.route_metric == "distance" else o.observed_duration) if candidates else unknown(reason)
 
     async def query_walking_time(self, origin, destination, deadline):
         if self.client is None:

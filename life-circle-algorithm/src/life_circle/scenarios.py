@@ -84,3 +84,52 @@ def scenarios():
                 return np.maximum(0, 900 + distance)
             cases[name] = Scenario(name, f"{width} 米窄通道，偏移 {offset} 米；用于暴露漏采限制", channel)
     return cases
+
+
+def accuracy_scenario(definition):
+    """Frozen P1 models; truth and observation failures have separate functions.
+
+    Layout parameters are generated before any run and stored in the protocol.
+    Rotation is about the fixed zero anchor. Road models reuse TestRoadNetwork.
+    Signed-field pockets/channels are synthetic scalar models, not road claims.
+    """
+    family, variant = definition['family'], definition['variant']
+    angle = definition['angle']
+    cosine, sine = np.cos(angle), np.sin(angle)
+    def local(x,y):
+        return cosine*np.asarray(x)+sine*np.asarray(y), -sine*np.asarray(x)+cosine*np.asarray(y)
+    speed = definition['speed']
+    failure = None
+    network = TestRoadNetwork('river' if variant % 2 == 0 else 'wall') if family == 2 else None
+    def truth(x,y):
+        u,v = local(x,y)
+        radius = np.hypot(u,v)
+        if family == 0:
+            return (radius if variant % 2 == 0 else np.abs(u)+np.abs(v)) / speed
+        if family == 1:
+            theta = np.arctan2(v,u)
+            boundary = 960 + 140*np.sin(3*theta) + 70*np.sin(7*theta)
+            near = radius/boundary*900
+            far = 2050 + 550*np.sin(u/135)*np.cos(v/175)
+            return np.where(radius > 1280, far, near)
+        if family == 2:
+            return network(u,v)
+        if family == 3:
+            offset = definition['offset']
+            island = np.hypot(u-1100,v-offset)-60
+            main = radius-700
+            distance = np.minimum(main,island)
+            if variant % 2:
+                corridor = np.maximum.reduce(np.broadcast_arrays(600-u,u-1100,np.abs(v-offset)-25))
+                distance = np.minimum(distance,corridor)
+            return np.maximum(0,900+3*distance)
+        return radius/speed
+    if family == 4:
+        def failure(x,y):
+            u,v = local(x,y)
+            return bool(300 < u < 750 and abs(v-definition['offset']) < 150)
+    case = Scenario(definition['id'], f'P1 family {family}, frozen layout {variant}', truth, failure)
+    if family == 4:
+        u,v = 500,definition['offset']
+        case.failure_center = (cosine*u-sine*v,sine*u+cosine*v)
+    return case
