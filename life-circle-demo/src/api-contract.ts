@@ -19,6 +19,8 @@ export type CategoryResult = {
 
 export type Data = {
   geometry: Geometry | null;
+  evidenceGeometry: Geometry | null;
+  inferredRegion: Geometry | null;
   uncertain_region: Geometry | null;
   unknown_region: Geometry | null;
   computation_extent: Geometry | null;
@@ -88,7 +90,7 @@ export type Rules = {
   time_threshold_s: 900;
   time_inclusive: true;
   time_tolerance_s: number;
-  time_confirmation: "implementation_only" | "mock_only";
+  time_confirmation: "implementation_only" | "mock_only" | "baidu_sampled";
   distance: DistanceRule;
 };
 
@@ -120,7 +122,7 @@ export type TaskStatusResponse = {
   stage: string;
   requests: number;
   networkRequests: number;
-  budget: 200 | 400 | 800;
+  budget: number;
   elapsedSeconds: number;
   dataSource: "synthetic" | "baidu_walking";
   error: string | null;
@@ -204,4 +206,112 @@ export type OsmOfflineRequest = {
   coordinate_system: "bd09ll";
   algorithm?: "osm_offline";
   threshold?: 900;
+};
+
+export type HybridConfig = {
+  time_limit_seconds: 900;
+  endpoint_offset_limit_m: number;
+  initial_direction_count: number;
+  analysis_half_width_m: number;
+  initial_probe_distances_m: Array<number>;
+  max_exploration_radius_m: number;
+  boundary_tolerance_m: number;
+  max_refinement_depth: number;
+  max_baidu_requests: number;
+  max_direction_count: number;
+  angular_refinement_threshold_m: number;
+  angular_refinement_ratio: number;
+  topology_risk_threshold: number;
+  topology_search_radius_m: number;
+  max_triangle_edge_m: number;
+  mixed_triangle_target_m: number;
+  request_qps: number;
+  deadline_seconds: number;
+  failure_streak_limit: number;
+  origin_endpoint_failure_streak_limit: number;
+  interior_gap_radii_m: Array<number>;
+  bridge_display_width_m: number;
+};
+
+export type HybridRequest = {
+  origin: Origin;
+  coordinate_system: "bd09ll";
+  config?: Partial<HybridConfig>;
+  client_request_id: string;
+};
+
+export type HybridIsochrone = {
+  algorithm: "hybrid";
+  algorithm_version: string;
+  coordinate_system: "bd09ll";
+  quality: "usable" | "partial" | "insufficient";
+  coverage_policy: "continuous_land_interior";
+  geometry: Geometry | null;
+  evidence_geometry: Geometry | null;
+  inferred_fill_geometry: Geometry | null;
+  unknown_region: Geometry | null;
+  evidence_unknown_region: Geometry | null;
+  computation_extent: Geometry;
+  extent_truncated: boolean;
+  requests_used: number;
+  valid_baidu_samples: number;
+  invalid_baidu_samples: number;
+  unknown_samples: number;
+  boundary_error_estimate: number | null;
+  stop_reason: string;
+  warnings: Array<string>;
+  config: HybridConfig;
+  readiness: HybridReadiness;
+  timing_seconds: HybridTimings;
+};
+
+export type HybridReadiness = {
+  mode: "full" | "degraded";
+  graph_available: boolean;
+  data_version_matches: boolean;
+  coverage_available: boolean;
+  origin_in_coverage: boolean;
+  extent_in_coverage: boolean;
+  obstacle_layer_available: boolean;
+  risk_layer_available: boolean;
+  warnings: Array<string>;
+};
+
+export type HybridTimings = {
+  preparation: number;
+  obstacle_load: number;
+  requests: number;
+  geometry_rebuilds: number;
+  compute_total: number;
+  task_total: number;
+};
+
+export type HybridResultResponse = {
+  schema_version: "1.0";
+  responseType: "result";
+  taskId: string;
+  taskStatus: "completed";
+  status: "complete" | "partial" | "failed" | "empty";
+  businessStatus: "complete" | "partial" | "failed" | "empty";
+  dataSource: "synthetic" | "baidu_walking";
+  center: Origin;
+  generatedAt: number;
+  facilitiesStatus: "not_integrated" | "complete" | "partial" | "failed";
+  facilityAnalysis: FacilityAnalysis | null;
+  coordinateSystem: "bd09ll";
+  coordinateOrder: "longitude,latitude";
+  units: Record<string, string>;
+  rules: Rules;
+  data: Data;
+  algorithm: HybridIsochrone;
+  warnings: Array<Issue>;
+  errors: Array<Issue>;
+  isochrone: HybridIsochrone;
+  config_hash: string;
+  result_hash: string;
+};
+
+export type HybridError = {
+  code: string;
+  message: string;
 };

@@ -1,4 +1,7 @@
-"""Frozen 60-point OSM/Baidu validation: prepare locally, execute once, render offline."""
+"""Legacy offline-OSM comparison; supply an existing 60-point source explicitly.
+
+For the current Hybrid accuracy audit use python -m tools.validate_hybrid.
+"""
 from __future__ import annotations
 
 import argparse
@@ -21,16 +24,19 @@ import httpx
 import numpy as np
 from shapely.geometry import Point, box, mapping
 from app.config import Settings, load_settings
+from app.geo.coordinates import wgs84_to_bd09
 from app.persistence import atomic_dump
 from app.algorithms.osm_offline.engine import OsmOfflineEngine
 from life_circle.models import IsochroneRequest
 from life_circle.providers import BaiduProvider
 from life_circle.coordinates import LocalProjection
+from tools.test_origin import TEST_ORIGIN
 
-ORIGIN = (121.51108, 31.20415)
+ORIGIN = TEST_ORIGIN
 THRESHOLD_S = 900
-DEFAULT_OUTPUT = BACKEND / "docs/reviews/2026-09-14/osm-baidu-validation"
-FROZEN_SOURCE = DEFAULT_OUTPUT / "plan.json"
+DEFAULT_OUTPUT = BACKEND / ".hybrid-ledgers/legacy-osm-validation"
+# The prior plan supplies the reproducible radial offsets and group labels;
+# ``prepare`` projects those offsets around TEST_ORIGIN before any new run.
 
 
 def utc_now():
@@ -64,9 +70,12 @@ def prepare(output, source):
     origin_xy = projection.origin(ORIGIN)
     rows = []
     for old_row in old["cases"]:
-        # Classify the exact six-decimal coordinates sent to Baidu, not the
-        # unrounded metric point used by the previous plotting script.
-        dest = (old_row["lng"], old_row["lat"])
+        # Reuse the frozen radial offsets and groups, then project them around
+        # the current fixed origin.  This keeps the sampling design stable
+        # while ensuring every new report is about TEST_ORIGIN.
+        x = origin_xy[0] + float(old_row["offset_e_m"])
+        y = origin_xy[1] + float(old_row["offset_n_m"])
+        dest = tuple(round(float(v), 6) for v in wgs84_to_bd09(*projection.inverse.transform(x, y)))
         x, y = projection.origin(dest)
         point = Point(x, y)
         assert engine.coverage.covers(point)
@@ -225,17 +234,15 @@ def main():
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--prepare", action="store_true")
     mode.add_argument("--execute-live", action="store_true")
-    mode.add_argument("--render", action="store_true")
     parser.add_argument("--output",type=Path,default=DEFAULT_OUTPUT)
-    parser.add_argument("--source",type=Path,default=FROZEN_SOURCE)
+    parser.add_argument("--source",type=Path,help="--prepare requires an explicit existing 60-point plan")
     args = parser.parse_args()
     if args.prepare:
+        if args.source is None or not args.source.is_file():
+            parser.error("--prepare requires --source pointing to an existing plan")
         prepare(args.output.resolve(), args.source)
     elif args.execute_live:
         execute(args.output.resolve())
-    else:
-        from render_osm_baidu_report import render
-        render(args.output.resolve())
 
 
 if __name__ == "__main__":

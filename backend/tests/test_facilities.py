@@ -10,8 +10,9 @@ from app.analyses import RateGate
 from app.facilities import analyze_facilities
 from app.places import PlacesClient, classify
 from life_circle.models import CancelToken, RouteObservation
+from tools.test_origin import TEST_ORIGIN
 
-ORIGIN = (121.52609, 31.25956)
+ORIGIN = TEST_ORIGIN
 
 
 @pytest.mark.parametrize("name,expected", [

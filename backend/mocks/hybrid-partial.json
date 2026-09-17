@@ -1,0 +1,728 @@
+{
+  "schema_version": "1.0",
+  "responseType": "result",
+  "taskId": "synthetic-hybrid-fixture",
+  "taskStatus": "completed",
+  "status": "partial",
+  "businessStatus": "partial",
+  "dataSource": "synthetic",
+  "center": {
+    "lng": 121.513925,
+    "lat": 31.313079
+  },
+  "generatedAt": 1789516800.0,
+  "facilitiesStatus": "not_integrated",
+  "facilityAnalysis": null,
+  "coordinateSystem": "bd09ll",
+  "coordinateOrder": "longitude,latitude",
+  "units": {
+    "distance": "m",
+    "duration": "s",
+    "area": "m2"
+  },
+  "rules": {
+    "version": "n04-v1",
+    "time_threshold_s": 900,
+    "time_inclusive": true,
+    "time_tolerance_s": 0.0,
+    "time_confirmation": "mock_only",
+    "distance": {
+      "metric": "unconfirmed",
+      "threshold_m": 1000.0,
+      "inclusive": null,
+      "tolerance_m": null,
+      "assessment_scope": "unconfirmed",
+      "category_policy": "unconfirmed"
+    }
+  },
+  "data": {
+    "geometry": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "evidenceGeometry": null,
+    "inferredRegion": null,
+    "uncertain_region": null,
+    "unknown_region": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.50153261321243,
+              31.302124671590782
+            ],
+            [
+              121.5012063777144,
+              31.323787121455407
+            ],
+            [
+              121.5262897303349,
+              31.32416981325038
+            ],
+            [
+              121.52660826076608,
+              31.302514429836222
+            ],
+            [
+              121.50153261321243,
+              31.302124671590782
+            ]
+          ],
+          [
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "computation_extent": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.52660826076608,
+              31.302514429836222
+            ],
+            [
+              121.5262897303349,
+              31.32416981325038
+            ],
+            [
+              121.5012063777144,
+              31.323787121455407
+            ],
+            [
+              121.50153261321243,
+              31.302124671590782
+            ],
+            [
+              121.52660826076608,
+              31.302514429836222
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "facilities": null,
+    "categories": [
+      {
+        "category": "market",
+        "major_category": "shopping",
+        "minor_category": "market",
+        "query_status": "unknown",
+        "count_in_circle": null,
+        "service_status": "unknown"
+      },
+      {
+        "category": "pharmacy",
+        "major_category": "medical",
+        "minor_category": "pharmacy",
+        "query_status": "unknown",
+        "count_in_circle": null,
+        "service_status": "unknown"
+      },
+      {
+        "category": "school",
+        "major_category": "education",
+        "minor_category": "school",
+        "query_status": "unknown",
+        "count_in_circle": null,
+        "service_status": "unknown"
+      }
+    ],
+    "blind_points": null,
+    "blind_region": null,
+    "report": null
+  },
+  "algorithm": {
+    "algorithm": "hybrid",
+    "algorithm_version": "hybrid-v1.5.0",
+    "coordinate_system": "bd09ll",
+    "quality": "partial",
+    "coverage_policy": "continuous_land_interior",
+    "geometry": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "evidence_geometry": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "inferred_fill_geometry": null,
+    "unknown_region": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.50153261321243,
+              31.302124671590782
+            ],
+            [
+              121.5012063777144,
+              31.323787121455407
+            ],
+            [
+              121.5262897303349,
+              31.32416981325038
+            ],
+            [
+              121.52660826076608,
+              31.302514429836222
+            ],
+            [
+              121.50153261321243,
+              31.302124671590782
+            ]
+          ],
+          [
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "evidence_unknown_region": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.50153261321243,
+              31.302124671590782
+            ],
+            [
+              121.5012063777144,
+              31.323787121455407
+            ],
+            [
+              121.5262897303349,
+              31.32416981325038
+            ],
+            [
+              121.52660826076608,
+              31.302514429836222
+            ],
+            [
+              121.50153261321243,
+              31.302124671590782
+            ]
+          ],
+          [
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "computation_extent": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.52660826076608,
+              31.302514429836222
+            ],
+            [
+              121.5262897303349,
+              31.32416981325038
+            ],
+            [
+              121.5012063777144,
+              31.323787121455407
+            ],
+            [
+              121.50153261321243,
+              31.302124671590782
+            ],
+            [
+              121.52660826076608,
+              31.302514429836222
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "extent_truncated": false,
+    "requests_used": 0,
+    "valid_baidu_samples": 0,
+    "invalid_baidu_samples": 0,
+    "unknown_samples": 0,
+    "boundary_error_estimate": null,
+    "stop_reason": "synthetic_contract_fixture",
+    "warnings": [
+      "synthetic_contract_fixture"
+    ],
+    "config": {
+      "time_limit_seconds": 900,
+      "endpoint_offset_limit_m": 50.0,
+      "initial_direction_count": 16,
+      "analysis_half_width_m": 1200.0,
+      "initial_probe_distances_m": [
+        400.0,
+        700.0,
+        1000.0,
+        1200.0
+      ],
+      "max_exploration_radius_m": 3200.0,
+      "boundary_tolerance_m": 50.0,
+      "max_refinement_depth": 6,
+      "max_baidu_requests": 400,
+      "max_direction_count": 64,
+      "angular_refinement_threshold_m": 250.0,
+      "angular_refinement_ratio": 0.25,
+      "topology_risk_threshold": 0.6,
+      "topology_search_radius_m": 150.0,
+      "max_triangle_edge_m": 400.0,
+      "mixed_triangle_target_m": 100.0,
+      "request_qps": 3.0,
+      "deadline_seconds": 1800.0,
+      "failure_streak_limit": 5,
+      "origin_endpoint_failure_streak_limit": 3,
+      "interior_gap_radii_m": [
+        25.0,
+        50.0,
+        100.0
+      ],
+      "bridge_display_width_m": 3.0
+    },
+    "readiness": {
+      "mode": "degraded",
+      "graph_available": false,
+      "data_version_matches": false,
+      "coverage_available": false,
+      "origin_in_coverage": false,
+      "extent_in_coverage": false,
+      "obstacle_layer_available": false,
+      "risk_layer_available": false,
+      "warnings": [
+        "synthetic_contract_fixture"
+      ]
+    },
+    "timing_seconds": {
+      "preparation": 0.0,
+      "obstacle_load": 0.0,
+      "requests": 0.0,
+      "geometry_rebuilds": 0.0,
+      "compute_total": 0.0,
+      "task_total": 0.0
+    }
+  },
+  "warnings": [
+    {
+      "code": "SYNTHETIC_CONTRACT_FIXTURE",
+      "message": "Synthetic fixture; no Baidu requests.",
+      "scope": "all",
+      "severity": "warning"
+    }
+  ],
+  "errors": [],
+  "isochrone": {
+    "algorithm": "hybrid",
+    "algorithm_version": "hybrid-v1.5.0",
+    "coordinate_system": "bd09ll",
+    "quality": "partial",
+    "coverage_policy": "continuous_land_interior",
+    "geometry": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "evidence_geometry": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "inferred_fill_geometry": null,
+    "unknown_region": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.50153261321243,
+              31.302124671590782
+            ],
+            [
+              121.5012063777144,
+              31.323787121455407
+            ],
+            [
+              121.5262897303349,
+              31.32416981325038
+            ],
+            [
+              121.52660826076608,
+              31.302514429836222
+            ],
+            [
+              121.50153261321243,
+              31.302124671590782
+            ]
+          ],
+          [
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "evidence_unknown_region": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.50153261321243,
+              31.302124671590782
+            ],
+            [
+              121.5012063777144,
+              31.323787121455407
+            ],
+            [
+              121.5262897303349,
+              31.32416981325038
+            ],
+            [
+              121.52660826076608,
+              31.302514429836222
+            ],
+            [
+              121.50153261321243,
+              31.302124671590782
+            ]
+          ],
+          [
+            [
+              121.51804954286669,
+              31.316762352740042
+            ],
+            [
+              121.50969042538865,
+              31.31663044362766
+            ],
+            [
+              121.50979799826973,
+              31.309410466982133
+            ],
+            [
+              121.51815624525649,
+              31.309543215121845
+            ],
+            [
+              121.51804954286669,
+              31.316762352740042
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "computation_extent": {
+      "type": "MultiPolygon",
+      "coordinates": [
+        [
+          [
+            [
+              121.52660826076608,
+              31.302514429836222
+            ],
+            [
+              121.5262897303349,
+              31.32416981325038
+            ],
+            [
+              121.5012063777144,
+              31.323787121455407
+            ],
+            [
+              121.50153261321243,
+              31.302124671590782
+            ],
+            [
+              121.52660826076608,
+              31.302514429836222
+            ]
+          ]
+        ]
+      ],
+      "coordinateSystem": "bd09ll"
+    },
+    "extent_truncated": false,
+    "requests_used": 0,
+    "valid_baidu_samples": 0,
+    "invalid_baidu_samples": 0,
+    "unknown_samples": 0,
+    "boundary_error_estimate": null,
+    "stop_reason": "synthetic_contract_fixture",
+    "warnings": [
+      "synthetic_contract_fixture"
+    ],
+    "config": {
+      "time_limit_seconds": 900,
+      "endpoint_offset_limit_m": 50.0,
+      "initial_direction_count": 16,
+      "analysis_half_width_m": 1200.0,
+      "initial_probe_distances_m": [
+        400.0,
+        700.0,
+        1000.0,
+        1200.0
+      ],
+      "max_exploration_radius_m": 3200.0,
+      "boundary_tolerance_m": 50.0,
+      "max_refinement_depth": 6,
+      "max_baidu_requests": 400,
+      "max_direction_count": 64,
+      "angular_refinement_threshold_m": 250.0,
+      "angular_refinement_ratio": 0.25,
+      "topology_risk_threshold": 0.6,
+      "topology_search_radius_m": 150.0,
+      "max_triangle_edge_m": 400.0,
+      "mixed_triangle_target_m": 100.0,
+      "request_qps": 3.0,
+      "deadline_seconds": 1800.0,
+      "failure_streak_limit": 5,
+      "origin_endpoint_failure_streak_limit": 3,
+      "interior_gap_radii_m": [
+        25.0,
+        50.0,
+        100.0
+      ],
+      "bridge_display_width_m": 3.0
+    },
+    "readiness": {
+      "mode": "degraded",
+      "graph_available": false,
+      "data_version_matches": false,
+      "coverage_available": false,
+      "origin_in_coverage": false,
+      "extent_in_coverage": false,
+      "obstacle_layer_available": false,
+      "risk_layer_available": false,
+      "warnings": [
+        "synthetic_contract_fixture"
+      ]
+    },
+    "timing_seconds": {
+      "preparation": 0.0,
+      "obstacle_load": 0.0,
+      "requests": 0.0,
+      "geometry_rebuilds": 0.0,
+      "compute_total": 0.0,
+      "task_total": 0.0
+    }
+  },
+  "config_hash": "d5cc8f81f7adfa828d14082ecdd15c839bbca26f3b89c19c4b5bd757eb677e00",
+  "result_hash": "066c54b7444bcaa971c49ccbcd8d73b48aca4835c86caf610b69977f2cc394ba"
+}

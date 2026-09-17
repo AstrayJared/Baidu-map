@@ -167,7 +167,7 @@ async def compute_isochrone(request, provider, cancel_token=None, *, clock=None,
     try:
         field = await asyncio.to_thread(reconstruct, mesh, request.raster_size)
         bands = []
-        for minutes in (5, 10, 15):
+        for minutes in request.time_bands:
             geometry = field.geometry if minutes == 15 else await asyncio.to_thread(contour_field, field.x, field.x, field.z, field.support, minutes * 60)
             bands.append({"minutes": minutes, "geometry": None if field.support.is_empty else business_geometry(geometry, projection)})
     except (GeometryError, GEOSException):

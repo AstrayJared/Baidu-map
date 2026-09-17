@@ -44,7 +44,8 @@ export function analysisReportView(result: AnalysisResult) {
   return {
     taskId: result.taskId, center: result.center,
     generatedAt: new Date(result.generatedAt * 1000).toISOString(),
-    dataSource: result.dataSource === 'synthetic' ? '合成时间场（非真实社区）' : '百度步行路线数据',
+    dataSource: result.dataSource === 'synthetic' ? '合成时间场（非真实社区）'
+      : '百度步行路线数据',
     availability: analysisAvailability(result),
     geometrySummary: geometryMessage(result.isochrone.geometry),
     qualityLabel: { usable: '可用', partial: '部分结果', insufficient: '证据不足' }[result.isochrone.quality],

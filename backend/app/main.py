@@ -11,28 +11,38 @@ from .config import Settings, load_settings
 from .analysis import router
 from .contracts import AnalysisResponse, Issue
 from .analyses import AnalysisManager, analysis_router
+from .hybrid_api import HybridManager, hybrid_router
 from .osm_api import router as osm_router
 
 
 class HealthResponse(BaseModel):
     status: str
     baidu_ak_configured: bool
+    default_analysis_engine: str
+    osm_state: str
 
 
-def create_app(settings: Settings | None = None, *, provider_factory=None) -> FastAPI:
+def create_app(settings: Settings | None = None, *, provider_factory=None,
+               hybrid_provider_factory=None) -> FastAPI:
     config = settings if settings is not None else load_settings()
     manager = AnalysisManager(config, provider_factory)
+    hybrid = HybridManager(config, manager.gate, hybrid_provider_factory)
 
     @asynccontextmanager
     async def lifespan(app):
-        from .algorithms.osm_offline.engine import OsmOfflineEngine
-        app.state.osm_offline = OsmOfflineEngine.load(config)
         yield
+        await hybrid.close()
         await manager.close()
 
-    app = FastAPI(title="Life Circle Backend", version="0.2.0", debug=False, lifespan=lifespan)
+    app = FastAPI(title="Life Circle Backend", version="2.0.0", debug=False, lifespan=lifespan)
+    from .algorithms.osm_offline.lazy import LazyOsmOfflineEngine
+    app.state.osm_offline = LazyOsmOfflineEngine(config)
     app.state.analyses = manager
+    app.state.hybrid = hybrid
+    # The two algorithms intentionally coexist on separate, stable contracts.
+    # /api/analyses is Baidu-only; /api/v1/analysis/hybrid is OSM + Baidu.
     app.include_router(analysis_router(manager))
+    app.include_router(hybrid_router(hybrid))
     app.add_middleware(
         CORSMiddleware,
         allow_origins=config.cors_origins,
@@ -51,6 +61,8 @@ def create_app(settings: Settings | None = None, *, provider_factory=None) -> Fa
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request, exc):
+        if request.url.path.startswith("/api/v1/analysis/hybrid"):
+            return JSONResponse(status_code=422, content={"code": "hybrid_invalid_request", "message": "Invalid Hybrid request"})
         if request.url.path.startswith("/api/analyses"):
             # Keep the task API's response shape without reflecting raw inputs.
             return JSONResponse(status_code=422, content={"detail": "Invalid analysis request"})
@@ -59,6 +71,10 @@ def create_app(settings: Settings | None = None, *, provider_factory=None) -> Fa
 
     @app.exception_handler(HTTPException)
     async def http_error(request, exc):
+        if request.url.path.startswith("/api/v1/analysis/hybrid"):
+            detail = exc.detail if isinstance(exc.detail, dict) and "code" in exc.detail else {
+                "code": "hybrid_http_error", "message": "Hybrid request unavailable"}
+            return JSONResponse(status_code=exc.status_code, content=detail)
         if request.url.path.startswith("/api/analyses"):
             return await http_exception_handler(request, exc)
         return failure_response(exc.status_code, "HTTP_ERROR", "请求路径或方法不可用。")
@@ -69,7 +85,12 @@ def create_app(settings: Settings | None = None, *, provider_factory=None) -> Fa
 
     @app.get("/health", response_model=HealthResponse)
     def health() -> HealthResponse:
-        return HealthResponse(status="ok", baidu_ak_configured=config.ak_configured)
+        return HealthResponse(
+            status="ok",
+            baidu_ak_configured=config.ak_configured,
+            default_analysis_engine="synthetic" if config.analysis_provider == "synthetic" else "baidu",
+            osm_state=app.state.osm_offline.state,
+        )
 
     return app
 

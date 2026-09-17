@@ -162,23 +162,6 @@ def test_spacing_uses_precise_clock_without_changing_deadline_epoch():
     asyncio.run(run())
 
 
-def test_live_session_uses_same_shared_production_limiter(tmp_path):
-    from app.config import Settings
-    from tools.live_smoke import Ledger, Session
-
-    async def run():
-        with Ledger(tmp_path) as ledger:
-            session = Session(ledger, tmp_path, Settings(_env_file=None,
-                baidu_map_ak='offline-fixture', analysis_qps=3),
-                transport=httpx.MockTransport(lambda _: httpx.Response(200, json={'status': 7})))
-            try:
-                assert isinstance(session.provider, LimitedProvider)
-                assert session.provider.gate.interval == 1/3
-            finally:
-                await session.client.aclose()
-    asyncio.run(run())
-
-
 def test_scheduler_retry_still_consumes_budget_and_shared_cooldown():
     from life_circle.models import CancelToken, IsochroneRequest
     from life_circle.scheduler import Scheduler

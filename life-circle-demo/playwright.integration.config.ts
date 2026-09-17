@@ -2,12 +2,12 @@ import { defineConfig, devices } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const artifacts = process.env.INTEGRATION_OUTPUT_DIR || 'D:/CodexOutputs/isochrone-integration';
+const artifacts = process.env.INTEGRATION_OUTPUT_DIR || 'output/hybrid-integration';
 const temp = resolve(artifacts, 'tmp');
 mkdirSync(temp, { recursive: true });
 process.env.TEMP = temp;
 process.env.TMP = temp;
-const python = process.env.ANALYSIS_TEST_PYTHON || 'D:/CodexCaches/baidu-map-algorithm-venv/Scripts/python.exe';
+const python = process.env.ANALYSIS_TEST_PYTHON || resolve('../backend/.venv/Scripts/python.exe');
 export default defineConfig({
   testDir: './tests/integration', fullyParallel: false, workers: 1,
   timeout: 30000, expect: { timeout: 10000 },

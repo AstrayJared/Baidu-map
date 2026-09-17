@@ -34,6 +34,8 @@
   },
   "data": {
     "geometry": null,
+    "evidence_geometry": null,
+    "inferred_region": null,
     "uncertain_region": null,
     "unknown_region": null,
     "computation_extent": null,

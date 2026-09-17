@@ -100,6 +100,102 @@ class Scheduler:
             if self.provider.network:
                 self.stats.network_wait_seconds += latency
 
+    async def _invoke_many(self, destinations, attempt):
+        started = self.clock.time()
+        response_task = asyncio.create_task(
+            self.provider.query_walking_times(self.origin, destinations, self.deadline)
+        )
+        cancel_task = asyncio.create_task(self.token.event.wait())
+        fallback = lambda reason: [RouteObservation(point, reason=reason, attempts=attempt) for point in destinations]
+        try:
+            done, _ = await asyncio.wait(
+                [response_task, cancel_task],
+                timeout=max(0, min(self.request.timeout, self.deadline - started)),
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            if self._stopped() or cancel_task in done:
+                return fallback(self.stop_reason or "cancelled")
+            if response_task not in done:
+                return fallback("timeout")
+            try:
+                observations = response_task.result()
+            except Exception:
+                return fallback("provider_error")
+            if not isinstance(observations, list) or len(observations) != len(destinations):
+                return fallback("invalid_response")
+            validated = []
+            for point, observation in zip(destinations, observations):
+                if not isinstance(observation, RouteObservation) or observation.destination != point:
+                    validated.append(RouteObservation(point, reason="invalid_response", attempts=attempt))
+                else:
+                    validated.append(replace(observation, attempts=attempt, request_origin=self.origin))
+            return validated
+        finally:
+            for task in (response_task, cancel_task):
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(cancel_task, return_exceptions=True)
+            done, _ = await asyncio.wait([response_task], timeout=.01)
+            if response_task in done:
+                self._consume_late(response_task)
+            else:
+                if self.stop_reason is None:
+                    self.stop_reason = "upstream_failure"
+                self._draining.add(response_task)
+                response_task.add_done_callback(self._consume_late)
+            latency = self.clock.time() - started
+            self.stats.latencies.append(latency)
+            if self.provider.network:
+                self.stats.network_wait_seconds += latency
+
+    def _record(self, point, observation):
+        observation = replace(observation, request_origin=self.origin)
+        if self._stopped() and observation.duration is not None:
+            observation = replace(observation, duration=None, reason=self.stop_reason or "closed")
+        self.cache[point] = observation
+        if observation.reason in ("temporary", "timeout", "rate_limit") and observation.attempts == self.request.max_attempts:
+            self.fail_streak += 1
+        elif observation.duration is not None or observation.reason not in ("temporary", "timeout", "rate_limit", "phase_budget", "budget"):
+            self.fail_streak = 0
+        if self.fail_streak >= 5 and self.stop_reason is None:
+            self.stop_reason = "upstream_failure"
+
+    async def _observe_batches(self, missing, call_limit, request_limit):
+        batch_size = min(50, max(1, int(getattr(self.provider, "batch_size", 1))))
+        for start in range(0, len(missing), batch_size):
+            if self._stopped() or self.stats.requests >= call_limit:
+                break
+            group = missing[start:start + batch_size]
+            pending, results = group, {}
+            for attempt in range(1, self.request.max_attempts + 1):
+                capacity = call_limit - self.stats.requests
+                sent = pending[:capacity]
+                if not sent or self._stopped():
+                    break
+                self.stats.requests += len(sent)
+                self.stats.network_requests += 1
+                self.stats.retries += len(sent) if attempt > 1 else 0
+                if self.on_progress:
+                    self.on_progress()
+                observations = await self._invoke_many(sent, attempt)
+                for point, observation in zip(sent, observations):
+                    results[point] = observation
+                    if observation.reason:
+                        counts = self.stats.failures
+                        counts[observation.reason] = counts.get(observation.reason, 0) + 1
+                    if observation.reason in ("permission", "quota", "invalid_parameter"):
+                        self.stop_reason = observation.reason
+                pending = [point for point in sent if results[point].reason in ("temporary", "timeout", "rate_limit")]
+                if not pending or self._stopped():
+                    break
+            for point in group:
+                observation = results.get(point, RouteObservation(
+                    point, reason=self.stop_reason or ("phase_budget" if request_limit is not None else "budget")
+                ))
+                self._record(point, observation)
+            if self.remaining == 0 and self.stop_reason is None:
+                self.stop_reason = "budget"
+
     async def observe_many(self, destinations, *, request_limit=None):
         points = [normalize(p) for p in destinations]
         async with self.lock:
@@ -107,6 +203,13 @@ class Scheduler:
             unique = list(dict.fromkeys(points))
             missing = [p for p in unique if p not in self.cache]
             self.stats.cache_hits += len(points) - len(missing)
+            if missing and callable(getattr(self.provider, "query_walking_times", None)) and getattr(self.provider, "batch", False):
+                await self._observe_batches(missing, call_limit, request_limit)
+                self.stats.unique_positions = len(self.cache)
+                return [self.cache.get(p, RouteObservation(
+                    p, reason=self.stop_reason or ("phase_budget" if request_limit is not None else "closed"),
+                    request_origin=self.origin,
+                )) for p in points]
             for start in range(0, len(missing), self.request.concurrency):
                 if self._stopped() or self.stats.requests >= call_limit:
                     break
@@ -160,16 +263,7 @@ class Scheduler:
                         break
                 for point in group:
                     observation = results.get(point, RouteObservation(point, reason=self.stop_reason or ("phase_budget" if request_limit is not None else "budget")))
-                    observation = replace(observation, request_origin=self.origin)
-                    if self._stopped() and observation.duration is not None:
-                        observation = replace(observation, duration=None, reason=self.stop_reason or "closed")
-                    self.cache[point] = observation
-                    if observation.reason in ("temporary", "timeout", "rate_limit") and observation.attempts == self.request.max_attempts:
-                        self.fail_streak += 1
-                    elif observation.duration is not None or observation.reason not in ("temporary", "timeout", "rate_limit", "phase_budget", "budget"):
-                        self.fail_streak = 0
-                    if self.fail_streak >= 5 and self.stop_reason is None:
-                        self.stop_reason = "upstream_failure"
+                    self._record(point, observation)
                 if self.remaining == 0 and self.stop_reason is None:
                     self.stop_reason = "budget"
             self.stats.unique_positions = len(self.cache)

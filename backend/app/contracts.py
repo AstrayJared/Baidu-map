@@ -252,6 +252,8 @@ class FacilityAnalysis(WireModel):
 
 class Data(WireModel):
     geometry: Geometry | None = None
+    evidence_geometry: Geometry | None = Field(default=None, alias="evidenceGeometry")
+    inferred_region: Geometry | None = Field(default=None, alias="inferredRegion")
     uncertain_region: Geometry | None = None
     unknown_region: Geometry | None = None
     computation_extent: Geometry | None = None
@@ -271,7 +273,9 @@ class Rules(WireModel):
     time_threshold_s: Literal[900] = 900
     time_inclusive: Literal[True] = True
     time_tolerance_s: float = 0
-    time_confirmation: Literal["implementation_only", "mock_only"] = "implementation_only"
+    time_confirmation: Literal[
+        "implementation_only", "mock_only", "baidu_sampled",
+    ] = "implementation_only"
     distance: DistanceRule = Field(default_factory=DistanceRule)
 
 
@@ -320,7 +324,7 @@ class TaskStatusResponse(WireModel):
     stage: str
     requests: int = Field(ge=0)
     network_requests: int = Field(ge=0, alias="networkRequests")
-    budget: Literal[200, 400, 800]
+    budget: int = Field(ge=1, le=800)
     elapsed_seconds: float = Field(ge=0, alias="elapsedSeconds")
     data_source: Literal["synthetic", "baidu_walking"] = Field(alias="dataSource")
     error: str | None = None

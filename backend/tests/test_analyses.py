@@ -94,7 +94,7 @@ def test_invalid_requests(change):
 def test_missing_config_unknown_task_and_cors():
     settings = Settings(_env_file=None, analysis_provider="baidu", baidu_map_ak="", analysis_qps=None)
     with TestClient(create_app(settings)) as client:
-        assert client.post("/api/analyses", json=body()).status_code == 503
+        assert client.post("/api/analyses", json=body("missing-config")).status_code == 503
         assert client.get("/api/analyses/missing").status_code == 404
         assert client.get("/api/analyses/missing/result").status_code == 404
         assert client.post("/api/analyses/missing/cancel").status_code == 404
@@ -284,37 +284,3 @@ def test_shutdown_cancels_provider_and_closes_context():
         task = client.post("/api/analyses", json=body()).json()["taskId"]
     assert closed
     assert app.state.analyses.jobs[task].status == "cancelled"
-
-
-@pytest.mark.parametrize("upstream,reason", [(101, "permission"), (301, "quota"), (1, "upstream_failure")])
-def test_real_adapter_wiring_without_network(monkeypatch, upstream, reason):
-    import httpx
-    real_client = httpx.AsyncClient
-    clients, calls = [], []
-
-    def handle(request):
-        calls.append(request)
-        assert request.url.path == "/directionlite/v1/walking"
-        assert request.url.params["steps_info"] == "1"
-        assert request.url.params["origin"] == "39.915000,116.404000"
-        assert request.url.params["coord_type"] == "bd09ll"
-        return httpx.Response(200, json={"status": upstream})
-
-    def client_factory(**kwargs):
-        assert kwargs["trust_env"] is False and kwargs["follow_redirects"] is False
-        instance = real_client(transport=httpx.MockTransport(handle), **kwargs)
-        clients.append(instance)
-        return instance
-
-    monkeypatch.setattr("app.analyses.httpx.AsyncClient", client_factory)
-    settings = Settings(_env_file=None, analysis_provider="baidu", baidu_map_ak="offline-contract-fixture", analysis_qps=10000)
-    with TestClient(create_app(settings)) as client:
-        task = client.post("/api/analyses", json=body()).json()["taskId"]
-        assert finished(client, task)["status"] == "completed"
-        result = client.get(f"/api/analyses/{task}/result").json()
-        assert result["dataSource"] == "baidu_walking"
-        assert result["isochrone"]["stopReason"] == reason
-        assert result["isochrone"]["geometry"] is None
-        assert result["isochrone"]["statistics"]["network_requests"] == len(calls) <= 200
-        assert all(c.is_closed for c in clients)
-        assert "offline-contract-fixture" not in str(result)

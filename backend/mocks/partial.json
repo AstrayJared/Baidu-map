@@ -61,6 +61,8 @@
       ],
       "coordinate_system": "bd09ll"
     },
+    "evidence_geometry": null,
+    "inferred_region": null,
     "uncertain_region": {
       "type": "Polygon",
       "coordinates": [

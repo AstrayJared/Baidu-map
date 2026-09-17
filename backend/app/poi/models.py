@@ -3,6 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic.alias_generators import to_camel
+from app.test_origin import TEST_ORIGIN
 
 Category = Literal['market', 'pharmacy', 'primary_school']
 CATEGORIES = ('market', 'pharmacy', 'primary_school')
@@ -20,7 +21,7 @@ class Point(WireModel):
 
 class PoiCollectRequest(WireModel):
     schema_version: Literal['poi-v1'] = 'poi-v1'
-    center: Point = Field(default_factory=lambda: Point(lng=121.513926, lat=31.313077))
+    center: Point = Field(default_factory=lambda: Point(lng=TEST_ORIGIN[0], lat=TEST_ORIGIN[1]))
     coordinate_system: Literal['bd09ll']  # Caller must declare the coordinate system.
     analysis_half_width_meters: float = Field(default=1600, gt=0, le=1600, strict=True)
     search_margin_meters: float = Field(default=1000, ge=0, le=1000, strict=True)

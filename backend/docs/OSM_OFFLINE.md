@@ -1,3 +1,5 @@
+> 当前状态（2026-09-17）：独立 OSM 基线接口继续保留；OSM 图引擎同时供 Hybrid 使用。纯百度与 OSM＋百度两套生产算法并存。
+
 # OSM_OFFLINE Phase 1 实现与验收报告
 
 实现日期：2026-09-14。算法为独立 OSM 离线传统路由基线；不是 ground truth。操作步骤见 [数据与运行说明](../../data/osm/README.md)。
@@ -16,7 +18,7 @@
 
 7. **cache 格式**：版本化 gzip JSON，扩展名 `.osm-cache`；节点、边 key、方向、数值及属性作为 JSON，geometry 为 WKT。不是 pickle，不执行对象反序列化代码。临时文件写完后原子替换。跨独立 Python 进程 roundtrip 测试验证节点/边和所有保留属性一致。
 
-8. **cache 加载**：应用 lifespan 启动一次，读 cache→校验→规范几何→构建 STRtree 和 weak component 索引→冻结图。验证数据版本、CRS、步速/时间、length、geometry、端点、关键属性和记录数量。配置与缓存不匹配会明确返回 insufficient。PBF 和 Pyrosm 不参与请求；缓存不可用不阻止原服务启动。
+8. **cache 加载**：2.0 起使用线程安全惰性单例；应用启动和 `/health` 只创建 `unloaded` 占位对象，不读 cache。首次显式调用 OSM Offline 或旧 Hybrid 接口时，在工作线程执行一次读 cache→校验→规范几何→构建 STRtree 和 weak component 索引→冻结图；并发请求共享同一加载过程。验证数据版本、CRS、步速/时间、length、geometry、端点、关键属性和记录数量。配置与缓存不匹配会明确返回 insufficient，且只影响显式 OSM/Hybrid 接口。PBF 和 Pyrosm 不参与请求。
 
 9. **CRS**：独立模块完成 BD09→GCJ02→迭代近似 WGS84；PyProj `always_xy=True` 转换为 Settings 的 EPSG:32651，逆过程输出 BD09LL。所有 nearest、projection、距离、substring、buffer、coverage 距离在米制 CRS；拒绝经纬度 CRS 和英尺单位投影。上海 roundtrip 采用 2e-6 度容差，不宣称绝对精确。
 
@@ -44,7 +46,7 @@
 
 21. **diagnostics**：算法和快照版本、图节点/边数、输入/路由/metric/输出 CRS、snap edge/distance/time、network budget、组件大小、reachable nodes/full edges/partial edges/segments/length、geometry fallback/reverse 计数、coverage 可用性与边界命中、步速/buffer/snap max/coverage margin、polygonization 方法、snap/routing/interval/polygon/total 毫秒、零网络调用及 attribution。所有正常结果会记录这些信息，异常结果至少记录失败阶段/原因及已完成数据。边数统计在启动时完成，不在每次请求扫描全图。
 
-22. **API 调用**：`POST /api/v1/analysis/osm_offline`，JSON `{"origin":{"lng":121.51108,"lat":31.20415},"coordinate_system":"bd09ll","algorithm":"osm_offline","threshold":900}`。现有 422/500 统一 envelope；没有要求百度 AK。`algorithm.algorithm` 标识算法，`algorithm.quality` 和外层 status 分离。命令与配置见数据 README。
+22. **API 调用**：`POST /api/v1/analysis/osm_offline`，JSON `{"origin":{"lng":121.51392519758,"lat":31.313079085826},"coordinate_system":"bd09ll","algorithm":"osm_offline","threshold":900}`。现有 422/500 统一 envelope；没有要求百度 AK。`algorithm.algorithm` 标识算法，`algorithm.quality` 和外层 status 分离。命令与配置见数据 README。
 
 23. **新增测试**：指定核心 16 项全部存在：coordinate_roundtrip、edge_cost、threshold_900_inclusive、basic_cutoff_dijkstra、snap_middle_of_edge、directed_snap、single_sided_partial_edge、boundary_edge_two_sided、curved_partial_edge、edge_geometry_orientation、disconnected_graph、snap_cost_consumes_budget、graph_cache_roundtrip、extract_boundary_partial、polygon_validity、global_graph_immutability。额外测试随机路由 oracle、平行道路隔离、MultiPolygon、非米制 CRS 拒绝、缺失属性/缓存/几何、coverage holes、API 离线/422/500、并发/一次加载、属性安全简化和 PBF 集成。
 
@@ -54,7 +56,7 @@
 
 26. **单次请求性能**：第一轮 5 次为 914.6/876.7/874.1/881.4/852.6 ms；首次 cache 加载、验证和索引约 74.1 秒。移除每请求全图计数后复测为 **552.7/563.9/557.8/533.6/534.0 ms**，geometry 仍完全一致。首轮 snap 0.22 ms、Dijkstra 0.56 ms、区间 23.96 ms、polygon 577.96 ms；149 个 reachable nodes、435 个有向片段，network 总长度约 24.41 km。最终证据见 [OSM_OFFLINE_smoke.json](OSM_OFFLINE_smoke.json)。第二轮与真实构图同时运行，资源竞争下 startup 为 445.5 秒，不能当作独占启动性能；之后集成测试改为串行。结果依赖地点、硬件及内存压力，仅作为实测，不宣称 SLA。
 
-27. **已知限制**：OSM 路网/门禁缺失；近似中国坐标转换；离路直线 snap 不能证明无墙/河阻挡；条件通行、步行 turn restrictions 和开放时间未建模；coverage 只检测数据边界而非内部完整性；固定速度无 penalty；buffer 可能填入非真实可达的面积或掩盖狭窄间隙；上海图缓存启动较慢且占较多内存，每 worker 独立载入；缓存 v1 只保留 routing 必要属性；前端尚需接入 OSM 展示和 attribution。Graph 中零长度道路准备阶段明确拒绝，不静默删除拓扑。
+27. **已知限制**：OSM 路网/门禁缺失；近似中国坐标转换；离路直线 snap 不能证明无墙/河阻挡；条件通行、步行 turn restrictions 和开放时间未建模；coverage 只检测数据边界而非内部完整性；固定速度无 penalty；buffer 可能填入非真实可达的面积或掩盖狭窄间隙；上海图缓存首次显式加载较慢且占较多内存，每 worker 独立载入；缓存 v1 只保留 routing 必要属性；前端尚需接入 OSM 展示和 attribution。Graph 中零长度道路准备阶段明确拒绝，不静默删除拓扑。
 
 28. **未来 Comparator**：作为算法外部模块，分别获取 interpolation 与 osm_offline 输出并统一到同一米制 CRS，比较 IoU/交并面积/面积比/对称差/Hausdorff；冻结 development set 调整后的 buffer；使用 held-out 百度步行时间验证点同时评价两算法 Accuracy/Precision/Recall/Boundary Time Error。原始 OSM reachable network 作为可解释诊断保留，不作 ground truth；任何 hybrid 必须是第三种独立算法。
 

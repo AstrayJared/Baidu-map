@@ -152,6 +152,28 @@
           ],
           "default": null
         },
+        "evidenceGeometry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Geometry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "inferredRegion": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Geometry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "uncertain_region": {
           "anyOf": [
             {
@@ -503,7 +525,8 @@
           "default": "implementation_only",
           "enum": [
             "implementation_only",
-            "mock_only"
+            "mock_only",
+            "baidu_sampled"
           ],
           "title": "Time Confirmation",
           "type": "string"

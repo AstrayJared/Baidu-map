@@ -24,8 +24,11 @@ class Settings(BaseSettings):
     isochrone_buffer_m: float = Field(default=25, gt=0, allow_inf_nan=False)
     osm_coverage_boundary_path: Path | None = None
     osm_coverage_margin_m: float = Field(default=100, ge=0, allow_inf_nan=False)
+    hybrid_ledger_dir: Path = BACKEND_DIR / ".hybrid-ledgers"
+    hybrid_risk_path: Path = BACKEND_DIR.parent / "data/osm/shanghai.risks.geojson"
+    hybrid_obstacle_path: Path = BACKEND_DIR.parent / "data/osm/shanghai.obstacles.geojson"
 
-    @field_validator("osm_pbf_path", "osm_graph_cache_path", "osm_coverage_boundary_path", mode="before")
+    @field_validator("osm_pbf_path", "osm_graph_cache_path", "osm_coverage_boundary_path", "hybrid_ledger_dir", "hybrid_risk_path", "hybrid_obstacle_path", mode="before")
     @classmethod
     def osm_paths(cls, value):
         if value is None or value == "":

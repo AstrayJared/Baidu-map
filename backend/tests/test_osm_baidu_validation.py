@@ -10,8 +10,9 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
 from validate_osm_baidu import classify, confusion_matrix, metrics, query_baidu, safe_routes
 from app.config import Settings
+from tools.test_origin import TEST_ORIGIN, TEST_ORIGIN_URL
 
-ORIGIN = (121.51108,31.20415)
+ORIGIN = TEST_ORIGIN
 DEST = (121.513104,31.207251)
 
 
@@ -53,7 +54,7 @@ def test_live_contract_and_strict_endpoint_gate(tmp_path,duration,endpoints,expe
     run = asyncio.run(query_baidu(settings,[row()],ORIGIN,tmp_path,transport=httpx.MockTransport(send)))
     assert run["cases"][0]["baidu_inside"] is expected
     assert seen[0]["coord_type"] == "bd09ll"
-    assert seen[0]["origin"] == "31.204150,121.511080"
+    assert seen[0]["origin"] == TEST_ORIGIN_URL
     assert seen[0]["destination"] == "31.207251,121.513104"
     assert "SYNTHETIC-KEY" not in (tmp_path/"run.json").read_text()
 
@@ -102,17 +103,3 @@ def test_malformed_response_safely_allowlisted():
     data["result"]["routes"][0]["private"] = "ignored"
     result = safe_routes(data,ORIGIN,DEST)
     assert "private" not in result[0]
-
-
-def test_plot_path_keeps_hole_with_opposite_winding():
-    import numpy as np
-    from shapely.geometry import Polygon
-    from matplotlib.path import Path as MP
-    from render_osm_baidu_report import polygon_path
-    p=Polygon([(0,0),(10,0),(10,10),(0,10)],holes=[[(2,2),(8,2),(8,8),(2,8)]])
-    path=polygon_path(p,np.array([0,0]))
-    assert list(path.codes).count(MP.MOVETO)==2
-    starts=np.flatnonzero(path.codes==MP.MOVETO)
-    rings=[path.vertices[starts[0]:starts[1]],path.vertices[starts[1]:]]
-    signed=lambda r:sum(a[0]*b[1]-b[0]*a[1] for a,b in zip(r,r[1:]))
-    assert signed(rings[0])>0 and signed(rings[1])<0

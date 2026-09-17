@@ -7,6 +7,7 @@ from life_circle.models import RouteObservation
 from life_circle.coordinates import LocalProjection
 
 from app.contracts import PoiEvidence, Facility, RouteEvidence, AnalysisResponse, TaskStatusResponse, TaskResultResponse, OsmOfflineRequest
+from app.hybrid_contracts import HybridRequest, HybridResultResponse, HybridError
 from app.poi_evidence import poi_evidence, route_evidence
 from tools.endpoint_e83_poi import confirmed_poi
 from tools.export_contract import typescript
@@ -80,8 +81,9 @@ def test_route_assembly_retains_both_diagnostics_and_legacy_invalid_duration():
 
 
 def test_typescript_matches_current_serialization_contract():
-    expected = typescript([AnalysisResponse, TaskStatusResponse, TaskResultResponse, OsmOfflineRequest],
-        request_models=[OsmOfflineRequest])
+    expected = typescript([AnalysisResponse, TaskStatusResponse, TaskResultResponse, OsmOfflineRequest,
+        HybridRequest, HybridResultResponse, HybridError],
+        request_models=[OsmOfflineRequest, HybridRequest])
     actual = Path(__file__).resolve().parents[2] / "life-circle-demo/src/api-contract.ts"
     assert actual.read_text(encoding="utf-8") == expected
 
