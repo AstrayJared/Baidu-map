@@ -1,0 +1,41 @@
+{
+  "engineering_baseline_commit": "04aa97ff1f4a468ef16e44681e7e8fd3f1c77c4f",
+  "branch": "chore/hybrid-only-validation",
+  "precision_accepted": false,
+  "audit_outcome": "insufficient_evidence",
+  "tolerance_accuracy": 0.9230769230769231,
+  "strict_accuracy": 0.8717948717948718,
+  "decidable": 78,
+  "planned": 100,
+  "boundary_tolerance_accuracy": 0.9090909090909091,
+  "staged_snapshot_checks": {
+    "backend": {
+      "passed": 352,
+      "skipped": 1
+    },
+    "algorithm": {
+      "passed": 96
+    },
+    "frontend": {
+      "passed": 156
+    },
+    "production_build": "passed"
+  },
+  "raw_source_fingerprint_difference_from_live_audit": [
+    "backend/app/test_origin.py"
+  ],
+  "nonsemantic_cleanup": [
+    {
+      "path": "backend/app/test_origin.py",
+      "change": "remove_trailing_blank_line",
+      "python_ast_unchanged": true
+    },
+    {
+      "path": "backend/tests/test_hybrid_isochrone.py",
+      "change": "remove_trailing_blank_line",
+      "python_ast_unchanged": true
+    }
+  ],
+  "historical_document_deletions_excluded": 61,
+  "note": "Reports and git-plan describe the audit-time state before committing. This context records the subsequent authorized engineering commit; frozen evidence is unchanged."
+}

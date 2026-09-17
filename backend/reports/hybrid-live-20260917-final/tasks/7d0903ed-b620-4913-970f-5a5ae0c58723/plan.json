@@ -1,0 +1,41 @@
+{
+  "origin": {
+    "lng": 121.51392519758,
+    "lat": 31.313079085826
+  },
+  "coordinate_system": "bd09ll",
+  "config": {
+    "time_limit_seconds": 900,
+    "endpoint_offset_limit_m": 50.0,
+    "initial_direction_count": 16,
+    "analysis_half_width_m": 1200.0,
+    "initial_probe_distances_m": [
+      400.0,
+      700.0,
+      1000.0,
+      1200.0
+    ],
+    "max_exploration_radius_m": 3200.0,
+    "boundary_tolerance_m": 50.0,
+    "max_refinement_depth": 6,
+    "max_baidu_requests": 400,
+    "max_direction_count": 64,
+    "angular_refinement_threshold_m": 250.0,
+    "angular_refinement_ratio": 0.25,
+    "topology_risk_threshold": 0.6,
+    "topology_search_radius_m": 150.0,
+    "max_triangle_edge_m": 400.0,
+    "mixed_triangle_target_m": 100.0,
+    "request_qps": 3.0,
+    "deadline_seconds": 1800.0,
+    "failure_streak_limit": 5,
+    "origin_endpoint_failure_streak_limit": 3,
+    "interior_gap_radii_m": [
+      25.0,
+      50.0,
+      100.0
+    ],
+    "bridge_display_width_m": 3.0
+  },
+  "client_request_id": "verification-v15-restored-fixed-origin"
+}

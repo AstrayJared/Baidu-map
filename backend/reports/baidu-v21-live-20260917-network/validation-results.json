@@ -1,0 +1,2227 @@
+[
+  {
+    "coordinate": [
+      121.516138,
+      31.315416
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 9.231856994607806,
+    "duration": 468,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51612243891,
+      31.315327528335
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.5073,
+      31.311261
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 41.13973473522832,
+    "duration": 912,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50729046041,
+      31.311052299489
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508181,
+      31.310215
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 32.131406023373785,
+    "duration": 1544,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50814963152,
+      31.310253128132
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.513511,
+      31.306974
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 34.89951797353915,
+    "duration": 938,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51351170192,
+      31.306965141963
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.517677,
+      31.309676
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 24.528574141847546,
+    "duration": 893,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51770404547,
+      31.309772046079
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.518726,
+      31.310224
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 25.52382644700093,
+    "duration": 807,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51863169768,
+      31.310162244738
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.517808,
+      31.314288
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 36.27627236387196,
+    "duration": 585,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51781715954,
+      31.314234083289
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.518753,
+      31.3101
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 11.547444071328032,
+    "duration": 819,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51869144636,
+      31.310052902917
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.505332,
+      31.314088
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 0.5323753283375363,
+    "duration": 906,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50520261801,
+      31.314023604755
+    ],
+    "strict_correct": false,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.517702,
+      31.308888
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 2.9732378884285864,
+    "duration": 1368,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5176735594,
+      31.308921585679
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.515823,
+      31.308278
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 34.34690316857611,
+    "duration": 893,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51576798647,
+      31.3083830295
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.514204,
+      31.309913
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 36.96236722316215,
+    "duration": 793,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51433211359,
+      31.310011508218
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.510028,
+      31.317207
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 42.76646819761176,
+    "duration": 829,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51002410409,
+      31.317169244814
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.507783,
+      31.313402
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 16.603316207732792,
+    "duration": 976,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50777210358,
+      31.313323205183
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.508456,
+      31.317215
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 15.658973098303228,
+    "duration": 905,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5084551646,
+      31.317155096153
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.514899,
+      31.317337
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 42.631440301465105,
+    "duration": 794,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51488683454,
+      31.31715728919
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.520783,
+      31.31166
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 30.637433522805168,
+    "duration": 891,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.52072626525,
+      31.311717933249
+    ],
+    "strict_correct": false,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.514593,
+      31.307764
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 19.38610609239676,
+    "duration": 873,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51457019638,
+      31.307792974218
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508258,
+      31.316511
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 20.639015984679293,
+    "duration": 843,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50840460511,
+      31.316514854502
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.521553,
+      31.314123
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 6.008398824749974,
+    "duration": 963,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.52149555322,
+      31.314118567072
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.515377,
+      31.308185
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 49.004457748685056,
+    "duration": 931,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51533886344,
+      31.30824928959
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.513453,
+      31.310211
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 1.9077149845197885,
+    "duration": 535,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51342395145,
+      31.310245071924
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.516047,
+      31.315832
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 32.545579523127294,
+    "duration": 603,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51618279811,
+      31.315898207516
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.516395,
+      31.307778
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 31.91981188321187,
+    "duration": 1258,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51644597317,
+      31.307719138737
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.516058,
+      31.315076
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 33.57007555221185,
+    "duration": 463,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51605260341,
+      31.315326890081
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.510757,
+      31.314904
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 44.37388616702156,
+    "duration": 542,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51074133016,
+      31.314841426198
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.518081,
+      31.314988
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 0.3909052672454801,
+    "duration": 643,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51756843932,
+      31.31494161388
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.512579,
+      31.307034
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 29.910288016967314,
+    "duration": 1122,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51263310072,
+      31.306879526728
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.507451,
+      31.313442
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 7.4206680246485375,
+    "duration": 996,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50752218839,
+      31.313342944179
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.517345,
+      31.3126
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 8.45536978776385,
+    "duration": 510,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51721740167,
+      31.312557524188
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.518315,
+      31.315522
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 14.008568982170093,
+    "duration": 1044,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51829691296,
+      31.315509547087
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.515672,
+      31.316013
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 41.50376315459418,
+    "duration": 639,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51566423209,
+      31.316153601279
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508303,
+      31.312134
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 12.043778918706895,
+    "duration": 866,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50828096899,
+      31.312133696922
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.511308,
+      31.314407
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 25.917240762115473,
+    "duration": 496,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51133028424,
+      31.314403931008
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.520366,
+      31.311004
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 22.25712795847312,
+    "duration": 880,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.52036687804,
+      31.310943192292
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.517328,
+      31.316037
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 32.28618643058293,
+    "duration": null,
+    "reason": "endpoint_offset",
+    "endpoint_verified": false,
+    "valid": false,
+    "route_origin": null,
+    "route_destination": null,
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.51224,
+      31.310334
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 14.749665692421983,
+    "duration": 504,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51242564813,
+      31.310368869411
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.510783,
+      31.318914
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 46.63999897896158,
+    "duration": 1198,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51075506291,
+      31.318952428719
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.514143,
+      31.307688
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 18.46691256294883,
+    "duration": 894,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51415093731,
+      31.307659775586
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.5171,
+      31.313608
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 1.0917814080741013,
+    "duration": 411,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51709856436,
+      31.313616537273
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.511993,
+      31.306994
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 44.79143211363483,
+    "duration": 1190,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5119641416,
+      31.30699577019
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.514674,
+      31.317784
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 28.37720497718092,
+    "duration": 822,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51496738123,
+      31.317928118703
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.520398,
+      31.314746
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 45.16122305193973,
+    "duration": 805,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.52038964796,
+      31.314534172979
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.513725,
+      31.315668
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 7.557494997114885,
+    "duration": 598,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51382761184,
+      31.315718946891
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.508074,
+      31.310933
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 23.301961667232558,
+    "duration": 848,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50807023227,
+      31.311043152157
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508319,
+      31.317319
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 32.99375664476967,
+    "duration": 917,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5083152294,
+      31.317154845115
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.507921,
+      31.310435
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 7.82563778829731,
+    "duration": 1527,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50776969605,
+      31.310152587643
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.507007,
+      31.313676
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 48.47460983271289,
+    "duration": 696,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50699248504,
+      31.313592640835
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.517824,
+      31.315133
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 1.4806695445699358,
+    "duration": 643,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51756843932,
+      31.31494161388
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.519091,
+      31.314518
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 19.036249832235484,
+    "duration": 890,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51903387996,
+      31.314497680983
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.51185,
+      31.317878
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 49.242903702640106,
+    "duration": 758,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51155310037,
+      31.317865780379
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.510278,
+      31.309949
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 19.639804952824086,
+    "duration": 684,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51012809326,
+      31.309918109293
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.515174,
+      31.317314
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 17.067044056520956,
+    "duration": 783,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51527620155,
+      31.31737054409
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.506662,
+      31.31597
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 19.582306782606853,
+    "duration": 1053,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50658462716,
+      31.316063102364
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.516104,
+      31.310378
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 32.411909915387696,
+    "duration": 757,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51608866284,
+      31.31049626692
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.511485,
+      31.308372
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 35.71725541745324,
+    "duration": 772,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51158559965,
+      31.308574065721
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.51482,
+      31.310061
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 25.355417064085156,
+    "duration": 738,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51484111964,
+      31.310055480046
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.511392,
+      31.308259
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 25.109101083146214,
+    "duration": 1094,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5112257968,
+      31.308182284629
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.510963,
+      31.317974
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 26.607889119520134,
+    "duration": 1254,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51103381823,
+      31.317963383135
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.516505,
+      31.312043
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 39.82069543871702,
+    "duration": 508,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51649886014,
+      31.312090383367
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.516533,
+      31.314755
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 4.613670909077429,
+    "duration": 411,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51644118919,
+      31.314770376485
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.510307,
+      31.311847
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 21.50744838151761,
+    "duration": 677,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5102393832,
+      31.311828859741
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.520827,
+      31.313267
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 38.13450410690115,
+    "duration": 800,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.52071754323,
+      31.313308123958
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.512799,
+      31.31042
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 30.15971494553251,
+    "duration": 473,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51292494015,
+      31.310461880777
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.514739,
+      31.309949
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 37.13693731056902,
+    "duration": 714,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5149008225,
+      31.309805917705
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.511968,
+      31.310032
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 27.313297515486767,
+    "duration": 572,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51198601687,
+      31.309996364211
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508928,
+      31.317295
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 3.0609054366728548,
+    "duration": 877,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50891503596,
+      31.317286088878
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.521096,
+      31.31397
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 1.604995176341084,
+    "duration": 1009,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.52104700293,
+      31.314002562347
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.515844,
+      31.31634
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 33.85979542277159,
+    "duration": 635,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51589390491,
+      31.316375686146
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.51823,
+      31.309012
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 23.972834730436176,
+    "duration": 1295,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51824199771,
+      31.308947700262
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.509833,
+      31.310216
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 17.379999470770436,
+    "duration": 1491,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50984854024,
+      31.310207212933
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.515165,
+      31.315597
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 16.710376472436458,
+    "duration": 418,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51503504838,
+      31.315518127558
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.509076,
+      31.310374
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 44.425385021619434,
+    "duration": 1503,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5091091966,
+      31.310355106105
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.516997,
+      31.315385
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 41.873153847989535,
+    "duration": 618,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51693045537,
+      31.31533522423
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.520972,
+      31.314383
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 4.346281097400435,
+    "duration": 865,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.52087789335,
+      31.314380422512
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.517125,
+      31.309103
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 29.205478193743176,
+    "duration": 864,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51707533173,
+      31.309205494805
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.519997,
+      31.315202
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 34.832573909125365,
+    "duration": 834,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51997157336,
+      31.315199076892
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508604,
+      31.312184
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 35.36240492148961,
+    "duration": 822,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50881084121,
+      31.312314770108
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.512857,
+      31.306977
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 32.08738547563113,
+    "duration": 1103,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51286278112,
+      31.30695093096
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.519562,
+      31.315382
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 8.834703865384276,
+    "duration": 888,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51955310746,
+      31.315444023818
+    ],
+    "strict_correct": false,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.512835,
+      31.31838
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 24.570615831905304,
+    "duration": 710,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51257194304,
+      31.318151353775
+    ],
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      121.518875,
+      31.309906
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 12.317802844849798,
+    "duration": 885,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51887077974,
+      31.30985491836
+    ],
+    "strict_correct": false,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.50782,
+      31.310712
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 4.967526501005989,
+    "duration": 1071,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5075701367,
+      31.310692469108
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.520282,
+      31.310606
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 20.99510290672181,
+    "duration": 838,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51991817782,
+      31.310737548963
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.517817,
+      31.313176
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 44.75248444154634,
+    "duration": 512,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51776640724,
+      31.31315332608
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.518437,
+      31.310269
+    ],
+    "group": "boundary",
+    "inside": true,
+    "boundary_distance_m": 40.51857105139703,
+    "duration": 791,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51852212123,
+      31.31031103658
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.507571,
+      31.310218
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 48.645376564134395,
+    "duration": 1522,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50754979233,
+      31.310202359998
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.516009,
+      31.309293
+    ],
+    "group": "interior",
+    "inside": true,
+    "boundary_distance_m": 96.66651893246407,
+    "duration": 800,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51567868702,
+      31.30915236475
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508827,
+      31.313951
+    ],
+    "group": "interior",
+    "inside": true,
+    "boundary_distance_m": 101.6414629484299,
+    "duration": 593,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50871221282,
+      31.313944890604
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.519351,
+      31.31332
+    ],
+    "group": "interior",
+    "inside": true,
+    "boundary_distance_m": 110.55678792131107,
+    "duration": 630,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51922243618,
+      31.31344967397
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.519873,
+      31.312568
+    ],
+    "group": "interior",
+    "inside": true,
+    "boundary_distance_m": 71.0222147944657,
+    "duration": 809,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51983979339,
+      31.312546918298
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.509581,
+      31.314194
+    ],
+    "group": "interior",
+    "inside": true,
+    "boundary_distance_m": 114.3443654242635,
+    "duration": 537,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50946191445,
+      31.314166807578
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508032,
+      31.314544
+    ],
+    "group": "interior",
+    "inside": true,
+    "boundary_distance_m": 139.5526758512209,
+    "duration": 728,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.5080130469,
+      31.314553781255
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.519232,
+      31.31364
+    ],
+    "group": "interior",
+    "inside": true,
+    "boundary_distance_m": 74.37314082859098,
+    "duration": 616,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51923256126,
+      31.313639831337
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.513348,
+      31.316944
+    ],
+    "group": "interior",
+    "inside": true,
+    "boundary_distance_m": 67.63866241085734,
+    "duration": 634,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.51340950666,
+      31.316996355139
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.523798,
+      31.318944
+    ],
+    "group": "exterior",
+    "inside": false,
+    "boundary_distance_m": 498.8075603065372,
+    "duration": 1655,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.52378145499,
+      31.318942261526
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  },
+  {
+    "coordinate": [
+      121.508572,
+      31.30902
+    ],
+    "group": "exterior",
+    "inside": false,
+    "boundary_distance_m": 134.87811811321035,
+    "duration": 1363,
+    "reason": null,
+    "endpoint_verified": true,
+    "valid": true,
+    "route_origin": [
+      121.51391521603,
+      31.313079014247
+    ],
+    "route_destination": [
+      121.50854859138,
+      31.308993613467
+    ],
+    "strict_correct": true,
+    "tolerant_correct": true
+  }
+]

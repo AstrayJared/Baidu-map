@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "responseType": "task",
+  "taskId": "7d0903ed-b620-4913-970f-5a5ae0c58723",
+  "status": "completed",
+  "businessStatus": "partial",
+  "stage": "completed",
+  "requests": 400,
+  "networkRequests": 400,
+  "budget": 400,
+  "elapsedSeconds": 391.43700000000536,
+  "dataSource": "baidu_walking",
+  "error": null
+}

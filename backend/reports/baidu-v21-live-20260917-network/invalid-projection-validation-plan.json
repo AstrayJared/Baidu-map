@@ -1,0 +1,906 @@
+{
+  "result_sha256": "f345ab61b0e7fc27d0697a1993e52a2d7ba59bdf77363018754b332653bd4c83",
+  "points": [
+    {
+      "coordinate": [
+        125.279762,
+        62.475628
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 3.8014615346658833
+    },
+    {
+      "coordinate": [
+        125.270879,
+        62.471481
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 34.53231322838064
+    },
+    {
+      "coordinate": [
+        125.271764,
+        62.470437
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 41.436961864738706
+    },
+    {
+      "coordinate": [
+        125.277122,
+        62.467202
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 42.02583157170747
+    },
+    {
+      "coordinate": [
+        125.281309,
+        62.469899
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 23.42413247606949
+    },
+    {
+      "coordinate": [
+        125.282364,
+        62.470446
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 35.04854706522069
+    },
+    {
+      "coordinate": [
+        125.281441,
+        62.474502
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 28.277717233411117
+    },
+    {
+      "coordinate": [
+        125.28239,
+        62.470322
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 21.06949982067908
+    },
+    {
+      "coordinate": [
+        125.2689,
+        62.474303
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 7.9054065389181565
+    },
+    {
+      "coordinate": [
+        125.281334,
+        62.469113
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 6.434465296187962
+    },
+    {
+      "coordinate": [
+        125.279445,
+        62.468504
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 34.324327502099436
+    },
+    {
+      "coordinate": [
+        125.277818,
+        62.470136
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 35.3197804265983
+    },
+    {
+      "coordinate": [
+        125.273621,
+        62.477415
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 45.454765666317634
+    },
+    {
+      "coordinate": [
+        125.271364,
+        62.473618
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 10.180466889797946
+    },
+    {
+      "coordinate": [
+        125.272041,
+        62.477423
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 15.34310611724771
+    },
+    {
+      "coordinate": [
+        125.274144,
+        62.478167
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 49.510530081634094
+    },
+    {
+      "coordinate": [
+        125.278517,
+        62.477545
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 43.47258192838905
+    },
+    {
+      "coordinate": [
+        125.284431,
+        62.47188
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 35.675945643497776
+    },
+    {
+      "coordinate": [
+        125.278209,
+        62.467992
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 21.512779186518152
+    },
+    {
+      "coordinate": [
+        125.27773,
+        62.478054
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 44.56155693850576
+    },
+    {
+      "coordinate": [
+        125.271841,
+        62.476721
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 24.45817502787865
+    },
+    {
+      "coordinate": [
+        125.285206,
+        62.474337
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 24.27991369030321
+    },
+    {
+      "coordinate": [
+        125.278997,
+        62.468411
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 47.178441071910065
+    },
+    {
+      "coordinate": [
+        125.277063,
+        62.470434
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 2.2472213892998196
+    },
+    {
+      "coordinate": [
+        125.27967,
+        62.476043
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 37.48331900258707
+    },
+    {
+      "coordinate": [
+        125.280021,
+        62.468005
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 30.884511875093523
+    },
+    {
+      "coordinate": [
+        125.279681,
+        62.475289
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 33.339077448129935
+    },
+    {
+      "coordinate": [
+        125.274354,
+        62.475117
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 44.02562022509424
+    },
+    {
+      "coordinate": [
+        125.281715,
+        62.4752
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 4.838566636723913
+    },
+    {
+      "coordinate": [
+        125.276185,
+        62.467262
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 29.658427938927424
+    },
+    {
+      "coordinate": [
+        125.27103,
+        62.473658
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 0.1756986349124579
+    },
+    {
+      "coordinate": [
+        125.280975,
+        62.472817
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 12.346957452485091
+    },
+    {
+      "coordinate": [
+        125.281951,
+        62.475734
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 11.923680791255585
+    },
+    {
+      "coordinate": [
+        125.279293,
+        62.476224
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 45.73305773318436
+    },
+    {
+      "coordinate": [
+        125.271887,
+        62.472352
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 18.44486083825105
+    },
+    {
+      "coordinate": [
+        125.274907,
+        62.474621
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 26.87703761306683
+    },
+    {
+      "coordinate": [
+        125.284012,
+        62.471225
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 7.465309303971786
+    },
+    {
+      "coordinate": [
+        125.280958,
+        62.476247
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 36.09911746188654
+    },
+    {
+      "coordinate": [
+        125.275843,
+        62.470556
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 17.567098376078416
+    },
+    {
+      "coordinate": [
+        125.277757,
+        62.467915
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 13.271749180806934
+    },
+    {
+      "coordinate": [
+        125.28073,
+        62.473823
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 1.7103586059423723
+    },
+    {
+      "coordinate": [
+        125.275596,
+        62.467223
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 44.254312961582215
+    },
+    {
+      "coordinate": [
+        125.278291,
+        62.477991
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 32.82399144600664
+    },
+    {
+      "coordinate": [
+        125.284044,
+        62.47496
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 49.41271868663864
+    },
+    {
+      "coordinate": [
+        125.277337,
+        62.47588
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 5.055071753787657
+    },
+    {
+      "coordinate": [
+        125.271656,
+        62.471154
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 14.659416695198498
+    },
+    {
+      "coordinate": [
+        125.271903,
+        62.477527
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 32.77879543570634
+    },
+    {
+      "coordinate": [
+        125.271503,
+        62.470656
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 10.035735793088598
+    },
+    {
+      "coordinate": [
+        125.270584,
+        62.473891
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 40.57731586730688
+    },
+    {
+      "coordinate": [
+        125.281457,
+        62.475346
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 1.0733318485183512
+    },
+    {
+      "coordinate": [
+        125.28273,
+        62.474732
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 6.716718863804107
+    },
+    {
+      "coordinate": [
+        125.275452,
+        62.478085
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 44.46350045429009
+    },
+    {
+      "coordinate": [
+        125.273871,
+        62.470172
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 27.39426091903233
+    },
+    {
+      "coordinate": [
+        125.278793,
+        62.477523
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 23.006370824872686
+    },
+    {
+      "coordinate": [
+        125.270237,
+        62.476181
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 22.31282971305773
+    },
+    {
+      "coordinate": [
+        125.279728,
+        62.4706
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 33.384420889895765
+    },
+    {
+      "coordinate": [
+        125.275085,
+        62.468598
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 31.223417394009488
+    },
+    {
+      "coordinate": [
+        125.278438,
+        62.470284
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 22.587382315226876
+    },
+    {
+      "coordinate": [
+        125.274991,
+        62.468486
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 20.466083889238373
+    },
+    {
+      "coordinate": [
+        125.27456,
+        62.47818
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 31.873326497229602
+    },
+    {
+      "coordinate": [
+        125.280131,
+        62.472261
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 42.07228048746098
+    },
+    {
+      "coordinate": [
+        125.28016,
+        62.474968
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 3.534260577006531
+    },
+    {
+      "coordinate": [
+        125.273901,
+        62.472066
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 19.98279177643772
+    },
+    {
+      "coordinate": [
+        125.284475,
+        62.473483
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 45.746027949463425
+    },
+    {
+      "coordinate": [
+        125.276406,
+        62.470642
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 29.24275611321561
+    },
+    {
+      "coordinate": [
+        125.278355,
+        62.470171
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 34.63344901550101
+    },
+    {
+      "coordinate": [
+        125.275571,
+        62.470255
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 24.36861770986315
+    },
+    {
+      "coordinate": [
+        125.272515,
+        62.477503
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 4.305229653799355
+    },
+    {
+      "coordinate": [
+        125.284746,
+        62.474185
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 18.788278165009256
+    },
+    {
+      "coordinate": [
+        125.279466,
+        62.47655
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 36.72677620383421
+    },
+    {
+      "coordinate": [
+        125.281865,
+        62.469237
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 31.282132891248093
+    },
+    {
+      "coordinate": [
+        125.273425,
+        62.470439
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 14.04796536130951
+    },
+    {
+      "coordinate": [
+        125.278784,
+        62.475809
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 12.95758051959379
+    },
+    {
+      "coordinate": [
+        125.272664,
+        62.470596
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 49.641847724402396
+    },
+    {
+      "coordinate": [
+        125.280626,
+        62.475597
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 37.7216181858984
+    },
+    {
+      "coordinate": [
+        125.284621,
+        62.474596
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 12.470920165488806
+    },
+    {
+      "coordinate": [
+        125.280755,
+        62.469327
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 35.32529964037745
+    },
+    {
+      "coordinate": [
+        125.283641,
+        62.475415
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 20.54640842643534
+    },
+    {
+      "coordinate": [
+        125.272189,
+        62.472402
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 40.772689839011825
+    },
+    {
+      "coordinate": [
+        125.276464,
+        62.467206
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 31.024206903226748
+    },
+    {
+      "coordinate": [
+        125.283204,
+        62.475594
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 18.386684855162457
+    },
+    {
+      "coordinate": [
+        125.276442,
+        62.478586
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 20.58649985745445
+    },
+    {
+      "coordinate": [
+        125.282513,
+        62.470129
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 2.561014597083108
+    },
+    {
+      "coordinate": [
+        125.271401,
+        62.470933
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 2.6226768277617984
+    },
+    {
+      "coordinate": [
+        125.283928,
+        62.470827
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 24.91394008639318
+    },
+    {
+      "coordinate": [
+        125.28145,
+        62.473392
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 48.55099958435226
+    },
+    {
+      "coordinate": [
+        125.282073,
+        62.470491
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 47.593540697076335
+    },
+    {
+      "coordinate": [
+        125.271151,
+        62.47044
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 48.71505062484238
+    },
+    {
+      "coordinate": [
+        125.2775,
+        62.477589
+      ],
+      "group": "boundary",
+      "inside": true,
+      "boundary_distance_m": 2.3078495980948834
+    },
+    {
+      "coordinate": [
+        125.284837,
+        62.474359
+      ],
+      "group": "boundary",
+      "inside": false,
+      "boundary_distance_m": 18.35052077008126
+    },
+    {
+      "coordinate": [
+        125.279633,
+        62.469517
+      ],
+      "group": "interior",
+      "inside": true,
+      "boundary_distance_m": 96.36652373917468
+    },
+    {
+      "coordinate": [
+        125.272413,
+        62.474166
+      ],
+      "group": "interior",
+      "inside": true,
+      "boundary_distance_m": 98.12452457515612
+    },
+    {
+      "coordinate": [
+        125.282992,
+        62.473536
+      ],
+      "group": "interior",
+      "inside": true,
+      "boundary_distance_m": 99.73910393710615
+    },
+    {
+      "coordinate": [
+        125.283516,
+        62.472786
+      ],
+      "group": "interior",
+      "inside": true,
+      "boundary_distance_m": 79.9434938522926
+    },
+    {
+      "coordinate": [
+        125.273171,
+        62.474408
+      ],
+      "group": "interior",
+      "inside": true,
+      "boundary_distance_m": 112.638222574475
+    },
+    {
+      "coordinate": [
+        125.271614,
+        62.474757
+      ],
+      "group": "interior",
+      "inside": true,
+      "boundary_distance_m": 133.36071119076405
+    },
+    {
+      "coordinate": [
+        125.282872,
+        62.473856
+      ],
+      "group": "interior",
+      "inside": true,
+      "boundary_distance_m": 64.06355182271271
+    },
+    {
+      "coordinate": [
+        125.276958,
+        62.477153
+      ],
+      "group": "interior",
+      "inside": true,
+      "boundary_distance_m": 69.28905195272999
+    },
+    {
+      "coordinate": [
+        125.287462,
+        62.479149
+      ],
+      "group": "exterior",
+      "inside": false,
+      "boundary_distance_m": 510.985093747935
+    },
+    {
+      "coordinate": [
+        125.272157,
+        62.469245
+      ],
+      "group": "exterior",
+      "inside": false,
+      "boundary_distance_m": 133.118499659828
+    }
+  ],
+  "criteria": ">=80 valid, >=80% valid per group, >=20 reachable and unreachable; tolerance accuracy >=90%, boundary >=95%"
+}
