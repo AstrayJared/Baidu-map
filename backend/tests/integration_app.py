@@ -5,7 +5,13 @@ import math
 from life_circle.providers import AnalyticProvider
 from life_circle.scenarios import scenarios
 from app.config import Settings
-from app.main import create_app
+from unittest.mock import patch
+
+settings = Settings(_env_file=None, baidu_map_ak="", analysis_provider="synthetic",
+    cors_origins=["http://127.0.0.1:5178"])
+# main creates its default app at import time; offline tests must not load credentials.
+with patch("app.config.load_settings", return_value=settings):
+    from app.main import create_app
 
 cases = scenarios()
 
@@ -28,5 +34,4 @@ def provider(origin):
     return result
 
 
-app = create_app(Settings(_env_file=None, baidu_map_ak="", analysis_provider="synthetic",
-    cors_origins=["http://127.0.0.1:5178"]), provider_factory=provider)
+app = create_app(settings, provider_factory=provider)

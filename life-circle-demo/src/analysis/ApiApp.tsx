@@ -8,7 +8,7 @@ import { isAnalysisBusy } from './types';
 import { ApiMap, type Layers } from './ApiMap';
 import { LocationControls } from './LocationControls';
 import { geometryMessage } from './geometry';
-import { analysisAvailability } from './adapter';
+import { analysisAvailability, withFacilityRoute } from './adapter';
 import { AnalysisReport } from './AnalysisReport';
 import { AnalysisProgress } from './AnalysisProgress';
 import './api.css';
@@ -48,7 +48,7 @@ export default function ApiApp() {
   const [lastResult, setLastResult] = useState<AnalysisResult>();
   const [dirty, setDirty] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
-  const [layers, setLayers] = useState<Layers>({ reachable: true, unknown: true, uncertain: true, extent: false, serviceBlind: true });
+  const [layers, setLayers] = useState<Layers>({ reachable: true, unreachable: true, unknown: true, uncertain: true, extent: false, serviceBlind: true });
   const controller = useRef<AnalysisController | null>(null);
   useEffect(() => {
     const instance = new AnalysisController(createApiService(), setState);
@@ -96,7 +96,7 @@ export default function ApiApp() {
           <Space wrap><Button aria-label="开始分析" type="primary" onClick={analyze} disabled={!valid || busy} loading={busy}>开始分析</Button>
             {(busy || (state.phase === 'error' && state.task)) && <Button onClick={() => void controller.current?.cancel()} disabled={state.phase === 'cancelling'}>取消任务</Button>}</Space>
         </Card>
-        <Card title="地图图层"><div className="api-layer-list">{([['reachable', '可达区域'], ['unknown', '不可达/未核验区域（灰色）'], ['serviceBlind', '设施服务盲区（灰色）'], ['uncertain', '不确定区域'], ['extent', '计算范围']] as const).map(([key, label]) => <Checkbox key={key} checked={layers[key]} onChange={event => setLayers({ ...layers, [key]: event.target.checked })}><i className={`api-swatch ${key}`} />{label}</Checkbox>)}</div></Card>
+        <Card title="地图图层"><div className="api-layer-list">{([['reachable', '可达区域'], ['unreachable', '已知不可达区域'], ['unknown', '未核验区域（灰色）'], ['serviceBlind', '设施服务盲区（灰色）'], ['uncertain', '不确定区域'], ['extent', '计算范围']] as const).map(([key, label]) => <Checkbox key={key} checked={layers[key]} onChange={event => setLayers({ ...layers, [key]: event.target.checked })}><i className={`api-swatch ${key}`} />{label}</Checkbox>)}</div></Card>
         <label className="api-label">步行时间层<Select aria-label="步行时间层" value={minutes} onChange={setMinutes} options={[5,10,15].map(value=>({value,label:`${value} 分钟`}))}/></label>
         <Checkbox checked={showFacilities} onChange={e=>setShowFacilities(e.target.checked)}>设施标记</Checkbox>
         <Checkbox checked={showAssessments} onChange={e=>setShowAssessments(e.target.checked)}>点位三态</Checkbox>
@@ -129,7 +129,11 @@ export default function ApiApp() {
         {unavailable && !lastResult && state.result && <ResultSummary result={state.result.isochrone} />}
         {displayedResult && <><ResultSummary result={displayedResult.isochrone} /><p className="api-muted">结果来源：{displayedResult.dataSource === 'synthetic' ? '合成时间场' : '百度步行数据'}<br />结果中心：{displayedResult.center.lng.toFixed(6)}, {displayedResult.center.lat.toFixed(6)}<br />{new Date(displayedResult.generatedAt * 1000).toLocaleString('zh-CN')}</p><details><summary>查看机器可读结果</summary><pre>{JSON.stringify(displayedResult, null, 2)}</pre></details></>}
         <Button block disabled={!lastResult} onClick={() => setReportOpen(true)}>查看分析报告</Button>
-       </Card>{displayedResult?.facilityAnalysis && <FacilityPanel key={displayedResult.taskId} result={displayedResult} group={group} onGroup={setGroup} selected={selected} onSelect={setSelected} onRoute={points=>setRoute({ taskId: displayedResult!.taskId, points })}/>}</section>
+       </Card>{displayedResult?.facilityAnalysis && <FacilityPanel key={displayedResult.taskId} result={displayedResult} group={group} onGroup={setGroup} selected={selected} onSelect={setSelected} onRoute={(points, evidence)=>{
+          const taskId = displayedResult.taskId;
+          setRoute({ taskId, points });
+          if (evidence?.poiEvidence) setLastResult(previous => previous?.taskId === taskId ? withFacilityRoute(previous, evidence) : previous);
+        }}/>}</section>
     </main>
     <footer className="api-footer">质量提示随采样证据展示；未知区域不代表不可达。设施判断仅代表有证据的采样点，不推断盲区面积。</footer>
     <Drawer title="生活圈分析报告" open={reportOpen} onClose={() => setReportOpen(false)} size={680}>

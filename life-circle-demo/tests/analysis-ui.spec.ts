@@ -275,7 +275,7 @@ test('facility route requests stay on the same origin and draw the returned path
   await page.getByRole('button', { name: /离线测试药房/ }).click();
   await expect.poll(facilityIconSeq).not.toBe(normalIconSeq);
   await page.getByRole('button', { name: '查看中心到设施的步行路线' }).click();
-  await expect(page.getByText('600 米 · 500 秒 · 端点已核验')).toBeVisible();
+  await expect(page.getByText('600 米 · 500 秒 · 路线可用；不代表设施已严格核验')).toBeVisible();
   await expect(legend).toContainText('步行路线');
   // The api base is unconfigured here, so the route POST must go to the page origin,
   // never to a hardcoded backend port.
@@ -325,7 +325,7 @@ test('narrow screens keep the facility flow usable without horizontal overflow',
   // Facility panel stays operable: select, route request, readable evidence.
   await page.getByRole('button', { name: /离线测试药房/ }).click();
   await page.getByRole('button', { name: '查看中心到设施的步行路线' }).click();
-  await expect(page.getByText('600 米 · 500 秒 · 端点已核验')).toBeVisible();
+  await expect(page.getByText('600 米 · 500 秒 · 路线可用；不代表设施已严格核验')).toBeVisible();
   await expect.poll(overflow).toBeLessThanOrEqual(0);
   // The report reopens and remains readable on the narrow screen.
   await page.getByRole('button', { name: '查看分析报告', exact: true }).click();
@@ -334,3 +334,59 @@ test('narrow screens keep the facility flow usable without horizontal overflow',
   await page.keyboard.press('Escape');
   expect(errors).toEqual([]);
 });
+
+
+test('parsed but offset endpoints never render a valid route or verified POI', async ({ page }) => {
+  await setup(page, { withFacilities: true });
+  await page.route('**/api/analyses/*/routes/*', route => route.fulfill({ json: {
+    endpoint_verified: true, distance_m: 600, duration_s: null, reason: 'endpoint_offset',
+    path: [[116.404, 39.915], [116.405, 39.916]],
+  } }));
+  await page.goto('/');
+  await page.getByRole('button', { name: '开始分析', exact: true }).click();
+  await expect(page.getByTestId('analysis-report')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('analysis-report')).not.toBeVisible();
+  await page.getByRole('button', { name: /离线测试药房/ }).click();
+  await page.getByRole('button', { name: '查看中心到设施的步行路线' }).click();
+  await expect(page.getByText('未知 米 · 未知 秒 · 路线端点偏移，设施可达性未知')).toBeVisible();
+  expect(await page.evaluate(() => (window as any).__mapAudit.polylines)).toEqual([]);
+  await expect(page.getByText('端点已核验', { exact: false })).toHaveCount(0);
+});
+
+
+for (const [status, label, counts] of [
+  ['verified_reachable', '严格核验：15分钟内可达', '15分钟内可达 1'],
+  ['verified_unreachable', '严格核验：返回路线超过15分钟', '返回路线超过15分钟 1'],
+  ['pending', '待核验（未知）', '待核验（未知）1'],
+] as const) {
+  test(`production POI evidence ${status} enriches the same report snapshot`, async ({ page }) => {
+    await setup(page, { withFacilities: true });
+    const pending = status === 'pending';
+    const seconds = status === 'verified_unreachable' ? 901 : 500;
+    await page.route('**/api/analyses/*/routes/*', route => route.fulfill({ json: {
+      endpoint_verified: true, distance_m: 600, duration_s: pending ? null : seconds,
+      reason: pending ? 'endpoint_offset' : null, path: [[116.404,39.915],[116.405,39.915]],
+      poiEvidence: { version: '1.0', facilityId: 'pharmacy-fixture', status,
+        reason: pending ? 'endpoint_offset' : null, duration: pending ? null : seconds,
+        observedDuration: seconds, endpointVerified: true,
+        requestOrigin: [116.404,39.915], destination: [116.404,39.915], routeOrigin: [116.404,39.915],
+        routeDestination: pending ? [116.405,39.915] : [116.404,39.915],
+        originOffsetM: 0, destinationOffsetM: pending ? 80 : 0 },
+    } }));
+    await page.goto('/');
+    await page.getByRole('button', { name: '开始分析', exact: true }).click();
+    await expect(page.getByTestId('analysis-report')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('analysis-report')).not.toBeVisible();
+    await expect(page.getByText('旧版结果未提供严格证据', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: /离线测试药房/ }).click();
+    await page.getByRole('button', { name: '查看中心到设施的步行路线' }).click();
+    await expect(page.getByTestId('route-poi-evidence')).toContainText(label);
+    await expect(page.getByTestId('route-poi-evidence')).toContainText(`实际端点观测耗时：${seconds}`);
+    if (pending) expect(await page.evaluate(() => (window as any).__mapAudit.polylines)).toEqual([]);
+    await page.getByRole('button', { name: '查看分析报告', exact: true }).click();
+    await expect(page.getByTestId('strict-poi-counts')).toContainText(counts);
+    await expect(page.getByTestId('analysis-report')).toContainText('116.404000, 39.915000');
+  });
+}

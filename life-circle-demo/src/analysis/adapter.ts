@@ -2,6 +2,21 @@ import { categories, categoryMeta } from '../types';
 import type { AnalysisInput, AnalysisResult } from './types';
 import { validResult } from './validate';
 import { geometryMessage } from './geometry';
+import type { RouteEvidence } from '../api-contract';
+
+/** Enrich only the existing task snapshot; route evidence cannot change geometry/counts. */
+export function withFacilityRoute(result: AnalysisResult, route: RouteEvidence): AnalysisResult {
+  const evidence = route.poiEvidence;
+  if (!evidence || !result.facilityAnalysis) return result;
+  const facility = result.data.facilities?.find(f => f.id === evidence.facilityId);
+  if (!facility || evidence.requestOrigin[0] !== result.center.lng || evidence.requestOrigin[1] !== result.center.lat
+    || evidence.destination[0] !== +facility.location.lng.toFixed(6)
+    || evidence.destination[1] !== +facility.location.lat.toFixed(6)) throw new Error('路线证据与分析条件不一致');
+  const copy = structuredClone(result);
+  copy.data.facilities!.find(f => f.id === facility.id)!.poiEvidence = structuredClone(evidence);
+  copy.facilityAnalysis!.routes[facility.id] = structuredClone(route);
+  return copy;
+}
 
 /** Task API → geographic frontend AnalysisResult. Never use the legacy demo projection. */
 export function decodeAnalysisResult(value: unknown): AnalysisResult {
@@ -21,7 +36,7 @@ export function matchesAnalysisInput(result: AnalysisResult, input: AnalysisInpu
 
 /** Completion is a task state; it does not mean every business module has run. */
 export function analysisAvailability(result: AnalysisResult): 'partial' | 'unavailable' {
-  return result.isochrone.quality === 'insufficient' || result.isochrone.geometry === null
+  return result.status === 'failed' || result.isochrone.quality === 'insufficient' || result.isochrone.geometry === null
     ? 'unavailable' : 'partial';
 }
 
@@ -44,5 +59,11 @@ export function analysisReportView(result: AnalysisResult) {
         state: result.facilityAnalysis ? '检索记录 · 估算圈内' : '尚未接入' };
     }),
     blindZoneCount: null,
+    poiCounts: {
+      reachable: (result.data.facilities ?? []).filter(f => f.poiEvidence?.status === 'verified_reachable').length,
+      unreachable: (result.data.facilities ?? []).filter(f => f.poiEvidence?.status === 'verified_unreachable').length,
+      pending: (result.data.facilities ?? []).filter(f => f.poiEvidence?.status === 'pending').length,
+      legacy: (result.data.facilities ?? []).filter(f => !f.poiEvidence).length,
+    },
   };
 }

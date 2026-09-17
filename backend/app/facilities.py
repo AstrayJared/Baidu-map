@@ -12,6 +12,7 @@ from .places import PlacesClient
 from .place_protocol import STOP_ERRORS
 from .request_control import RequestStopped, request_slot
 from .rules import DistanceRule, distance_within
+from .poi_evidence import poi_evidence, route_evidence
 
 GROUPS = {"shopping": ("market", "supermarket"), "medical": ("pharmacy", "hospital_pharmacy"), "education": ("school",)}
 RULE = DistanceRule(metric="walking_route", threshold_m=1000, inclusive=True, tolerance_m=100,
@@ -33,6 +34,7 @@ async def analyze_facilities(result, client, ak, gate, token, *, max_points=9, m
     geometry = shape(result.geometry) if result.geometry else None
     for item in facilities:
         item.in_circle = geometry.covers(Point(item.location.lng, item.location.lat)) if geometry else None
+        item.poi_evidence = poi_evidence(None, origin, (item.location.lng, item.location.lat), item.id)
     candidates = sorted((o for o in result.sample_observations if o.duration is not None and o.duration <= 900 and o.endpoint_verified and geometry is not None and geometry.covers(Point(*o.destination))), key=lambda o: (o.duration, o.destination))
     # Spread selected points through the time range; never claim unmeasured area coverage.
     selected = candidates[:1] if max_points == 1 else candidates if len(candidates) <= max_points else [candidates[round(i*(len(candidates)-1)/(max_points-1))] for i in range(max_points)]
@@ -74,9 +76,9 @@ async def analyze_facilities(result, client, ak, gate, token, *, max_points=9, m
                 break
         cache[key] = value
         if sample.destination == origin and value is not None:
-            routes[item.id] = {"distance_m": value.distance_m, "duration_s": value.duration,
-                               "endpoint_verified": value.endpoint_verified, "reason": value.reason,
-                               "path": value.route_path if value.endpoint_verified else []}
+            mapped = route_evidence(value, origin, (item.location.lng, item.location.lat), item.id)
+            routes[item.id] = mapped
+            item.poi_evidence = mapped.poi_evidence
         return value
 
     for sample in selected:

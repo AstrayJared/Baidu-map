@@ -1,4 +1,4 @@
-import type { RouteEvidence } from '../api-contract';
+import type { RouteEvidence, PoiEvidence } from '../api-contract';
 import type { AnalysisResult, BusinessStatus, TaskStatus } from './types';
 
 type RecordValue = Record<string, unknown>;
@@ -33,14 +33,30 @@ export function validResult(v: unknown): v is AnalysisResult {
     || v.schema_version !== '1.0' || v.responseType !== 'result' || v.taskStatus !== 'completed'
     || !businessStatus(v.status) || !businessStatus(v.businessStatus) || v.status !== v.businessStatus
     || !object(v.center) || !point([v.center.lng, v.center.lat]) || !finite(v.generatedAt)
-    || v.generatedAt < 0 || !Number.isFinite(new Date(v.generatedAt * 1000).getTime())
+    || v.generatedAt <= 0 || !Number.isFinite(new Date(v.generatedAt * 1000).getTime())
     || !['not_integrated', 'complete', 'partial', 'failed'].includes(v.facilitiesStatus as string) || v.coordinateSystem !== 'bd09ll'
     || v.coordinateOrder !== 'longitude,latitude' || !object(v.units) || !object(v.rules)
-    || !object(v.data) || !object(v.isochrone)) return false;
+    || !object(v.data) || !Array.isArray(v.data.categories)
+    || !v.data.categories.every(c => object(c) && minor(c.category)
+      && (c.count_in_circle === null || count(c.count_in_circle)))
+    || !object(v.isochrone)) return false;
   const r = v.isochrone;
   if (r.timeBands !== undefined && (!Array.isArray(r.timeBands) || !r.timeBands.every(b => object(b) && [5,10,15].includes(b.minutes as number) && (b.geometry === null || geometry(b.geometry))))) return false;
   if (r.unreachableRegion !== undefined && r.unreachableRegion !== null && !geometry(r.unreachableRegion)) return false;
   if (!validFacilities(v.facilityAnalysis, v.facilitiesStatus, v.data)) return false;
+  const facilities = v.data.facilities as { poiEvidence?: PoiEvidence | null }[] | null;
+  if (facilities?.some(f => f.poiEvidence && (f.poiEvidence.requestOrigin[0] !== (v.center as RecordValue).lng
+    || f.poiEvidence.requestOrigin[1] !== (v.center as RecordValue).lat))) return false;
+  if (object(v.facilityAnalysis) && object(v.facilityAnalysis.routes)) {
+    for (const [id, route] of Object.entries(v.facilityAnalysis.routes)) {
+      const e = (route as RouteEvidence).poiEvidence;
+      const facility = (v.data.facilities as { id: string; location: { lng: number; lat: number }; poiEvidence?: PoiEvidence | null }[]).find(f => f.id === id);
+      if (e && (!facility || e.facilityId !== id || e.requestOrigin[0] !== v.center.lng || e.requestOrigin[1] !== v.center.lat
+        || e.destination[0] !== +facility.location.lng.toFixed(6) || e.destination[1] !== +facility.location.lat.toFixed(6))) return false;
+      if (e && (!facility?.poiEvidence || Object.keys(e).some(key =>
+        JSON.stringify(e[key as keyof PoiEvidence]) !== JSON.stringify(facility.poiEvidence![key as keyof PoiEvidence])))) return false;
+    }
+  }
   if (r.coordinateSystem !== 'bd09ll' || !(r.geometry === null || geometry(r.geometry))
     || !geometry(r.unknownRegion) || !geometry(r.uncertainRegion) || !geometry(r.computationExtent)
     || !['usable', 'partial', 'insufficient'].includes(r.quality as string)
@@ -56,14 +72,44 @@ export function validResult(v: unknown): v is AnalysisResult {
 }
 
 const group = (v: unknown) => ['shopping', 'medical', 'education'].includes(v as string);
+const minor = (v: unknown) => ['market', 'supermarket', 'pharmacy', 'hospital_pharmacy', 'school'].includes(v as string);
 const nullableNonnegative = (v: unknown) => v === null || (finite(v) && v >= 0);
+// Contract consistency only: this never creates or upgrades a POI status.
+function matchingEndpoints(actual: number[], requested: number[]) {
+  const scale = 6371008.8 * Math.PI / 180;
+  return Math.hypot((actual[0] - requested[0]) * scale * Math.cos(requested[1] * Math.PI / 180),
+    (actual[1] - requested[1]) * scale) <= 1e-5;
+}
 
 export function validRoute(v: unknown): v is RouteEvidence {
   return object(v) && typeof v.endpoint_verified === 'boolean'
     && nullableNonnegative(v.distance_m) && nullableNonnegative(v.duration_s)
     && (v.reason === null || typeof v.reason === 'string')
+    && (v.reason === null || v.duration_s === null)
     && Array.isArray(v.path) && v.path.every(point)
-    && (v.endpoint_verified || v.path.length === 0);
+    && (v.endpoint_verified || v.path.length === 0)
+    && (v.poiEvidence == null || (validPoiEvidence(v.poiEvidence)
+      && (v.poiEvidence.status === 'pending' || (v.reason === null && v.endpoint_verified
+        && v.duration_s === v.poiEvidence.duration))));
+}
+
+/** Validate the server's conclusion, never derive a status from duration/geometry. */
+export function validPoiEvidence(v: unknown): v is PoiEvidence {
+  if (!object(v) || v.version !== '1.0' || typeof v.facilityId !== 'string' || !v.facilityId
+    || !['pending', 'verified_reachable', 'verified_unreachable'].includes(v.status as string)
+    || !(v.reason === null || typeof v.reason === 'string')
+    || !nullableNonnegative(v.duration) || !nullableNonnegative(v.observedDuration)
+    || typeof v.endpointVerified !== 'boolean' || !point(v.requestOrigin) || !point(v.destination)
+    || !(v.routeOrigin === null || point(v.routeOrigin)) || !(v.routeDestination === null || point(v.routeDestination))
+    || !nullableNonnegative(v.originOffsetM) || !nullableNonnegative(v.destinationOffsetM)) return false;
+  if (v.endpointVerified && (v.routeOrigin === null || v.routeDestination === null)) return false;
+  if (v.status === 'pending') return v.duration === null && v.reason !== null;
+  return v.reason === null && finite(v.duration) && v.observedDuration === v.duration && v.endpointVerified
+    && matchingEndpoints(v.routeOrigin as number[], v.requestOrigin as number[])
+    && matchingEndpoints(v.routeDestination as number[], v.destination as number[])
+    && (v.status === 'verified_reachable' ? v.duration <= 900 : v.duration > 900)
+    && (v.originOffsetM === null || (v.originOffsetM as number) <= 1e-5)
+    && (v.destinationOffsetM === null || (v.destinationOffsetM as number) <= 1e-5);
 }
 
 function validQuery(v: unknown): boolean {
@@ -81,11 +127,14 @@ function validAssessment(v: unknown): boolean {
 function validFacility(v: unknown): boolean {
   return object(v) && typeof v.id === 'string' && v.id.length > 0 && typeof v.name === 'string'
     && group(v.major_category) && object(v.location) && point([v.location.lng, v.location.lat])
-    && (v.in_circle === null || typeof v.in_circle === 'boolean');
+    && (v.in_circle === null || typeof v.in_circle === 'boolean')
+    && (v.poiEvidence == null || (validPoiEvidence(v.poiEvidence) && v.poiEvidence.facilityId === v.id
+      && v.poiEvidence.destination[0] === +(v.location.lng as number).toFixed(6)
+      && v.poiEvidence.destination[1] === +(v.location.lat as number).toFixed(6)));
 }
 
 function validFacilities(v: unknown, status: unknown, data: RecordValue): boolean {
-  if (v === null || v === undefined) return status === 'not_integrated';
+  if (v === null || v === undefined) return status === 'not_integrated' && data.facilities === null;
   if (!object(v) || v.status !== status || !['complete', 'partial', 'failed'].includes(v.status as string)) return false;
   const counts = [v.candidate_points, v.assessed_points, v.unassessed_points, v.network_requests];
   return counts.every(count) && finite(v.elapsed_seconds) && v.elapsed_seconds >= 0

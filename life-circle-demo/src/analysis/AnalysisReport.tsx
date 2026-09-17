@@ -26,6 +26,7 @@ export function AnalysisReport({ result, stale, lastAttemptFailed }: {
     <p>Provider 调用 {view.statistics.requests} 次，网络尝试预留 {view.statistics.network_requests} 次，重试 {view.statistics.retries} 次。预留计数不等于实际发送或计费次数。</p>
     <p>未知面积 {(view.statistics.unknown_area / 1e6).toFixed(3)} 平方公里，未完成边界格 {view.statistics.unfinished_boundary} 个。</p>
     <h2>02 / 设施与服务盲区</h2>
+    {result.facilityAnalysis && <p data-testid="strict-poi-counts">严格步行核验：15分钟内可达 {view.poiCounts.reachable}；返回路线超过15分钟 {view.poiCounts.unreachable}；待核验（未知）{view.poiCounts.pending}；旧版未提供证据 {view.poiCounts.legacy}。未核验不等于不可达。</p>}
     <table className={styles.reportTable} data-testid="analysis-facility-stats">
       <thead><tr><th>设施类别</th><th>圈内数量</th><th>数据状态</th></tr></thead>
       <tbody>{view.facilityStats.map(s => <tr key={s.category}><td>{s.label}</td><td>{s.count ?? '无法确定'}</td><td>{s.state}</td></tr>)}</tbody>
