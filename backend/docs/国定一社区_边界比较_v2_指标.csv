@@ -1,4 +1,0 @@
-﻿method,status,reserved_attempts,actual_calls,unconfirmed_reservations,complete_responses,retries,attempt_outcomes,valid_reference_count,invalid_reference_count,invalid_reference_fraction,excluded_overlap_count,reference_quadrants,true_reachable_count,predicted_reachable_count,true_positive,false_positive,missed_reachable,unknown_points,false_inclusion_rate,miss_rate,unknown_point_fraction,unknown_area_fraction,components,holes
-adaptive,not_run,0,0,0,0,0,{},80,16,0.16666666666666666,0,"{""WN"": 26, ""WS"": 26, ""ES"": 17, ""EN"": 11}",45,0,0,0,45,80,,1.0,1.0,1.0,,
-uniform,not_run,0,0,0,0,0,{},80,16,0.16666666666666666,0,"{""WN"": 26, ""WS"": 26, ""ES"": 17, ""EN"": 11}",45,0,0,0,45,80,,1.0,1.0,1.0,,
-radial,not_run,0,0,0,0,0,{},80,16,0.16666666666666666,0,"{""WN"": 26, ""WS"": 26, ""ES"": 17, ""EN"": 11}",45,0,0,0,45,80,,1.0,1.0,1.0,,
