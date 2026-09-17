@@ -46,12 +46,13 @@ export type Facility = {
   name: string;
   location: Origin;
   in_circle: boolean | null;
+  poiEvidence?: PoiEvidence | null;
 };
 
 export type Geometry = {
   type: "Polygon" | "MultiPolygon";
   coordinates: Array<unknown>;
-  coordinate_system: "bd09ll";
+  coordinateSystem: "bd09ll";
 };
 
 export type Issue = {
@@ -64,6 +65,22 @@ export type Issue = {
 export type Origin = {
   lng: number;
   lat: number;
+};
+
+export type PoiEvidence = {
+  version: "1.0";
+  facilityId: string;
+  status: "pending" | "verified_reachable" | "verified_unreachable";
+  reason: string | null;
+  duration: number | null;
+  observedDuration: number | null;
+  endpointVerified: boolean;
+  requestOrigin: [number, number];
+  destination: [number, number];
+  routeOrigin: [number, number] | null;
+  routeDestination: [number, number] | null;
+  originOffsetM: number | null;
+  destinationOffsetM: number | null;
 };
 
 export type Rules = {
@@ -156,6 +173,7 @@ export type RouteEvidence = {
   endpoint_verified: boolean;
   reason: string | null;
   path: Array<Array<number>>;
+  poiEvidence?: PoiEvidence | null;
 };
 
 export type TaskResultResponse = {

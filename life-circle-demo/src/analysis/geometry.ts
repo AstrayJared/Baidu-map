@@ -1,5 +1,10 @@
 import type { BaiduMapApi, BMapMap, BMapPolygonOptions } from '../map/baiduMapTypes';
-import type { BusinessGeometry } from './types';
+import type { BusinessGeometry, Isochrone } from './types';
+
+export function geometryForMinutes(result: Isochrone, minutes: number): BusinessGeometry | null {
+  const band = result.timeBands?.find(b => b.minutes === minutes);
+  return band ? band.geometry : minutes === 15 ? result.geometry : null;
+}
 
 /** Each component keeps its exterior and all interior rings in one overlay. */
 export function polygonPaths(geometry: BusinessGeometry | null): string[][] {

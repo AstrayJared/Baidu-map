@@ -76,6 +76,47 @@ class CategoryLevels(WireModel):
         return self
 
 
+class PoiEvidence(WireModel):
+    """Strict requested-OD evidence, not geometry membership or 1km service coverage."""
+    version: Literal["1.0"] = "1.0"
+    facility_id: str = Field(alias="facilityId", min_length=1)
+    status: Literal["pending", "verified_reachable", "verified_unreachable"]
+    reason: str | None
+    duration: float | None = Field(ge=0)
+    observed_duration: float | None = Field(alias="observedDuration", ge=0)
+    endpoint_verified: bool = Field(alias="endpointVerified")
+    request_origin: tuple[float, float] = Field(alias="requestOrigin")
+    destination: tuple[float, float]
+    route_origin: tuple[float, float] | None = Field(alias="routeOrigin")
+    route_destination: tuple[float, float] | None = Field(alias="routeDestination")
+    origin_offset_m: float | None = Field(alias="originOffsetM", ge=0)
+    destination_offset_m: float | None = Field(alias="destinationOffsetM", ge=0)
+
+    @model_validator(mode="after")
+    def consistent_evidence(self):
+        from life_circle.coordinates import LocalProjection
+        import math
+        for point in (self.request_origin, self.destination, self.route_origin, self.route_destination):
+            if point is not None:
+                Origin(lng=point[0], lat=point[1])
+        if self.endpoint_verified and (self.route_origin is None or self.route_destination is None):
+            raise ValueError("Parsed endpoints must be present")
+        if self.status == "pending":
+            if self.duration is not None or self.reason is None:
+                raise ValueError("Pending requires a reason and no effective duration")
+        else:
+            if self.reason is not None or self.duration is None or self.observed_duration != self.duration or not self.endpoint_verified:
+                raise ValueError("Verified state requires valid requested-route evidence")
+            for actual, requested in ((self.route_origin, self.request_origin), (self.route_destination, self.destination)):
+                if math.dist(LocalProjection(requested).to_local(actual), (0, 0)) > 1e-5:
+                    raise ValueError("Strict endpoints must match")
+            if any(offset is not None and offset > 1e-5 for offset in (self.origin_offset_m, self.destination_offset_m)):
+                raise ValueError("Strict offsets must match")
+            if (self.duration <= 900) != (self.status == "verified_reachable"):
+                raise ValueError("Status must match the 900s threshold")
+        return self
+
+
 class Facility(CategoryLevels):
     id: str
     name: str
@@ -84,6 +125,16 @@ class Facility(CategoryLevels):
     minor_category: MinorCategory
     location: Origin
     in_circle: bool | None
+    # Absent/null is an explicitly unsupported legacy contract, never pending.
+    poi_evidence: PoiEvidence | None = Field(default=None, alias="poiEvidence", json_schema_extra={"x-legacy-optional": True})
+
+    @model_validator(mode="after")
+    def evidence_belongs_to_facility(self):
+        if self.poi_evidence is not None:
+            target = (round(self.location.lng, 6), round(self.location.lat, 6))
+            if self.poi_evidence.facility_id != self.id or self.poi_evidence.destination != target:
+                raise ValueError("POI evidence must belong to this facility")
+        return self
 
     @model_validator(mode="before")
     @classmethod
@@ -172,6 +223,16 @@ class RouteEvidence(WireModel):
     endpoint_verified: bool
     reason: str | None
     path: list[list[float]]
+    poi_evidence: PoiEvidence | None = Field(default=None, alias="poiEvidence", json_schema_extra={"x-legacy-optional": True})
+
+    @model_validator(mode="after")
+    def valid_duration(self):
+        if self.reason is not None and self.duration_s is not None:
+            raise ValueError("Failure reason invalidates requested-route duration")
+        if self.poi_evidence is not None and self.poi_evidence.status != "pending":
+            if self.reason is not None or self.duration_s != self.poi_evidence.duration or not self.endpoint_verified:
+                raise ValueError("Route and strict evidence must describe the same observation")
+        return self
 
 
 class FacilityAnalysis(WireModel):
@@ -288,3 +349,21 @@ class TaskResultResponse(WireModel):
     errors: list[Issue] = Field(default_factory=list)
     # Compatibility payload consumed by the current async browser client.
     isochrone: dict
+
+    @model_validator(mode="after")
+    def evidence_belongs_to_task(self):
+        center = (self.center.lng, self.center.lat)
+        facilities = {f.id: f for f in self.data.facilities or []}
+        for facility in facilities.values():
+            if facility.poi_evidence is not None and facility.poi_evidence.request_origin != center:
+                raise ValueError("Facility evidence must originate from the task center")
+        for fid, route in (self.facility_analysis.routes if self.facility_analysis else {}).items():
+            evidence = route.poi_evidence
+            if evidence is not None:
+                if evidence.facility_id != fid or evidence.request_origin != center:
+                    raise ValueError("Route evidence must belong to the task and route key")
+                if self.data.facilities is not None:
+                    facility = facilities.get(fid)
+                    if facility is None or facility.poi_evidence != evidence:
+                        raise ValueError("Facility and route evidence must share a snapshot")
+        return self

@@ -4,10 +4,10 @@ import { useBaiduMap } from '../map/useBaiduMap';
 import type { BMapIcon, BMapMap } from '../map/baiduMapTypes';
 import { createDotIcon } from '../map/mapIcons';
 import type { Isochrone } from './types';
-import { drawGeometry } from './geometry';
+import { drawGeometry, geometryForMinutes } from './geometry';
 import type { Facility, AssessmentPoint } from '../api-contract';
 
-export type Layers = { reachable: boolean; unknown: boolean; uncertain: boolean; extent: boolean; serviceBlind: boolean };
+export type Layers = { reachable: boolean; unreachable: boolean; unknown: boolean; uncertain: boolean; extent: boolean; serviceBlind: boolean };
 
 /** 设施大类颜色（与图例、FacilityPanel 分组一致）；符号取小类首字。 */
 const majorColors: Record<string, string> = { shopping: '#168875', medical: '#397ac6', education: '#c78b36' };
@@ -57,10 +57,9 @@ export function ApiMap({ center, result, resultCenter, layers, onPick, minutes =
       instance.panTo(new api.Point(center.lng, center.lat));
       if (result) {
         if (layers.extent) drawGeometry(instance, api, result.computationExtent, { strokeColor: '#64748b', fillOpacity: 0, strokeStyle: 'dashed', strokeWeight: 1 });
-        const band = result.timeBands?.find(b=>b.minutes===minutes);
-        if (layers.reachable) drawGeometry(instance, api, band ? band.geometry : result.geometry, { strokeColor: '#147d70', fillColor: '#2da990', fillOpacity: .28, strokeWeight: 2 });
+        if (layers.reachable) drawGeometry(instance, api, geometryForMinutes(result, minutes), { strokeColor: '#147d70', fillColor: '#2da990', fillOpacity: .28, strokeWeight: 2 });
         if (layers.serviceBlind) Object.values(blindRegions).forEach(region => drawGeometry(instance, api, region as never, { strokeColor: '#4b5563', fillColor: '#6b7280', fillOpacity: .38, strokeWeight: 1 }));
-        if (layers.unknown) drawGeometry(instance, api, result.unreachableRegion ?? null, { strokeColor: '#374151', fillColor: '#6b7280', fillOpacity: .28, strokeStyle: 'dashed' });
+        if (layers.unreachable) drawGeometry(instance, api, result.unreachableRegion ?? null, { strokeColor: '#374151', fillColor: '#6b7280', fillOpacity: .28, strokeStyle: 'dashed' });
         if (layers.unknown) drawGeometry(instance, api, result.unknownRegion, { strokeColor: '#64748b', fillColor: '#64748b', fillOpacity: .24, strokeStyle: 'dashed' });
         if (layers.uncertain) drawGeometry(instance, api, result.uncertainRegion, { strokeColor: '#ca8a04', fillColor: '#facc15', fillOpacity: .15, strokeWeight: 1 });
       }
@@ -96,7 +95,7 @@ export function ApiMap({ center, result, resultCenter, layers, onPick, minutes =
       <strong>{unavailable ? '地图不可用' : '正在加载百度地图'}</strong>
       <p>{unavailable ? failureMessage : '地图就绪后可点击选择分析中心。'}</p>
     </div>}
-    <div className="api-map-caption">百度坐标 BD09LL · 点击地图选点
+    <div className="api-map-caption">{result && geometryForMinutes(result, minutes) === null && <><strong>{minutes} 分钟可达区域暂无有效数据</strong><br /></>}百度坐标 BD09LL · 点击地图选点
       {resultCenter && <><br />图层与报告中心：{resultCenter.lng.toFixed(6)}, {resultCenter.lat.toFixed(6)}</>}
     </div>
     {facilities.length > 0 && <div className="api-map-legend" data-testid="map-legend" aria-label="地图图例">

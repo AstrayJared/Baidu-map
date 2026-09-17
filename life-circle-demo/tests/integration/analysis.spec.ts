@@ -163,7 +163,10 @@ test('local unknown remains a separate layer', async ({ page }) => {
   expect(result.isochrone.unknownRegion.coordinates.length).toBeGreaterThan(0);
   const unknown = await page.evaluate(() => (window as any).__polygons.filter((p: any) => p.options.fillColor === '#64748b'));
   expect(unknown.length).toBe(result.isochrone.unknownRegion.coordinates.length);
-  await page.getByRole('checkbox', { name: '不可达/未核验区域（灰色）' }).uncheck();
+  const unreachableBefore = await page.evaluate(() => (window as any).__polygons.filter((p: any) => p.options.fillColor === '#6b7280'));
+  await page.getByRole('checkbox', { name: '未核验区域（灰色）' }).uncheck();
+  expect(await page.evaluate(() => (window as any).__polygons.filter((p: any) => p.options.fillColor === '#6b7280'))).toEqual(unreachableBefore);
+  await expect(page.getByRole('checkbox', { name: '已知不可达区域', exact: true })).toBeChecked();
   expect(await page.evaluate(() => (window as any).__polygons.filter((p: any) => p.options.fillColor === '#64748b').length)).toBe(0);
 });
 
@@ -367,12 +370,15 @@ test('facility report, category filtering, route and time layers share one analy
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   const location = { lng: 116.405, lat: 39.915 };
-  const savedRoute = { distance_m: 600, duration_s: 500, endpoint_verified: true, reason: null, path: [[116.404, 39.915], [116.405, 39.915]] };
+  const savedRoute = { poiEvidence: { version: '1.0', facilityId: 'pharmacy-fixture', status: 'verified_reachable',
+    reason: null, duration: 500, observedDuration: 500, endpointVerified: true,
+    requestOrigin: [116.404,39.915], destination: [location.lng,location.lat],
+    routeOrigin: [116.404,39.915], routeDestination: [location.lng,location.lat], originOffsetM: 0, destinationOffsetM: 0 }, distance_m: 600, duration_s: 500, endpoint_verified: true, reason: null, path: [[116.404, 39.915], [116.405, 39.915]] };
   await page.route('**/api/analyses/*/result', async route => {
     const response = await route.fetch();
     const data = await response.json();
     data.facilitiesStatus = 'partial';
-    data.data.facilities = [{ id: 'pharmacy-fixture', name: '离线测试药房', category: 'pharmacy', minor_category: 'pharmacy', major_category: 'medical', location, in_circle: true }];
+    data.data.facilities = [{ id: 'pharmacy-fixture', name: '离线测试药房', category: 'pharmacy', minor_category: 'pharmacy', major_category: 'medical', location, in_circle: true, poiEvidence: savedRoute.poiEvidence }];
     data.data.report = '离线业务样例：1处设施，未知不当盲区。';
     data.facilityAnalysis = {
       status: 'partial',
@@ -399,7 +405,12 @@ test('facility report, category filtering, route and time layers share one analy
   await expect(page.getByText('设施与基础报告', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: /离线测试药房/ }).click();
   await page.getByRole('button', { name: '查看中心到设施的步行路线' }).click();
-  await expect(page.getByText('600 米 · 500 秒 · 端点已核验')).toBeVisible();
+  await expect(page.getByText('600 米 · 500 秒 · 严格核验：15分钟内可达')).toBeVisible();
+  await expect(page.getByTestId('route-poi-evidence')).toContainText('严格核验：15分钟内可达');
+  await page.getByRole('button', { name: '查看分析报告', exact: true }).click();
+  await expect(page.getByTestId('strict-poi-counts')).toContainText('15分钟内可达 1');
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('analysis-report')).not.toBeVisible();
   await page.getByRole('combobox', { name: '步行时间层' }).click();
   await page.getByTitle('5 分钟', { exact: true }).click();
   await expect(page.getByText('离线业务样例：1处设施，未知不当盲区。', { exact: true })).toBeVisible();

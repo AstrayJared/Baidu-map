@@ -241,7 +241,7 @@ class AnalysisManager:
                 ).model_dump(by_alias=True)
                 if business:
                     facilities, categories, evidence, report = business
-                    job.result["data"].update(facilities=[f.model_dump() for f in facilities], categories=[c.model_dump() for c in categories], report=report)
+                    job.result["data"].update(facilities=[f.model_dump(by_alias=True) for f in facilities], categories=[c.model_dump() for c in categories], report=report)
                     job.result["warnings"].extend(Issue(code="FACILITY_LIMITATION", message=message, scope="facilities").model_dump() for message in evidence.warnings)
                 job.status = "completed"
         except asyncio.CancelledError:
@@ -297,9 +297,12 @@ def analysis_router(manager):
             async with httpx.AsyncClient(trust_env=False, follow_redirects=False) as client:
                 provider = BaiduProvider(manager.settings.baidu_map_ak.get_secret_value(),client=client,destination_uid=facility_id,route_metric="distance")
                 observed = await LimitedProvider(provider, manager.gate).query_walking_time(origin,(item["location"]["lng"],item["location"]["lat"]),deadline)
-            value = RouteEvidence(distance_m=observed.distance_m,duration_s=observed.duration,endpoint_verified=observed.endpoint_verified,
-                                  reason=observed.reason,path=observed.route_path if observed.endpoint_verified else []).model_dump()
+            from .poi_evidence import route_evidence
+            value = route_evidence(observed, origin,
+                (item["location"]["lng"], item["location"]["lat"]), facility_id).model_dump(by_alias=True)
             evidence["routes"][facility_id] = value
+            # Update the stored result and route response together for this task.
+            item["poiEvidence"] = value["poiEvidence"]
             evidence["network_requests"] += 1
             return value
 
