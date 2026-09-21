@@ -6,9 +6,9 @@ import { ApiMap, type Layers } from '../analysis/ApiMap';
 import { LocationControls } from '../analysis/LocationControls';
 import { createHybridClient, HybridApiError } from './client';
 import '../analysis/api.css';
+import { getHybridSession, saveHybridSession } from '../algorithmSessions';
 
 const api = createHybridClient();
-const initial = { lng: 121.513925, lat: 31.313079 };
 const terminal = (task: TaskStatusResponse) => ['completed', 'cancelled', 'failed'].includes(task.status);
 const quality = { usable: '可用', partial: '部分结果', insufficient: '证据不足' };
 const stopReasons: Record<string, string> = { budget: '达到验证预算', deadline: '达到时间上限',
@@ -20,16 +20,17 @@ const errorMessages: Record<string, string> = { baidu_walking_not_configured: '�
   hybrid_invalid_request: '分析参数无效，请检查坐标和预算' };
 
 export default function HybridApp() {
-  const [center, setCenter] = useState<Center>(initial);
-  const [lng, setLng] = useState<number | null>(initial.lng);
-  const [lat, setLat] = useState<number | null>(initial.lat);
-  const [budget, setBudget] = useState(400);
+  const session = getHybridSession();
+  const [center, setCenter] = useState<Center>(session.center);
+  const [lng, setLng] = useState<number | null>(session.lng);
+  const [lat, setLat] = useState<number | null>(session.lat);
+  const [budget, setBudget] = useState(session.budget);
   const [task, setTask] = useState<TaskStatusResponse>();
-  const [result, setResult] = useState<HybridResultResponse>();
+  const [result, setResult] = useState<HybridResultResponse | undefined>(session.result);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [dirty, setDirty] = useState(false);
-  const [layers, setLayers] = useState<Layers>({ reachable: true, unreachable: false, unknown: false, uncertain: false, extent: false, serviceBlind: false });
+  const [dirty, setDirty] = useState(session.dirty);
+  const [layers, setLayers] = useState<Layers>(session.layers);
   const active = useRef<{ requestId: string; taskId?: string; cancelled: boolean; controller: AbortController } | null>(null);
   useEffect(() => () => {
     const run = active.current;
@@ -40,6 +41,9 @@ export default function HybridApp() {
       void api.cancelByRequest(run.requestId).catch(() => {});
     }
   }, []);
+  useEffect(() => {
+    saveHybridSession({ center, lng, lat, budget, result, dirty, layers });
+  }, [center, lng, lat, budget, result, dirty, layers]);
   const valid = lng !== null && lat !== null && Number.isFinite(lng) && Number.isFinite(lat)
     && lng >= -180 && lng <= 180 && lat > -85 && lat < 85;
   function pick(next: Center) {

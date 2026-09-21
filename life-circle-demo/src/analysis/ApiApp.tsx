@@ -13,6 +13,7 @@ import { AnalysisReport } from './AnalysisReport';
 import { AnalysisProgress } from './AnalysisProgress';
 import './api.css';
 import { FacilityPanel } from './FacilityPanel';
+import { getBaiduSession, saveBaiduSession } from '../algorithmSessions';
 
 const reasons: Record<string, string> = { budget: '达到调用预算', deadline: '达到截止时间', resolution_limit: '达到网格分辨率或完成边界检查', maximum_range: '达到最大范围', permission: '步行接口权限异常', quota: '服务配额不足', invalid_parameter: '上游参数被拒绝', upstream_failure: '连续上游故障', geometry_error: '几何重建失败' };
 const warnings: Record<string, string> = { range_unknown: '外缘存在未知样本，范围尚未核实', range_truncated: '可达边界可能被计算范围截断', unfinished_boundary: '部分边界尚未完成细化', endpoints_unverified: '部分路线端点尚未核验', geometry_error: '几何重建失败' };
@@ -34,21 +35,22 @@ function ResultSummary({ result }: { result: Isochrone }) {
 }
 
 export default function ApiApp() {
-  const [center, setCenter] = useState<Center>({ lng: 116.404, lat: 39.915 });
-  const [lng, setLng] = useState<number | null>(116.404);
-  const [lat, setLat] = useState<number | null>(39.915);
-  const [budget, setBudget] = useState<Budget>(400);
+  const session = getBaiduSession();
+  const [center, setCenter] = useState<Center>(session.center);
+  const [lng, setLng] = useState<number | null>(session.lng);
+  const [lat, setLat] = useState<number | null>(session.lat);
+  const [budget, setBudget] = useState<Budget>(session.budget);
   const [minutes,setMinutes] = useState(15);
-  const [group,setGroup] = useState('all');
-  const [selected,setSelected] = useState<string|null>(null);
-  const [showFacilities,setShowFacilities] = useState(true);
-  const [showAssessments,setShowAssessments] = useState(true);
-  const [route,setRoute] = useState<{taskId:string;points:[number,number][]}|null>(null);
+  const [group,setGroup] = useState(session.group);
+  const [selected,setSelected] = useState<string|null>(session.selected);
+  const [showFacilities,setShowFacilities] = useState(session.showFacilities);
+  const [showAssessments,setShowAssessments] = useState(session.showAssessments);
+  const [route,setRoute] = useState(session.route);
   const [state, setState] = useState<AnalysisState>({ phase: 'idle' });
-  const [lastResult, setLastResult] = useState<AnalysisResult>();
-  const [dirty, setDirty] = useState(false);
-  const [reportOpen, setReportOpen] = useState(false);
-  const [layers, setLayers] = useState<Layers>({ reachable: true, unreachable: true, unknown: true, uncertain: true, extent: false, serviceBlind: true });
+  const [lastResult, setLastResult] = useState<AnalysisResult | undefined>(session.lastResult);
+  const [dirty, setDirty] = useState(session.dirty);
+  const [reportOpen, setReportOpen] = useState(session.reportOpen);
+  const [layers, setLayers] = useState<Layers>(session.layers);
   const controller = useRef<AnalysisController | null>(null);
   useEffect(() => {
     const instance = new AnalysisController(createApiService(), setState);
@@ -61,6 +63,10 @@ export default function ApiApp() {
     setDirty(false);
     setReportOpen(true);
   }, [state.phase, state.result]);
+  useEffect(() => {
+    saveBaiduSession({ center, lng, lat, budget, group, selected, showFacilities, showAssessments,
+      route, lastResult, dirty, reportOpen, layers });
+  }, [center, lng, lat, budget, group, selected, showFacilities, showAssessments, route, lastResult, dirty, reportOpen, layers]);
   const displayedResult = lastResult;
   const unavailable = !!state.result && analysisAvailability(state.result) === 'unavailable';
   const lastAttemptFailed = state.phase === 'error' || unavailable;
