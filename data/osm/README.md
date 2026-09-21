@@ -90,7 +90,7 @@ OSMnx 简化时在 `osmid/highway/foot/access/bridge/tunnel/service/oneway:foot`
 & $osmPython -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1 --no-access-log
 ```
 
-每个应用进程启动时加载一次缓存、校验并建立 STRtree/组件索引。请求只读共享图，无 Overpass、OSM API、百度 API、插值调用。缺 OSM 缓存时服务仍能启动，其他算法保持原行为。
+应用启动不读取缓存。首次显式调用离线 OSM 或旧 Hybrid 接口时，进程内线程安全地加载一次缓存、校验并建立 STRtree/组件索引；请求只读共享图。缺 OSM 缓存不影响默认百度路网 2.0、健康检查或前端启动。
 
 在另一个 PowerShell 窗口请求：
 

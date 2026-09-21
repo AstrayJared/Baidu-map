@@ -61,6 +61,8 @@
       ],
       "coordinate_system": "bd09ll"
     },
+    "evidence_geometry": null,
+    "inferred_region": null,
     "uncertain_region": {
       "type": "MultiPolygon",
       "coordinates": [],
@@ -110,7 +112,8 @@
           "lng": 116.4,
           "lat": 39.9
         },
-        "in_circle": true
+        "in_circle": true,
+        "poi_evidence": null
       },
       {
         "category": "pharmacy",
@@ -122,7 +125,8 @@
           "lng": 116.4,
           "lat": 39.9
         },
-        "in_circle": true
+        "in_circle": true,
+        "poi_evidence": null
       },
       {
         "category": "school",
@@ -134,7 +138,8 @@
           "lng": 116.4,
           "lat": 39.9
         },
-        "in_circle": true
+        "in_circle": true,
+        "poi_evidence": null
       }
     ],
     "categories": [

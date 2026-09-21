@@ -1,6 +1,10 @@
 """Durable JSON replacement and exclusive local file locks; no budget policy."""
 import json
 import os
+import time
+
+
+REPLACE_ATTEMPTS = 5
 
 
 def atomic_dump(path, value):
@@ -10,7 +14,16 @@ def atomic_dump(path, value):
         json.dump(value, stream, ensure_ascii=False, allow_nan=False, indent=2)
         stream.flush()
         os.fsync(stream.fileno())
-    os.replace(temporary, path)
+    # Antivirus and sync clients can hold the freshly written file for a few
+    # milliseconds; every ledger flush is retried before the run gives up.
+    for attempt in range(REPLACE_ATTEMPTS):
+        try:
+            os.replace(temporary, path)
+            return
+        except PermissionError:
+            if attempt == REPLACE_ATTEMPTS - 1:
+                raise
+            time.sleep(0.02 * (attempt + 1))
 
 
 def lock_file(stream):

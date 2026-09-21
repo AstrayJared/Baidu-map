@@ -1,0 +1,42 @@
+{
+  "generation_event_states": {
+    "completed": 400
+  },
+  "validation_event_states": {
+    "completed": 100
+  },
+  "generation_http_status": {
+    "200": 400
+  },
+  "validation_http_status": {
+    "200": 100
+  },
+  "generation_business_status": {
+    "0": 400
+  },
+  "validation_business_status": {
+    "0": 100
+  },
+  "algorithm_unknown_reference_truth": {
+    "False": 13,
+    "True": 1
+  },
+  "supplemental_polygon_membership": {
+    "valid_reference_points": 92,
+    "strict_correct": 81,
+    "strict_accuracy": 0.8804347826086957,
+    "tolerant_correct": 86,
+    "tolerance_accuracy": 0.9347826086956522,
+    "scope": "published_polygon_inclusion_only_unknown_outside_polygon_counted_as_excluded_not_prespecified_acceptance"
+  },
+  "geometry_valid": true,
+  "geometry_covers_origin": true,
+  "area_m2": 1185584.15201545,
+  "extent_truncated": false,
+  "unresolved_water_lines_affecting_shell": 0,
+  "generation_validation_overlap": 0,
+  "generation_valid_samples": 381,
+  "generation_invalid_samples": 19,
+  "generation_unknown_samples": 19,
+  "unsupported_frontier_length_m": 0.0
+}

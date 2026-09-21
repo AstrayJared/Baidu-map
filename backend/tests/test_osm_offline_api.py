@@ -14,7 +14,15 @@ from app.algorithms.osm_offline.graph_store import GraphStore, PEDESTRIAN_ATTRS,
 from app.config import Settings
 from app.geo.coordinates import wgs84_to_bd09
 from app.geo.projection import MetricProjection
-from app.main import create_app
+from app.main import create_app as production_app
+from app.osm_api import router as internal_osm_router
+
+
+def create_app(settings):
+    """Retained OSM internals, isolated test-only route."""
+    app = production_app(settings)
+    app.include_router(internal_osm_router)
+    return app
 
 ORIGIN = wgs84_to_bd09(121.5, 31.2)
 

@@ -1,0 +1,53 @@
+[
+  {
+    "coordinate": [
+      125.279762,
+      62.475628
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 3.8014615346658833,
+    "duration": null,
+    "reason": "invalid_parameter",
+    "endpoint_verified": false,
+    "valid": false,
+    "route_origin": null,
+    "route_destination": null,
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      125.270879,
+      62.471481
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 34.53231322838064,
+    "duration": null,
+    "reason": "invalid_parameter",
+    "endpoint_verified": false,
+    "valid": false,
+    "route_origin": null,
+    "route_destination": null,
+    "strict_correct": false,
+    "tolerant_correct": false
+  },
+  {
+    "coordinate": [
+      125.271764,
+      62.470437
+    ],
+    "group": "boundary",
+    "inside": false,
+    "boundary_distance_m": 41.436961864738706,
+    "duration": null,
+    "reason": "invalid_parameter",
+    "endpoint_verified": false,
+    "valid": false,
+    "route_origin": null,
+    "route_destination": null,
+    "strict_correct": false,
+    "tolerant_correct": false
+  }
+]

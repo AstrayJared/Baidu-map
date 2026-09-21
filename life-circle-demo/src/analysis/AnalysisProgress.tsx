@@ -4,7 +4,7 @@ import styles from '../components/loading.module.css';
 
 const stages: Record<string, string> = {
   initializing: '初始化采样', expanding: '检查并扩展范围', exploring: '探索采样',
-  refining: '边界细化与补测', reconstructing: '重建时间场与几何', facilities: '检索设施与核对步行距离',
+  refining: '边界细化与补测', reconstructing: '重建边界几何', facilities: '检索设施与核对步行距离',
 };
 
 /** Reuse the demo's visual primitives, without its timer, percentage or facility claims. */

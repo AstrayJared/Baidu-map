@@ -32,6 +32,7 @@ class IsochroneRequest:
     seed: int = 20260911
     active_sampling: bool = True
     expand: bool = True
+    time_bands: tuple[int, ...] = (5, 10, 15)
     config_version: str = "adaptive-v1"
 
     def __post_init__(self):
@@ -63,7 +64,12 @@ class IsochroneRequest:
                 raise ValueError("计算范围必须对齐粗格")
         if self.max_extent < self.extent:
             raise ValueError("最大范围不能小于初始范围")
+        if not self.time_bands or any(type(value) is not int or value not in (5, 10, 15) for value in self.time_bands):
+            raise ValueError("时间分层仅支持 5、10、15 分钟")
+        if len(set(self.time_bands)) != len(self.time_bands):
+            raise ValueError("时间分层不能重复")
         object.__setattr__(self, "origin", tuple(self.origin))
+        object.__setattr__(self, "time_bands", tuple(sorted(self.time_bands)))
 
 
 @dataclass(frozen=True)
@@ -134,6 +140,15 @@ class Statistics:
     unfinished_boundary: int = 0
     active_points: int = 0
     exploration_requests: int = 0
+    matrix_route_pairs: int = 0
+    detailed_route_requests: int = 0
+    sends: int = 0
+    responses: int = 0
+    terminations: int = 0
+    transport_failures: int = 0
+    cancellations: int = 0
+    endpoint_invalid: int = 0
+    unfinished_boundary_length_m: float = 0
 
 
 @dataclass(frozen=True)
@@ -162,6 +177,7 @@ class IsochroneResult:
     time_bands: list = field(default_factory=list)
     sample_observations: list = field(default_factory=list, repr=False)
     unreachable_region: dict | None = None
+    metadata: dict = field(default_factory=dict)
 
     def to_dict(self):
         return {
@@ -172,4 +188,5 @@ class IsochroneResult:
             "stopReason": self.stop_reason, "statistics": asdict(self.statistics),
             "warnings": self.warnings, "config": asdict(self.config),
             "timeBands": self.time_bands,
+            **self.metadata,
         }

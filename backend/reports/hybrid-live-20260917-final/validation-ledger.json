@@ -1,0 +1,5746 @@
+{
+  "version": "hybrid-v1.5",
+  "origin": [
+    121.513925,
+    31.313079
+  ],
+  "config": {
+    "time_limit_seconds": 900,
+    "endpoint_offset_limit_m": 50.0,
+    "initial_direction_count": 16,
+    "analysis_half_width_m": 1200.0,
+    "initial_probe_distances_m": [
+      400.0,
+      700.0,
+      1000.0,
+      1200.0
+    ],
+    "max_exploration_radius_m": 3200.0,
+    "boundary_tolerance_m": 50.0,
+    "max_refinement_depth": 6,
+    "max_baidu_requests": 100,
+    "max_direction_count": 64,
+    "angular_refinement_threshold_m": 250.0,
+    "angular_refinement_ratio": 0.25,
+    "topology_risk_threshold": 0.6,
+    "topology_search_radius_m": 150.0,
+    "max_triangle_edge_m": 400.0,
+    "mixed_triangle_target_m": 100.0,
+    "request_qps": 3.0,
+    "deadline_seconds": 1800.0,
+    "failure_streak_limit": 5,
+    "origin_endpoint_failure_streak_limit": 3,
+    "interior_gap_radii_m": [
+      25.0,
+      50.0,
+      100.0
+    ],
+    "bridge_display_width_m": 3.0
+  },
+  "requests_used": 100,
+  "stop_reason": null,
+  "events": [
+    {
+      "point_id": "p0001",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517446,
+        31.315434
+      ],
+      "reserved_at": 1789633012.3621945,
+      "state": "completed",
+      "sent_at": 1789633012.3687127,
+      "completed_at": 1789633012.488289
+    },
+    {
+      "point_id": "p0002",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.518601,
+        31.314609
+      ],
+      "reserved_at": 1789633012.8323936,
+      "state": "completed",
+      "sent_at": 1789633012.8434083,
+      "completed_at": 1789633012.8893676
+    },
+    {
+      "point_id": "p0003",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.518084,
+        31.314602
+      ],
+      "reserved_at": 1789633013.237846,
+      "state": "completed",
+      "sent_at": 1789633013.2473764,
+      "completed_at": 1789633013.2982194
+    },
+    {
+      "point_id": "p0004",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.51703,
+        31.316603
+      ],
+      "reserved_at": 1789633013.6431406,
+      "state": "completed",
+      "sent_at": 1789633013.6506634,
+      "completed_at": 1789633013.6998146
+    },
+    {
+      "point_id": "p0005",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.521552,
+        31.313092
+      ],
+      "reserved_at": 1789633014.0469692,
+      "state": "completed",
+      "sent_at": 1789633014.077069,
+      "completed_at": 1789633014.1302311
+    },
+    {
+      "point_id": "p0006",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.512666,
+        31.318128
+      ],
+      "reserved_at": 1789633014.4692583,
+      "state": "completed",
+      "sent_at": 1789633014.4932227,
+      "completed_at": 1789633014.5378785
+    },
+    {
+      "point_id": "p0007",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.516506,
+        31.308543
+      ],
+      "reserved_at": 1789633014.8753407,
+      "state": "completed",
+      "sent_at": 1789633014.899476,
+      "completed_at": 1789633014.9555998
+    },
+    {
+      "point_id": "p0008",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.521948,
+        31.312806
+      ],
+      "reserved_at": 1789633015.2963398,
+      "state": "completed",
+      "sent_at": 1789633015.3200376,
+      "completed_at": 1789633015.3705828
+    },
+    {
+      "point_id": "p0009",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520956,
+        31.312745
+      ],
+      "reserved_at": 1789633015.7196083,
+      "state": "completed",
+      "sent_at": 1789633015.7251453,
+      "completed_at": 1789633015.7738903
+    },
+    {
+      "point_id": "p0010",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.514105,
+        31.317958
+      ],
+      "reserved_at": 1789633016.108962,
+      "state": "completed",
+      "sent_at": 1789633016.1298223,
+      "completed_at": 1789633016.2088356
+    },
+    {
+      "point_id": "p0011",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517331,
+        31.316934
+      ],
+      "reserved_at": 1789633016.5495713,
+      "state": "completed",
+      "sent_at": 1789633016.565787,
+      "completed_at": 1789633016.6102755
+    },
+    {
+      "point_id": "p0012",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517993,
+        31.315782
+      ],
+      "reserved_at": 1789633016.9570205,
+      "state": "completed",
+      "sent_at": 1789633016.9745564,
+      "completed_at": 1789633017.020903
+    },
+    {
+      "point_id": "p0013",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520598,
+        31.312477
+      ],
+      "reserved_at": 1789633017.3634725,
+      "state": "completed",
+      "sent_at": 1789633017.370484,
+      "completed_at": 1789633017.4163895
+    },
+    {
+      "point_id": "p0014",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517525,
+        31.315606
+      ],
+      "reserved_at": 1789633017.7573686,
+      "state": "completed",
+      "sent_at": 1789633017.7751923,
+      "completed_at": 1789633017.8258111
+    },
+    {
+      "point_id": "p0015",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.516146,
+        31.317812
+      ],
+      "reserved_at": 1789633018.1645803,
+      "state": "completed",
+      "sent_at": 1789633018.1877925,
+      "completed_at": 1789633018.2378135
+    },
+    {
+      "point_id": "p0016",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.516573,
+        31.317579
+      ],
+      "reserved_at": 1789633018.5734382,
+      "state": "completed",
+      "sent_at": 1789633018.5865138,
+      "completed_at": 1789633018.6381485
+    },
+    {
+      "point_id": "p0017",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517345,
+        31.315983
+      ],
+      "reserved_at": 1789633018.9766266,
+      "state": "completed",
+      "sent_at": 1789633019.002148,
+      "completed_at": 1789633019.0463066
+    },
+    {
+      "point_id": "p0018",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513284,
+        31.318721
+      ],
+      "reserved_at": 1789633019.3830767,
+      "state": "completed",
+      "sent_at": 1789633019.4017656,
+      "completed_at": 1789633019.449918
+    },
+    {
+      "point_id": "p0019",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.515237,
+        31.318497
+      ],
+      "reserved_at": 1789633019.7911198,
+      "state": "completed",
+      "sent_at": 1789633019.8080409,
+      "completed_at": 1789633019.8605514
+    },
+    {
+      "point_id": "p0020",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517944,
+        31.309454
+      ],
+      "reserved_at": 1789633020.1966503,
+      "state": "completed",
+      "sent_at": 1789633020.20874,
+      "completed_at": 1789633020.257393
+    },
+    {
+      "point_id": "p0021",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.51357,
+        31.317278
+      ],
+      "reserved_at": 1789633020.601502,
+      "state": "completed",
+      "sent_at": 1789633020.6199992,
+      "completed_at": 1789633020.6720057
+    },
+    {
+      "point_id": "p0022",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.515017,
+        31.307209
+      ],
+      "reserved_at": 1789633021.0066276,
+      "state": "completed",
+      "sent_at": 1789633021.0184076,
+      "completed_at": 1789633021.0681164
+    },
+    {
+      "point_id": "p0023",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517363,
+        31.315989
+      ],
+      "reserved_at": 1789633021.4102674,
+      "state": "completed",
+      "sent_at": 1789633021.4301436,
+      "completed_at": 1789633021.4798698
+    },
+    {
+      "point_id": "p0024",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.519097,
+        31.315314
+      ],
+      "reserved_at": 1789633021.8146856,
+      "state": "completed",
+      "sent_at": 1789633021.8283582,
+      "completed_at": 1789633021.8755214
+    },
+    {
+      "point_id": "p0025",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520464,
+        31.311416
+      ],
+      "reserved_at": 1789633022.2214646,
+      "state": "completed",
+      "sent_at": 1789633022.2492378,
+      "completed_at": 1789633022.3013244
+    },
+    {
+      "point_id": "p0026",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.50874,
+        31.317616
+      ],
+      "reserved_at": 1789633022.639534,
+      "state": "completed",
+      "sent_at": 1789633022.6504014,
+      "completed_at": 1789633022.692508
+    },
+    {
+      "point_id": "p0027",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.515228,
+        31.318703
+      ],
+      "reserved_at": 1789633023.0305417,
+      "state": "completed",
+      "sent_at": 1789633023.045367,
+      "completed_at": 1789633023.0893638
+    },
+    {
+      "point_id": "p0028",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.504571,
+        31.313887
+      ],
+      "reserved_at": 1789633023.424148,
+      "state": "completed",
+      "sent_at": 1789633023.4441009,
+      "completed_at": 1789633023.4934943
+    },
+    {
+      "point_id": "p0029",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.518612,
+        31.309868
+      ],
+      "reserved_at": 1789633023.832558,
+      "state": "completed",
+      "sent_at": 1789633023.851389,
+      "completed_at": 1789633023.8994877
+    },
+    {
+      "point_id": "p0030",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.514089,
+        31.318178
+      ],
+      "reserved_at": 1789633024.2356687,
+      "state": "completed",
+      "sent_at": 1789633024.2572768,
+      "completed_at": 1789633024.3175712
+    },
+    {
+      "point_id": "p0031",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.510378,
+        31.317715
+      ],
+      "reserved_at": 1789633024.656362,
+      "state": "completed",
+      "sent_at": 1789633024.6787107,
+      "completed_at": 1789633024.7289226
+    },
+    {
+      "point_id": "p0032",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513268,
+        31.319005
+      ],
+      "reserved_at": 1789633025.0642948,
+      "state": "completed",
+      "sent_at": 1789633025.0773256,
+      "completed_at": 1789633025.1288385
+    },
+    {
+      "point_id": "p0033",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513455,
+        31.317302
+      ],
+      "reserved_at": 1789633025.4675672,
+      "state": "completed",
+      "sent_at": 1789633025.4873848,
+      "completed_at": 1789633025.5361013
+    },
+    {
+      "point_id": "p0034",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.508658,
+        31.310446
+      ],
+      "reserved_at": 1789633025.8732946,
+      "state": "completed",
+      "sent_at": 1789633025.8915129,
+      "completed_at": 1789633025.9391525
+    },
+    {
+      "point_id": "p0035",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.506292,
+        31.313469
+      ],
+      "reserved_at": 1789633026.2776906,
+      "state": "completed",
+      "sent_at": 1789633026.3345077,
+      "completed_at": 1789633026.3799145
+    },
+    {
+      "point_id": "p0036",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.508275,
+        31.313287
+      ],
+      "reserved_at": 1789633026.716426,
+      "state": "completed",
+      "sent_at": 1789633026.75112,
+      "completed_at": 1789633026.808306
+    },
+    {
+      "point_id": "p0037",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520544,
+        31.315161
+      ],
+      "reserved_at": 1789633027.1515722,
+      "state": "completed",
+      "sent_at": 1789633027.1661563,
+      "completed_at": 1789633027.209633
+    },
+    {
+      "point_id": "p0038",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.515759,
+        31.308728
+      ],
+      "reserved_at": 1789633027.5590818,
+      "state": "completed",
+      "sent_at": 1789633027.5833104,
+      "completed_at": 1789633027.633793
+    },
+    {
+      "point_id": "p0039",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520734,
+        31.311045
+      ],
+      "reserved_at": 1789633027.980479,
+      "state": "completed",
+      "sent_at": 1789633028.0117102,
+      "completed_at": 1789633028.0599089
+    },
+    {
+      "point_id": "p0040",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513234,
+        31.317554
+      ],
+      "reserved_at": 1789633028.4042602,
+      "state": "completed",
+      "sent_at": 1789633028.4245875,
+      "completed_at": 1789633028.4701724
+    },
+    {
+      "point_id": "p0041",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520949,
+        31.315471
+      ],
+      "reserved_at": 1789633028.8081665,
+      "state": "completed",
+      "sent_at": 1789633028.8302078,
+      "completed_at": 1789633028.877009
+    },
+    {
+      "point_id": "p0042",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.508931,
+        31.311144
+      ],
+      "reserved_at": 1789633029.2133813,
+      "state": "completed",
+      "sent_at": 1789633029.2217672,
+      "completed_at": 1789633029.2730572
+    },
+    {
+      "point_id": "p0043",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513392,
+        31.307863
+      ],
+      "reserved_at": 1789633029.618119,
+      "state": "completed",
+      "sent_at": 1789633029.6414564,
+      "completed_at": 1789633029.6922002
+    },
+    {
+      "point_id": "p0044",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.507883,
+        31.311578
+      ],
+      "reserved_at": 1789633030.0387354,
+      "state": "completed",
+      "sent_at": 1789633030.063763,
+      "completed_at": 1789633030.1218488
+    },
+    {
+      "point_id": "p0045",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513881,
+        31.3182
+      ],
+      "reserved_at": 1789633030.4646423,
+      "state": "completed",
+      "sent_at": 1789633030.4891932,
+      "completed_at": 1789633030.537174
+    },
+    {
+      "point_id": "p0046",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.510412,
+        31.309295
+      ],
+      "reserved_at": 1789633030.8831918,
+      "state": "completed",
+      "sent_at": 1789633030.897611,
+      "completed_at": 1789633030.9537175
+    },
+    {
+      "point_id": "p0047",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.521276,
+        31.312415
+      ],
+      "reserved_at": 1789633031.2890399,
+      "state": "completed",
+      "sent_at": 1789633031.305604,
+      "completed_at": 1789633031.3502107
+    },
+    {
+      "point_id": "p0048",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.511868,
+        31.319108
+      ],
+      "reserved_at": 1789633031.695071,
+      "state": "completed",
+      "sent_at": 1789633031.7233033,
+      "completed_at": 1789633031.7716136
+    },
+    {
+      "point_id": "p0049",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.521805,
+        31.314403
+      ],
+      "reserved_at": 1789633032.1158757,
+      "state": "completed",
+      "sent_at": 1789633032.14751,
+      "completed_at": 1789633032.1922953
+    },
+    {
+      "point_id": "p0050",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513324,
+        31.307814
+      ],
+      "reserved_at": 1789633032.5358796,
+      "state": "completed",
+      "sent_at": 1789633032.5554845,
+      "completed_at": 1789633032.5989587
+    },
+    {
+      "point_id": "p0051",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.509721,
+        31.308942
+      ],
+      "reserved_at": 1789633032.9405506,
+      "state": "completed",
+      "sent_at": 1789633032.9677362,
+      "completed_at": 1789633033.0213253
+    },
+    {
+      "point_id": "p0052",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.51234,
+        31.30784
+      ],
+      "reserved_at": 1789633033.3634286,
+      "state": "completed",
+      "sent_at": 1789633033.3943412,
+      "completed_at": 1789633033.4432995
+    },
+    {
+      "point_id": "p0053",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.507245,
+        31.310818
+      ],
+      "reserved_at": 1789633033.7854116,
+      "state": "completed",
+      "sent_at": 1789633033.8114412,
+      "completed_at": 1789633033.8678775
+    },
+    {
+      "point_id": "p0054",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.522697,
+        31.313173
+      ],
+      "reserved_at": 1789633034.2054935,
+      "state": "completed",
+      "sent_at": 1789633034.232167,
+      "completed_at": 1789633034.2740352
+    },
+    {
+      "point_id": "p0055",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.521938,
+        31.314923
+      ],
+      "reserved_at": 1789633034.6100764,
+      "state": "completed",
+      "sent_at": 1789633034.6320362,
+      "completed_at": 1789633034.6779575
+    },
+    {
+      "point_id": "p0056",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520791,
+        31.315477
+      ],
+      "reserved_at": 1789633035.015318,
+      "state": "completed",
+      "sent_at": 1789633035.0592191,
+      "completed_at": 1789633035.101318
+    },
+    {
+      "point_id": "p0057",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.516567,
+        31.317439
+      ],
+      "reserved_at": 1789633035.4385693,
+      "state": "completed",
+      "sent_at": 1789633035.461213,
+      "completed_at": 1789633035.515414
+    },
+    {
+      "point_id": "p0058",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520436,
+        31.310615
+      ],
+      "reserved_at": 1789633035.8624768,
+      "state": "completed",
+      "sent_at": 1789633035.8855004,
+      "completed_at": 1789633035.9287279
+    },
+    {
+      "point_id": "p0059",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.508467,
+        31.310981
+      ],
+      "reserved_at": 1789633036.2671936,
+      "state": "completed",
+      "sent_at": 1789633036.3014946,
+      "completed_at": 1789633036.3521433
+    },
+    {
+      "point_id": "p0060",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.520715,
+        31.310383
+      ],
+      "reserved_at": 1789633036.6886733,
+      "state": "completed",
+      "sent_at": 1789633036.717553,
+      "completed_at": 1789633036.7634795
+    },
+    {
+      "point_id": "p0061",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513521,
+        31.318465
+      ],
+      "reserved_at": 1789633037.1102324,
+      "state": "completed",
+      "sent_at": 1789633037.136814,
+      "completed_at": 1789633037.1942954
+    },
+    {
+      "point_id": "p0062",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.505917,
+        31.314275
+      ],
+      "reserved_at": 1789633037.528541,
+      "state": "completed",
+      "sent_at": 1789633037.558452,
+      "completed_at": 1789633037.614284
+    },
+    {
+      "point_id": "p0063",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.507959,
+        31.310847
+      ],
+      "reserved_at": 1789633037.9504497,
+      "state": "completed",
+      "sent_at": 1789633037.9783297,
+      "completed_at": 1789633038.0264254
+    },
+    {
+      "point_id": "p0064",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517507,
+        31.317387
+      ],
+      "reserved_at": 1789633038.372414,
+      "state": "completed",
+      "sent_at": 1789633038.4075098,
+      "completed_at": 1789633038.4594467
+    },
+    {
+      "point_id": "p0065",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.518895,
+        31.310132
+      ],
+      "reserved_at": 1789633038.8065913,
+      "state": "completed",
+      "sent_at": 1789633038.831956,
+      "completed_at": 1789633038.8820572
+    },
+    {
+      "point_id": "p0066",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.505218,
+        31.314318
+      ],
+      "reserved_at": 1789633039.2262375,
+      "state": "completed",
+      "sent_at": 1789633039.2524037,
+      "completed_at": 1789633039.315278
+    },
+    {
+      "point_id": "p0067",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.516259,
+        31.316656
+      ],
+      "reserved_at": 1789633039.6634083,
+      "state": "completed",
+      "sent_at": 1789633039.6896524,
+      "completed_at": 1789633039.7396472
+    },
+    {
+      "point_id": "p0068",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.509358,
+        31.308983
+      ],
+      "reserved_at": 1789633040.0842588,
+      "state": "completed",
+      "sent_at": 1789633040.108489,
+      "completed_at": 1789633040.1635041
+    },
+    {
+      "point_id": "p0069",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517391,
+        31.316211
+      ],
+      "reserved_at": 1789633040.5053923,
+      "state": "completed",
+      "sent_at": 1789633040.5355146,
+      "completed_at": 1789633040.5861604
+    },
+    {
+      "point_id": "p0070",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.519907,
+        31.315823
+      ],
+      "reserved_at": 1789633040.9280667,
+      "state": "completed",
+      "sent_at": 1789633040.9657247,
+      "completed_at": 1789633041.018412
+    },
+    {
+      "point_id": "p0071",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.52184,
+        31.312869
+      ],
+      "reserved_at": 1789633041.365461,
+      "state": "completed",
+      "sent_at": 1789633041.418291,
+      "completed_at": 1789633041.466399
+    },
+    {
+      "point_id": "p0072",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.507478,
+        31.310859
+      ],
+      "reserved_at": 1789633041.8135111,
+      "state": "completed",
+      "sent_at": 1789633041.848231,
+      "completed_at": 1789633041.9075446
+    },
+    {
+      "point_id": "p0073",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.507366,
+        31.311454
+      ],
+      "reserved_at": 1789633042.2501395,
+      "state": "completed",
+      "sent_at": 1789633042.355413,
+      "completed_at": 1789633042.4078457
+    },
+    {
+      "point_id": "p0074",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.515376,
+        31.307534
+      ],
+      "reserved_at": 1789633042.7501173,
+      "state": "completed",
+      "sent_at": 1789633042.7789853,
+      "completed_at": 1789633042.8307855
+    },
+    {
+      "point_id": "p0075",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.515496,
+        31.318461
+      ],
+      "reserved_at": 1789633043.1712298,
+      "state": "completed",
+      "sent_at": 1789633043.2004247,
+      "completed_at": 1789633043.253336
+    },
+    {
+      "point_id": "p0076",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.521498,
+        31.31505
+      ],
+      "reserved_at": 1789633043.5935721,
+      "state": "completed",
+      "sent_at": 1789633043.6262918,
+      "completed_at": 1789633043.674581
+    },
+    {
+      "point_id": "p0077",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.516359,
+        31.317762
+      ],
+      "reserved_at": 1789633044.0146816,
+      "state": "completed",
+      "sent_at": 1789633044.0410972,
+      "completed_at": 1789633044.0879693
+    },
+    {
+      "point_id": "p0078",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.522332,
+        31.314178
+      ],
+      "reserved_at": 1789633044.437765,
+      "state": "completed",
+      "sent_at": 1789633044.4730914,
+      "completed_at": 1789633044.5218174
+    },
+    {
+      "point_id": "p0079",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.508837,
+        31.310823
+      ],
+      "reserved_at": 1789633044.8586125,
+      "state": "completed",
+      "sent_at": 1789633044.8920143,
+      "completed_at": 1789633044.9420102
+    },
+    {
+      "point_id": "p0080",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513805,
+        31.317537
+      ],
+      "reserved_at": 1789633045.279199,
+      "state": "completed",
+      "sent_at": 1789633045.3137877,
+      "completed_at": 1789633045.3632345
+    },
+    {
+      "point_id": "p0081",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513353,
+        31.307502
+      ],
+      "reserved_at": 1789633045.6988685,
+      "state": "completed",
+      "sent_at": 1789633045.736974,
+      "completed_at": 1789633045.7848194
+    },
+    {
+      "point_id": "p0082",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.507983,
+        31.315809
+      ],
+      "reserved_at": 1789633046.1203496,
+      "state": "completed",
+      "sent_at": 1789633046.158216,
+      "completed_at": 1789633046.2440267
+    },
+    {
+      "point_id": "p0083",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.521106,
+        31.312705
+      ],
+      "reserved_at": 1789633046.585355,
+      "state": "completed",
+      "sent_at": 1789633046.6214697,
+      "completed_at": 1789633046.6713102
+    },
+    {
+      "point_id": "p0084",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.510844,
+        31.318284
+      ],
+      "reserved_at": 1789633047.0075483,
+      "state": "completed",
+      "sent_at": 1789633047.0396605,
+      "completed_at": 1789633047.088378
+    },
+    {
+      "point_id": "p0085",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.504797,
+        31.314064
+      ],
+      "reserved_at": 1789633047.4289777,
+      "state": "completed",
+      "sent_at": 1789633047.5344696,
+      "completed_at": 1789633047.5775354
+    },
+    {
+      "point_id": "p0086",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.521734,
+        31.313989
+      ],
+      "reserved_at": 1789633047.9131172,
+      "state": "completed",
+      "sent_at": 1789633047.9459095,
+      "completed_at": 1789633047.9931622
+    },
+    {
+      "point_id": "p0087",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.515266,
+        31.317682
+      ],
+      "reserved_at": 1789633048.3342848,
+      "state": "completed",
+      "sent_at": 1789633048.3674982,
+      "completed_at": 1789633048.4212956
+    },
+    {
+      "point_id": "p0088",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.519919,
+        31.309807
+      ],
+      "reserved_at": 1789633048.7586784,
+      "state": "completed",
+      "sent_at": 1789633048.789537,
+      "completed_at": 1789633048.8411903
+    },
+    {
+      "point_id": "p0089",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.51598,
+        31.314523
+      ],
+      "reserved_at": 1789633049.1779087,
+      "state": "completed",
+      "sent_at": 1789633049.2144535,
+      "completed_at": 1789633049.2606194
+    },
+    {
+      "point_id": "p0090",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517107,
+        31.313805
+      ],
+      "reserved_at": 1789633049.599406,
+      "state": "completed",
+      "sent_at": 1789633049.6331382,
+      "completed_at": 1789633049.6763976
+    },
+    {
+      "point_id": "p0091",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.516707,
+        31.311128
+      ],
+      "reserved_at": 1789633050.0213354,
+      "state": "completed",
+      "sent_at": 1789633050.0551364,
+      "completed_at": 1789633050.0981755
+    },
+    {
+      "point_id": "p0092",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.517643,
+        31.314081
+      ],
+      "reserved_at": 1789633050.4402676,
+      "state": "completed",
+      "sent_at": 1789633050.4694922,
+      "completed_at": 1789633050.514151
+    },
+    {
+      "point_id": "p0093",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.516743,
+        31.31198
+      ],
+      "reserved_at": 1789633050.8602295,
+      "state": "completed",
+      "sent_at": 1789633050.8973074,
+      "completed_at": 1789633050.9499009
+    },
+    {
+      "point_id": "p0094",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.51446,
+        31.314724
+      ],
+      "reserved_at": 1789633051.2967727,
+      "state": "completed",
+      "sent_at": 1789633051.3245568,
+      "completed_at": 1789633051.3724034
+    },
+    {
+      "point_id": "p0095",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.513818,
+        31.31388
+      ],
+      "reserved_at": 1789633051.7164154,
+      "state": "completed",
+      "sent_at": 1789633051.7469707,
+      "completed_at": 1789633051.7907126
+    },
+    {
+      "point_id": "p0096",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.510067,
+        31.313717
+      ],
+      "reserved_at": 1789633052.1382601,
+      "state": "completed",
+      "sent_at": 1789633052.1913586,
+      "completed_at": 1789633052.2563117
+    },
+    {
+      "point_id": "p0097",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.510789,
+        31.311153
+      ],
+      "reserved_at": 1789633052.6053553,
+      "state": "completed",
+      "sent_at": 1789633052.6501324,
+      "completed_at": 1789633052.6993647
+    },
+    {
+      "point_id": "p0098",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.512488,
+        31.316081
+      ],
+      "reserved_at": 1789633053.0430958,
+      "state": "completed",
+      "sent_at": 1789633053.083137,
+      "completed_at": 1789633053.1264718
+    },
+    {
+      "point_id": "p0099",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "exterior",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.519331,
+        31.305611
+      ],
+      "reserved_at": 1789633053.4619875,
+      "state": "completed",
+      "sent_at": 1789633053.4953094,
+      "completed_at": 1789633053.5514884
+    },
+    {
+      "point_id": "p0100",
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "exterior",
+      "refinement_level": 0,
+      "request_coordinate": [
+        121.503354,
+        31.320055
+      ],
+      "reserved_at": 1789633053.8956928,
+      "state": "completed",
+      "sent_at": 1789633053.9341998,
+      "completed_at": 1789633053.985729
+    }
+  ],
+  "samples": [
+    {
+      "point_id": "p0001",
+      "xy": [
+        357876.35026138,
+        3465114.9511194034
+      ],
+      "coordinate": [
+        121.517446,
+        31.315434
+      ],
+      "request_coordinate": [
+        121.517446,
+        31.315434
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 599,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51714971778,
+          31.315137367444
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 43.2230790112907,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0002",
+      "xy": [
+        357985.7986824287,
+        3465021.0564389643
+      ],
+      "coordinate": [
+        121.518601,
+        31.314609
+      ],
+      "request_coordinate": [
+        121.518601,
+        31.314609
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 933,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51870494804,
+          31.314603922568
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.980578816558603,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0003",
+      "xy": [
+        357936.2733395236,
+        3465021.4146938412
+      ],
+      "coordinate": [
+        121.518084,
+        31.314602
+      ],
+      "request_coordinate": [
+        121.518084,
+        31.314602
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 585,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51781715954,
+          31.314234083289
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 47.901564395607245,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0004",
+      "xy": [
+        357838.16435246344,
+        3465245.3250070964
+      ],
+      "coordinate": [
+        121.51703,
+        31.316603
+      ],
+      "request_coordinate": [
+        121.51703,
+        31.316603
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 950,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51699153921,
+          31.316726134418
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 14.16226636457314,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0005",
+      "xy": [
+        358266.3780161218,
+        3464846.084973072
+      ],
+      "coordinate": [
+        121.521552,
+        31.313092
+      ],
+      "request_coordinate": [
+        121.521552,
+        31.313092
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 855,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52143511957,
+          31.31333759648
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 29.56017208043505,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0006",
+      "xy": [
+        357422.66292489483,
+        3465422.373900182
+      ],
+      "coordinate": [
+        121.512666,
+        31.318128
+      ],
+      "request_coordinate": [
+        121.512666,
+        31.318128
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 707,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51257191486,
+          31.318121346536
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.028022386260123,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0007",
+      "xy": [
+        357776.547967708,
+        3464353.4759082464
+      ],
+      "coordinate": [
+        121.516506,
+        31.308543
+      ],
+      "request_coordinate": [
+        121.516506,
+        31.308543
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 960,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51645650639,
+          31.308619376059
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.732891687783681,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0008",
+      "xy": [
+        358303.9238195586,
+        3464813.418965085
+      ],
+      "coordinate": [
+        121.521948,
+        31.312806
+      ],
+      "request_coordinate": [
+        121.521948,
+        31.312806
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 933,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52249125076,
+          31.31322217606
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 69.09368293293444,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0009",
+      "xy": [
+        358208.77531829913,
+        3464809.0974875265
+      ],
+      "coordinate": [
+        121.520956,
+        31.312745
+      ],
+      "request_coordinate": [
+        121.520956,
+        31.312745
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 852,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52076700808,
+          31.312848674561
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 21.56922634086951,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0010",
+      "xy": [
+        357560.09581446624,
+        3465401.0791874994
+      ],
+      "coordinate": [
+        121.514105,
+        31.317958
+      ],
+      "request_coordinate": [
+        121.514105,
+        31.317958
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1071,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51412903691,
+          31.317901618684
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.669452419708568,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0011",
+      "xy": [
+        357867.4511418663,
+        3465281.3657093276
+      ],
+      "coordinate": [
+        121.517331,
+        31.316934
+      ],
+      "request_coordinate": [
+        121.517331,
+        31.316934
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 980,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51734071424,
+          31.316819673264
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.708970777872251,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0012",
+      "xy": [
+        357929.22266525624,
+        3465152.3347772732
+      ],
+      "coordinate": [
+        121.517993,
+        31.315782
+      ],
+      "request_coordinate": [
+        121.517993,
+        31.315782
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1070,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51829715035,
+          31.315779608062
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 29.139785282197575,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0013",
+      "xy": [
+        358174.09303132945,
+        3464780.2672933363
+      ],
+      "coordinate": [
+        121.520598,
+        31.312477
+      ],
+      "request_coordinate": [
+        121.520598,
+        31.312477
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 881,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5206172061,
+          31.312466667219
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.179530356558058,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0014",
+      "xy": [
+        357884.1576571358,
+        3465133.838581095
+      ],
+      "coordinate": [
+        121.517525,
+        31.315606
+      ],
+      "request_coordinate": [
+        121.517525,
+        31.315606
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 615,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51696036169,
+          31.315315515663
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 62.67819448765945,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0015",
+      "xy": [
+        357755.232136164,
+        3465381.0537964827
+      ],
+      "coordinate": [
+        121.516146,
+        31.317812
+      ],
+      "request_coordinate": [
+        121.516146,
+        31.317812
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1038,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51641378026,
+          31.317590740822
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 35.61826753323881,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0016",
+      "xy": [
+        357795.7829054219,
+        3465354.3843981824
+      ],
+      "coordinate": [
+        121.516573,
+        31.317579
+      ],
+      "request_coordinate": [
+        121.516573,
+        31.317579
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 869,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51657327855,
+          31.317472227713
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 11.829542510012402,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0017",
+      "xy": [
+        357867.45281891315,
+        3465175.9831137834
+      ],
+      "coordinate": [
+        121.517345,
+        31.315983
+      ],
+      "request_coordinate": [
+        121.517345,
+        31.315983
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 633,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51671130641,
+          31.315673154327
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 69.45877133774988,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0018",
+      "xy": [
+        357482.61759553535,
+        3465487.0356528084
+      ],
+      "coordinate": [
+        121.513284,
+        31.318721
+      ],
+      "request_coordinate": [
+        121.513284,
+        31.318721
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1020,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51327152182,
+          31.318895885671
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 19.418263842856554,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0019",
+      "xy": [
+        357669.1854957107,
+        3465458.7049183105
+      ],
+      "coordinate": [
+        121.515237,
+        31.318497
+      ],
+      "request_coordinate": [
+        121.515237,
+        31.318497
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 891,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5148979026,
+          31.318327649341
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 37.379263907530465,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0020",
+      "xy": [
+        357915.55423673225,
+        3464451.398101463
+      ],
+      "coordinate": [
+        121.517944,
+        31.309454
+      ],
+      "request_coordinate": [
+        121.517944,
+        31.309454
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 875,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51788335102,
+          31.309473899185
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.2339256823290405,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0021",
+      "xy": [
+        357507.9478203317,
+        3465326.6883910135
+      ],
+      "coordinate": [
+        121.51357,
+        31.317278
+      ],
+      "request_coordinate": [
+        121.51357,
+        31.317278
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 722,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51356945744,
+          31.317247494524
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.3798256310979213,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0022",
+      "xy": [
+        357632.0853410261,
+        3464208.5869217142
+      ],
+      "coordinate": [
+        121.515017,
+        31.307209
+      ],
+      "request_coordinate": [
+        121.515017,
+        31.307209
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1109,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51505875289,
+          31.307056774473
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 17.359300056198496,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0023",
+      "xy": [
+        357869.18486009433,
+        3465176.6099628718
+      ],
+      "coordinate": [
+        121.517363,
+        31.315989
+      ],
+      "request_coordinate": [
+        121.517363,
+        31.315989
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 635,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51671128881,
+          31.315653149805
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 72.37931821423103,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0024",
+      "xy": [
+        358034.30140577955,
+        3465098.0478782603
+      ],
+      "coordinate": [
+        121.519097,
+        31.315314
+      ],
+      "request_coordinate": [
+        121.519097,
+        31.315314
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 890,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51930370032,
+          31.315241002991
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 21.47477262743258,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0025",
+      "xy": [
+        358159.74958863313,
+        3464663.0440005
+      ],
+      "coordinate": [
+        121.520464,
+        31.311416
+      ],
+      "request_coordinate": [
+        121.520464,
+        31.311416
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 877,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52052672333,
+          31.311445316894
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.798659437183039,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0026",
+      "xy": [
+        357046.5640426511,
+        3465371.2578477585
+      ],
+      "coordinate": [
+        121.50874,
+        31.317616
+      ],
+      "request_coordinate": [
+        121.50874,
+        31.317616
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 914,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50878540769,
+          31.317605871736
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 4.4826094089603625,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0027",
+      "xy": [
+        357668.61361192365,
+        3465481.5427782116
+      ],
+      "coordinate": [
+        121.515228,
+        31.318703
+      ],
+      "request_coordinate": [
+        121.515228,
+        31.318703
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 909,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51479826956,
+          31.318496889972
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 46.910343719918586,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0028",
+      "xy": [
+        356643.03896725667,
+        3464962.2660025144
+      ],
+      "coordinate": [
+        121.504571,
+        31.313887
+      ],
+      "request_coordinate": [
+        121.504571,
+        31.313887
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 937,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50455212514,
+          31.313774659261
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.58514449004432,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0029",
+      "xy": [
+        357980.1254429086,
+        3464495.802936716
+      ],
+      "coordinate": [
+        121.518612,
+        31.309868
+      ],
+      "request_coordinate": [
+        121.518612,
+        31.309868
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 821,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51870140329,
+          31.31003301261
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 20.109729418070533,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0030",
+      "xy": [
+        357558.87447949033,
+        3465425.479492391
+      ],
+      "coordinate": [
+        121.514089,
+        31.318178
+      ],
+      "request_coordinate": [
+        121.514089,
+        31.318178
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1064,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51419894113,
+          31.317942144866
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 28.22757752277156,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0031",
+      "xy": [
+        357203.2757166666,
+        3465380.088510013
+      ],
+      "coordinate": [
+        121.510378,
+        31.317715
+      ],
+      "request_coordinate": [
+        121.510378,
+        31.317715
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1226,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51040425047,
+          31.317710742135
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.5547719478912376,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0032",
+      "xy": [
+        357481.4864396944,
+        3465518.5244865697
+      ],
+      "coordinate": [
+        121.513268,
+        31.319005
+      ],
+      "request_coordinate": [
+        121.513268,
+        31.319005
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1021,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51326153869,
+          31.318895820248
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.10861675315548,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0033",
+      "xy": [
+        357496.97894623457,
+        3465329.545413937
+      ],
+      "coordinate": [
+        121.513455,
+        31.317302
+      ],
+      "request_coordinate": [
+        121.513455,
+        31.317302
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 712,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51344966693,
+          31.317246681914
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.147246827499297,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0034",
+      "xy": [
+        357028.5210058242,
+        3464577.0402419595
+      ],
+      "coordinate": [
+        121.508658,
+        31.310446
+      ],
+      "request_coordinate": [
+        121.508658,
+        31.310446
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1589,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50861957674,
+          31.310484015097
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.587185764345638,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0035",
+      "xy": [
+        356806.7883939854,
+        3464914.4906956
+      ],
+      "coordinate": [
+        121.506292,
+        31.313469
+      ],
+      "request_coordinate": [
+        121.506292,
+        31.313469
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1098,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50628233946,
+          31.31340256399
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 7.42097905467966,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0036",
+      "xy": [
+        356995.9816327312,
+        3464892.234379322
+      ],
+      "coordinate": [
+        121.508275,
+        31.313287
+      ],
+      "request_coordinate": [
+        121.508275,
+        31.313287
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 935,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50825188637,
+          31.313273878596
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.645241621225233,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0037",
+      "xy": [
+        358172.70834854397,
+        3465077.7380290045
+      ],
+      "coordinate": [
+        121.520544,
+        31.315161
+      ],
+      "request_coordinate": [
+        121.520544,
+        31.315161
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 872,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5205297294,
+          31.315166088892
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.485687039815095,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0038",
+      "xy": [
+        357705.2966662786,
+        3464375.4551489796
+      ],
+      "coordinate": [
+        121.515759,
+        31.308728
+      ],
+      "request_coordinate": [
+        121.515759,
+        31.308728
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 846,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51571835494,
+          31.308782653932
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 7.22243549904491,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0039",
+      "xy": [
+        358185.09328580403,
+        3464621.2980701826
+      ],
+      "coordinate": [
+        121.520734,
+        31.311045
+      ],
+      "request_coordinate": [
+        121.520734,
+        31.311045
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 908,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52067596966,
+          31.311097170922
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 8.070426334739807,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0040",
+      "xy": [
+        357476.1906687489,
+        3465357.8394462727
+      ],
+      "coordinate": [
+        121.513234,
+        31.317554
+      ],
+      "request_coordinate": [
+        121.513234,
+        31.317554
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 694,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51323004197,
+          31.317245227139
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 34.20916471237344,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0041",
+      "xy": [
+        358211.94978312415,
+        3465111.1086296965
+      ],
+      "coordinate": [
+        121.520949,
+        31.315471
+      ],
+      "request_coordinate": [
+        121.520949,
+        31.315471
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 930,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52093853141,
+          31.31536141983
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.169372242989603,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0042",
+      "xy": [
+        357055.6139564309,
+        3464654.0354332654
+      ],
+      "coordinate": [
+        121.508931,
+        31.311144
+      ],
+      "request_coordinate": [
+        121.508931,
+        31.311144
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 759,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50896987943,
+          31.311174915729
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.054066097510613,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0043",
+      "xy": [
+        357477.5148623426,
+        3464283.958856929
+      ],
+      "coordinate": [
+        121.513392,
+        31.307863
+      ],
+      "request_coordinate": [
+        121.513392,
+        31.307863
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 882,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51339240921,
+          31.30781446286
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.378155429380966,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0044",
+      "xy": [
+        356956.08134523116,
+        3464703.351697061
+      ],
+      "coordinate": [
+        121.507883,
+        31.311578
+      ],
+      "request_coordinate": [
+        121.507883,
+        31.311578
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 920,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50788068773,
+          31.311562987417
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.678184240262993,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0045",
+      "xy": [
+        357539.002987153,
+        3465428.285363716
+      ],
+      "coordinate": [
+        121.513881,
+        31.3182
+      ],
+      "request_coordinate": [
+        121.513881,
+        31.3182
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 975,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51413973389,
+          31.318661876111
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 56.716558866466876,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0046",
+      "xy": [
+        357194.540643557,
+        3464447.241639759
+      ],
+      "coordinate": [
+        121.510412,
+        31.309295
+      ],
+      "request_coordinate": [
+        121.510412,
+        31.309295
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 737,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5104373376,
+          31.309239130589
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.6511477101974075,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0047",
+      "xy": [
+        358238.9719826683,
+        3464771.7613292383
+      ],
+      "coordinate": [
+        121.521276,
+        31.312415
+      ],
+      "request_coordinate": [
+        121.521276,
+        31.312415
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 906,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52092603323,
+          31.312290639079
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 36.10492459186539,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0048",
+      "xy": [
+        357347.7165262031,
+        3465532.2111966745
+      ],
+      "coordinate": [
+        121.511868,
+        31.319108
+      ],
+      "request_coordinate": [
+        121.511868,
+        31.319108
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 944,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51182414395,
+          31.319337498834
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 25.784199919265927,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0049",
+      "xy": [
+        358292.4729994214,
+        3464990.6957779797
+      ],
+      "coordinate": [
+        121.521805,
+        31.314403
+      ],
+      "request_coordinate": [
+        121.521805,
+        31.314403
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 928,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52183458202,
+          31.314383237597
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.605579107874256,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0050",
+      "xy": [
+        357470.93791861075,
+        3464278.64635246
+      ],
+      "coordinate": [
+        121.513324,
+        31.307814
+      ],
+      "request_coordinate": [
+        121.513324,
+        31.307814
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 876,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51333249374,
+          31.307784059762
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.419249974459109,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0051",
+      "xy": [
+        357127.96811995085,
+        3464409.0729202153
+      ],
+      "coordinate": [
+        121.509721,
+        31.308942
+      ],
+      "request_coordinate": [
+        121.509721,
+        31.308942
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1211,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50986762216,
+          31.308877047081
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 15.76382038650218,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0052",
+      "xy": [
+        357376.83560059406,
+        3464283.1537326723
+      ],
+      "coordinate": [
+        121.51234,
+        31.30784
+      ],
+      "request_coordinate": [
+        121.51234,
+        31.30784
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 834,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51231416022,
+          31.307867819609
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.958441559516116,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0053",
+      "xy": [
+        356894.03285582876,
+        3464619.84786797
+      ],
+      "coordinate": [
+        121.507245,
+        31.310818
+      ],
+      "request_coordinate": [
+        121.507245,
+        31.310818
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1044,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50723020846,
+          31.310692191602
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 14.013189495839805,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0054",
+      "xy": [
+        358376.2277211343,
+        3464852.186775092
+      ],
+      "coordinate": [
+        121.522697,
+        31.313173
+      ],
+      "request_coordinate": [
+        121.522697,
+        31.313173
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 950,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52265060113,
+          31.313144430935
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.424028773344022,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0055",
+      "xy": [
+        358305.95100419683,
+        3465047.9716469194
+      ],
+      "coordinate": [
+        121.521938,
+        31.314923
+      ],
+      "request_coordinate": [
+        121.521938,
+        31.314923
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 977,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52183502385,
+          31.314903351108
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 10.080803823317265,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0056",
+      "xy": [
+        358196.8191306779,
+        3465112.1540517886
+      ],
+      "coordinate": [
+        121.520791,
+        31.315477
+      ],
+      "request_coordinate": [
+        121.520791,
+        31.315477
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 927,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52076919629,
+          31.315469236626
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.250013146386185,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0057",
+      "xy": [
+        357795.0116021269,
+        3465338.887236934
+      ],
+      "coordinate": [
+        121.516567,
+        31.317439
+      ],
+      "request_coordinate": [
+        121.516567,
+        31.317439
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 866,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51654332451,
+          31.317441934757
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.293073913471652,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0058",
+      "xy": [
+        358155.9285248348,
+        3464574.37138456
+      ],
+      "coordinate": [
+        121.520436,
+        31.310615
+      ],
+      "request_coordinate": [
+        121.520436,
+        31.310615
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 908,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52060590368,
+          31.310686196281
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 18.009034399754963,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0059",
+      "xy": [
+        357011.03412587213,
+        3464636.5391447414
+      ],
+      "coordinate": [
+        121.508467,
+        31.310981
+      ],
+      "request_coordinate": [
+        121.508467,
+        31.310981
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 816,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50846005594,
+          31.311033804951
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.887694501969746,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0060",
+      "xy": [
+        358182.33145612676,
+        3464548.003502988
+      ],
+      "coordinate": [
+        121.520715,
+        31.310383
+      ],
+      "request_coordinate": [
+        121.520715,
+        31.310383
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 940,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52072525741,
+          31.310337674543
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.128905686939497,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0061",
+      "xy": [
+        357504.9316223316,
+        3465458.2698987448
+      ],
+      "coordinate": [
+        121.513521,
+        31.318465
+      ],
+      "request_coordinate": [
+        121.513521,
+        31.318465
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 980,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51376067534,
+          31.318909208483
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 54.18192098544763,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0062",
+      "xy": [
+        356772.1214814765,
+        3465004.129592282
+      ],
+      "coordinate": [
+        121.505917,
+        31.314275
+      ],
+      "request_coordinate": [
+        121.505917,
+        31.314275
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 909,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50591307417,
+          31.314342944807
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 7.535827717366773,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0063",
+      "xy": [
+        356962.2961270388,
+        3464622.2819088087
+      ],
+      "coordinate": [
+        121.507959,
+        31.310847
+      ],
+      "request_coordinate": [
+        121.507959,
+        31.310847
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 858,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50795027641,
+          31.311042981192
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 21.72881086200601,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0064",
+      "xy": [
+        357884.9409928317,
+        3465331.1784687806
+      ],
+      "coordinate": [
+        121.517507,
+        31.317387
+      ],
+      "request_coordinate": [
+        121.517507,
+        31.317387
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 933,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51750076678,
+          31.317341438231
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.077384989244163,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0065",
+      "xy": [
+        358007.60963120183,
+        3464524.4195726896
+      ],
+      "coordinate": [
+        121.518895,
+        31.310132
+      ],
+      "request_coordinate": [
+        121.518895,
+        31.310132
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 813,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51866156857,
+          31.310102572556
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 22.568490903892133,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0066",
+      "xy": [
+        356705.43029402127,
+        3465009.499797437
+      ],
+      "coordinate": [
+        121.505218,
+        31.314318
+      ],
+      "request_coordinate": [
+        121.505218,
+        31.314318
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 938,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50520287843,
+          31.314333671595
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.2536219455195825,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0067",
+      "xy": [
+        357764.4230228914,
+        3465252.7656526435
+      ],
+      "coordinate": [
+        121.516259,
+        31.316656
+      ],
+      "request_coordinate": [
+        121.516259,
+        31.316656
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 679,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51599379024,
+          31.316506615246
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 30.199879365141303,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0068",
+      "xy": [
+        357093.32597892056,
+        3464414.0879087932
+      ],
+      "coordinate": [
+        121.509358,
+        31.308983
+      ],
+      "request_coordinate": [
+        121.509358,
+        31.308983
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1365,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50930817217,
+          31.309055401493
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.331202693505295,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0069",
+      "xy": [
+        357872.17873408133,
+        3465201.1445713677
+      ],
+      "coordinate": [
+        121.517391,
+        31.316211
+      ],
+      "request_coordinate": [
+        121.517391,
+        31.316211
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 968,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51720103471,
+          31.316768241968
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 64.52234215593921,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0070",
+      "xy": [
+        358112.611306748,
+        3465152.576835001
+      ],
+      "coordinate": [
+        121.519907,
+        31.315823
+      ],
+      "request_coordinate": [
+        121.519907,
+        31.315823
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 891,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51997210694,
+          31.315809213967
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.440667879043118,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0071",
+      "xy": [
+        358293.6626217477,
+        3464820.667329932
+      ],
+      "coordinate": [
+        121.52184,
+        31.312869
+      ],
+      "request_coordinate": [
+        121.52184,
+        31.312869
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 869,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52159461301,
+          31.313399763613
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 63.62058956140357,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0072",
+      "xy": [
+        356916.3531794002,
+        3464624.142102361
+      ],
+      "coordinate": [
+        121.507478,
+        31.310859
+      ],
+      "request_coordinate": [
+        121.507478,
+        31.310859
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1084,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50758024291,
+          31.310842506909
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.93613749536577,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0073",
+      "xy": [
+        356906.50523898774,
+        3464690.179490798
+      ],
+      "coordinate": [
+        121.507366,
+        31.311454
+      ],
+      "request_coordinate": [
+        121.507366,
+        31.311454
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 962,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50737083998,
+          31.311582460505
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 14.241058759051903,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0074",
+      "xy": [
+        357666.91728158016,
+        3464243.9133774657
+      ],
+      "coordinate": [
+        121.515376,
+        31.307534
+      ],
+      "request_coordinate": [
+        121.515376,
+        31.307534
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1179,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51536835416,
+          31.307519429976
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.7679008834431778,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0075",
+      "xy": [
+        357693.92463350325,
+        3465454.221786573
+      ],
+      "coordinate": [
+        121.515496,
+        31.318461
+      ],
+      "request_coordinate": [
+        121.515496,
+        31.318461
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1243,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51514734816,
+          31.318299683215
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 37.746630435755186,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0076",
+      "xy": [
+        358263.9641811111,
+        3465063.130871636
+      ],
+      "coordinate": [
+        121.521498,
+        31.31505
+      ],
+      "request_coordinate": [
+        121.521498,
+        31.31505
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 935,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52149630746,
+          31.315008760836
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 4.569713903282846,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0077",
+      "xy": [
+        357775.55269298266,
+        3465375.089221123
+      ],
+      "coordinate": [
+        121.516359,
+        31.317762
+      ],
+      "request_coordinate": [
+        121.516359,
+        31.317762
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1047,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51648367502,
+          31.317661417773
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 16.39887503381436,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0078",
+      "xy": [
+        358342.6619755433,
+        3464964.450080059
+      ],
+      "coordinate": [
+        121.522332,
+        31.314178
+      ],
+      "request_coordinate": [
+        121.522332,
+        31.314178
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1014,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5223226474,
+          31.314169981807
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.2535968788597551,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0079",
+      "xy": [
+        357046.1696862442,
+        3464618.588918599
+      ],
+      "coordinate": [
+        121.508837,
+        31.310823
+      ],
+      "request_coordinate": [
+        121.508837,
+        31.310823
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 786,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50903962277,
+          31.310885030057
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 20.551420954827424,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0080",
+      "xy": [
+        357530.7974885267,
+        3465354.971285644
+      ],
+      "coordinate": [
+        121.513805,
+        31.317537
+      ],
+      "request_coordinate": [
+        121.513805,
+        31.317537
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1124,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51382925946,
+          31.317539370017
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.3349167282991923,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0081",
+      "xy": [
+        357473.26307131606,
+        3464244.03074175
+      ],
+      "coordinate": [
+        121.513353,
+        31.307502
+      ],
+      "request_coordinate": [
+        121.513353,
+        31.307502
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 888,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5132424372,
+          31.307433414895
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.997123517206353,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0082",
+      "xy": [
+        356971.6655790064,
+        3465171.964266598
+      ],
+      "coordinate": [
+        121.507983,
+        31.315809
+      ],
+      "request_coordinate": [
+        121.507983,
+        31.315809
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 853,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50789418398,
+          31.315813898502
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 8.503878951059637,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0083",
+      "xy": [
+        358223.09208556486,
+        3464804.3027363396
+      ],
+      "coordinate": [
+        121.521106,
+        31.312705
+      ],
+      "request_coordinate": [
+        121.521106,
+        31.312705
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 852,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52076700808,
+          31.312848674561
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 36.3596712591105,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0084",
+      "xy": [
+        357248.63337469136,
+        3465442.4619288226
+      ],
+      "coordinate": [
+        121.510844,
+        31.318284
+      ],
+      "request_coordinate": [
+        121.510844,
+        31.318284
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1216,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51082424823,
+          31.31817253036
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.488905184191378,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0085",
+      "xy": [
+        356664.8692777576,
+        3464981.70038056
+      ],
+      "coordinate": [
+        121.504797,
+        31.314064
+      ],
+      "request_coordinate": [
+        121.504797,
+        31.314064
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1013,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5047824797,
+          31.314064281124
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.3866334880144595,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0086",
+      "xy": [
+        358285.08539842546,
+        3464945.0078443605
+      ],
+      "coordinate": [
+        121.521734,
+        31.313989
+      ],
+      "request_coordinate": [
+        121.521734,
+        31.313989
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 909,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52182428289,
+          31.313983014811
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 8.689019598386839,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0087",
+      "xy": [
+        357670.81493586476,
+        3465368.3635529797
+      ],
+      "coordinate": [
+        121.515266,
+        31.317682
+      ],
+      "request_coordinate": [
+        121.515266,
+        31.317682
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 845,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51530643286,
+          31.317690872441
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.9867086602139614,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0088",
+      "xy": [
+        358105.2434725327,
+        3464486.0723750186
+      ],
+      "coordinate": [
+        121.519919,
+        31.309807
+      ],
+      "request_coordinate": [
+        121.519919,
+        31.309807
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "boundary",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 930,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51990754938,
+          31.309797256741
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.5305082638271452,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0089",
+      "xy": [
+        357734.7037224026,
+        3465017.0213634525
+      ],
+      "coordinate": [
+        121.51598,
+        31.314523
+      ],
+      "request_coordinate": [
+        121.51598,
+        31.314523
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 377,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51593216073,
+          31.314485620533
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.151136087672237,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0090",
+      "xy": [
+        357841.58806693647,
+        3464935.1964163156
+      ],
+      "coordinate": [
+        121.517107,
+        31.313805
+      ],
+      "request_coordinate": [
+        121.517107,
+        31.313805
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 426,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5170886641,
+          31.313706456355
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 11.042722002733973,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0091",
+      "xy": [
+        357799.48763891286,
+        3464639.4509883365
+      ],
+      "coordinate": [
+        121.516707,
+        31.311128
+      ],
+      "request_coordinate": [
+        121.516707,
+        31.311128
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 633,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51688716689,
+          31.311133960675
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 17.26174827524091,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0092",
+      "xy": [
+        357893.30438630865,
+        3464964.6447175825
+      ],
+      "coordinate": [
+        121.517643,
+        31.314081
+      ],
+      "request_coordinate": [
+        121.517643,
+        31.314081
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 565,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51754769713,
+          31.314001201856
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.648071541033419,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0093",
+      "xy": [
+        357804.1468317733,
+        3464733.76629324
+      ],
+      "coordinate": [
+        121.516743,
+        31.31198
+      ],
+      "request_coordinate": [
+        121.516743,
+        31.31198
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "inferred_fill",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 528,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51673826737,
+          31.312092683524
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.496712020837942,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0094",
+      "xy": [
+        357589.50268598576,
+        3465042.1713611865
+      ],
+      "coordinate": [
+        121.51446,
+        31.314724
+      ],
+      "request_coordinate": [
+        121.51446,
+        31.314724
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 256,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51445553893,
+          31.314713358961
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.2513716621837225,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0095",
+      "xy": [
+        357526.87266457826,
+        3464949.818548141
+      ],
+      "coordinate": [
+        121.513818,
+        31.31388
+      ],
+      "request_coordinate": [
+        121.513818,
+        31.31388
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 146,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51381599519,
+          31.313808456519
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 7.927729157125872,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0096",
+      "xy": [
+        357167.8776665281,
+        3464937.6095752376
+      ],
+      "coordinate": [
+        121.510067,
+        31.313717
+      ],
+      "request_coordinate": [
+        121.510067,
+        31.313717
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 436,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51006105894,
+          31.313728609591
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.406817101495927,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0097",
+      "xy": [
+        357233.25279822724,
+        3464652.5485993
+      ],
+      "coordinate": [
+        121.510789,
+        31.311153
+      ],
+      "request_coordinate": [
+        121.510789,
+        31.311153
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 572,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51088824732,
+          31.311201305966
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 10.886227979186724,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0098",
+      "xy": [
+        357402.7475509398,
+        3465195.894279872
+      ],
+      "coordinate": [
+        121.512488,
+        31.316081
+      ],
+      "request_coordinate": [
+        121.512488,
+        31.316081
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "interior",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 520,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5124103204,
+          31.316119945997
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 8.60855945942599,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0099",
+      "xy": [
+        358042.8907010505,
+        3464022.5585474493
+      ],
+      "coordinate": [
+        121.519331,
+        31.305611
+      ],
+      "request_coordinate": [
+        121.519331,
+        31.305611
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "exterior",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1699,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51931689182,
+          31.305619507846
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.6564585556590063,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    },
+    {
+      "point_id": "p0100",
+      "xy": [
+        356535.62989979517,
+        3465646.4102549106
+      ],
+      "coordinate": [
+        121.503354,
+        31.320055
+      ],
+      "request_coordinate": [
+        121.503354,
+        31.320055
+      ],
+      "source": "INDEPENDENT_VALIDATION",
+      "reason": "exterior",
+      "refinement_level": 0,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1628,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50340705548,
+          31.320049110044
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.101581565227819,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "osm_guidance": {
+        "available": false,
+        "risk_score": 0,
+        "reachable": null
+      },
+      "osm_baidu_disagreement": false
+    }
+  ]
+}

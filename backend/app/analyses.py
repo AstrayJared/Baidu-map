@@ -12,12 +12,13 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from life_circle.coordinates import normalize
-from life_circle.engine import compute_isochrone
+from .algorithms.baidu_e82 import compute_e82, EndpointAnalyticProvider
 from life_circle.models import CancelToken, IsochroneRequest, ProgressSnapshot, RouteObservation
-from life_circle.providers import AnalyticProvider, BaiduProvider
+from life_circle.providers import BaiduProvider
 
 from .baidu import silence_transport_logs
 from .contracts import Data, Issue, Rules, TaskResultResponse, TaskStatusResponse, RouteEvidence, map_business_status
+from .request_control import RequestStopped, request_slot
 from .rules import DistanceRule
 from .facilities import analyze_facilities
 
@@ -88,6 +89,7 @@ class Job:
 class RateGate:
     """Shared across jobs, including retries; space attempts after completion."""
     def __init__(self, qps, *, clock=time.monotonic, sleep=asyncio.sleep, spacing_clock=None):
+        self.qps = qps
         self.interval = 1 / qps if qps else 0
         self.next_send = 0
         self.lock = asyncio.Lock()
@@ -97,7 +99,9 @@ class RateGate:
         # Deadlines keep their original epoch; pacing uses the precise counter.
         self.spacing_clock = spacing_clock or (time.perf_counter if clock is time.monotonic else clock)
 
-    async def wait(self, deadline):
+    async def wait(self, deadline, *, cost=1):
+        if type(cost) not in (int, float) or cost <= 0:
+            raise ValueError("rate-limit cost must be positive")
         async with self.lock:
             now = self.spacing_clock()
             when = max(now, self.next_send)
@@ -112,13 +116,21 @@ class RateGate:
                 await self.sleep(max(when - self.spacing_clock(), time.get_clock_info('monotonic').resolution))
             if self.clock() >= deadline:
                 return False
-            self.next_send = self.spacing_clock() + self.interval
+            # Round the deadline outward: repeated 1/3-second additions can
+            # otherwise admit four requests into a strict rolling second.
+            self.next_send = self.after(self.spacing_clock(), self.interval * cost)
             return True
 
-    def completed(self, reason):
+    def completed(self, reason, *, cost=1):
         # Cool down all subsequent attempts, not just this destination's retry.
-        cooldown = max(self.interval, 1) if reason in ('rate_limit', 'timeout', 'interrupted') else self.interval
-        self.next_send = max(self.next_send, self.spacing_clock() + cooldown)
+        base = self.interval * cost
+        cooldown = max(base, 1) if reason in ('rate_limit', 'timeout', 'interrupted') else base
+        self.next_send = max(self.next_send, self.after(self.spacing_clock(), cooldown))
+
+    @staticmethod
+    def after(now, delay):
+        when = now + delay
+        return math.nextafter(when, math.inf) if when - now < delay else when
 
 
 class LimitedProvider:
@@ -127,6 +139,10 @@ class LimitedProvider:
     def __init__(self, provider, gate):
         self.provider, self.gate = provider, gate
         self.identity = provider.identity
+        self.batch = bool(getattr(provider, "batch", False))
+        if self.batch:
+            configured = math.floor(gate.qps) if gate.qps else 1
+            self.batch_size = min(provider.max_batch_size, max(1, configured))
 
     async def query_walking_time(self, origin, destination, deadline):
         # A permit alone cannot control server arrivals after DNS/TLS/pool delays.
@@ -141,6 +157,21 @@ class LimitedProvider:
                 return result
             finally:
                 self.gate.completed(reason)
+
+    async def query_walking_times(self, origin, destinations, deadline):
+        if not self.batch:
+            return [await self.query_walking_time(origin, point, deadline) for point in destinations]
+        cost = len(destinations)
+        async with self.gate.attempt_lock:
+            if not await self.gate.wait(deadline, cost=cost):
+                return [RouteObservation(point, reason="deadline", endpoint_verified=False) for point in destinations]
+            reason = "interrupted"
+            try:
+                results = await self.provider.query_walking_times(origin, destinations, deadline)
+                reason = next((item.reason for item in results if item.reason), None)
+                return results
+            finally:
+                self.gate.completed(reason, cost=cost)
 
 
 class AnalysisManager:
@@ -173,8 +204,6 @@ class AnalysisManager:
         if self.settings.analysis_provider == "baidu" and not self.provider_factory:
             if not self.settings.ak_configured or self.settings.analysis_qps is None:
                 raise HTTPException(503, "请在后端配置步行服务 AK 和 ANALYSIS_QPS")
-            if 143 / self.settings.analysis_qps >= 600:
-                raise HTTPException(503, "配置的 QPS 无法在截止时间内完成初始化")
         source = "synthetic" if self.settings.analysis_provider == "synthetic" else "baidu_walking"
         job = Job(str(uuid4()), payload, source)
         self.jobs[job.task_id] = job
@@ -195,17 +224,23 @@ class AnalysisManager:
                     if hasattr(provider, "__aenter__"):
                         provider = await stack.enter_async_context(provider)
                 elif self.settings.analysis_provider == "synthetic":
-                    provider = AnalyticProvider(origin, lambda x, y: math.hypot(x, y) / 1.2)
+                    provider = EndpointAnalyticProvider(origin, lambda x, y: math.hypot(x, y) / 1.2)
                 else:
                     silence_transport_logs()
                     client = await stack.enter_async_context(httpx.AsyncClient(trust_env=False, follow_redirects=False))
-                    provider = LimitedProvider(BaiduProvider(self.settings.baidu_map_ak.get_secret_value(), client=client), self.gate)
+                    provider = LimitedProvider(
+                        BaiduProvider(self.settings.baidu_map_ak.get_secret_value(), client=client),
+                        self.gate,
+                    )
                 request = IsochroneRequest(origin, "bd09ll", budget=budget,
+                    max_extent=1600, expand=False, time_bands=(15,), config_version="local-multicross-e82",
                     qps=self.settings.analysis_qps if provider.network else None)
-                result = await compute_isochrone(request, provider, job.token, on_progress=lambda p: self.update(job, p))
+                result = await compute_e82(request, provider, job.token, on_progress=lambda p: self.update(job, p))
                 if not self.provider_factory and provider.network and result.quality != "insufficient" and not job.token.cancelled:
-                    self.update(job, ProgressSnapshot("facilities", result.statistics.requests, result.statistics.network_requests, budget, time.monotonic()-job.started))
-                    business = await analyze_facilities(result, client, self.settings.baidu_map_ak.get_secret_value(), self.gate, job.token,
+                    self.update(job, ProgressSnapshot("facilities", result.statistics.requests,
+                        result.statistics.network_requests, budget, time.monotonic() - job.started))
+                    business = await analyze_facilities(result, client,
+                        self.settings.baidu_map_ak.get_secret_value(), self.gate, job.token,
                         deadline=job.started + 600)
             # Commit only after transport cleanup; cancellation during cleanup wins.
             if job.token.cancelled:
@@ -226,16 +261,18 @@ class AnalysisManager:
                 errors = ([Issue(code="INSUFFICIENT_EVIDENCE",
                                  message="没有足够步行证据生成等时圈。", scope="isochrone", severity="error")]
                            if business_status == "failed" else [])
+                confirmation = "baidu_sampled" if provider.network else "implementation_only"
                 job.result = TaskResultResponse(
                     task_id=job.task_id, task_status="completed", status=business_status,
                     business_status=business_status,
                     data_source=job.data_source, center={"lng": origin[0], "lat": origin[1]},
                     generated_at=time.time(), facilities_status=business[2].status if business else "not_integrated",
                     facility_analysis=business[2] if business else None,
-                    rules=Rules(distance=DistanceRule(metric="walking_route", threshold_m=1000,
+                    rules=Rules(time_confirmation=confirmation, distance=DistanceRule(metric="walking_route", threshold_m=1000,
                         inclusive=True, tolerance_m=100, assessment_scope="isochrone",
                         category_policy="major_minor")),
-                    data=Data(geometry=payload["geometry"], uncertain_region=payload["uncertainRegion"],
+                    data=Data(geometry=payload["geometry"], evidence_geometry=payload.get("evidenceGeometry"),
+                              inferred_region=payload.get("inferredRegion"), uncertain_region=payload["uncertainRegion"],
                               unknown_region=payload["unknownRegion"], computation_extent=payload["computationExtent"]),
                     algorithm=payload, warnings=warnings, errors=errors, isochrone=payload,
                 ).model_dump(by_alias=True)

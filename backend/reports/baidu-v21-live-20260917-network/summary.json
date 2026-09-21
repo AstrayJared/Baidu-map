@@ -1,0 +1,47 @@
+{
+  "outcome": "未通过",
+  "total": {
+    "planned": 97,
+    "valid": 96,
+    "strict_accuracy": 0.7083333333333334,
+    "tolerance_accuracy": 0.75,
+    "false_positive": 5,
+    "false_negative": 19
+  },
+  "strata": {
+    "boundary": {
+      "planned": 87,
+      "valid": 86,
+      "strict_accuracy": 0.6744186046511628,
+      "tolerance_accuracy": 0.7209302325581395,
+      "false_positive": 5,
+      "false_negative": 19
+    },
+    "interior": {
+      "planned": 8,
+      "valid": 8,
+      "strict_accuracy": 1.0,
+      "tolerance_accuracy": 1.0,
+      "false_positive": 0,
+      "false_negative": 0
+    },
+    "exterior": {
+      "planned": 2,
+      "valid": 2,
+      "strict_accuracy": 1.0,
+      "tolerance_accuracy": 1.0,
+      "false_positive": 0,
+      "false_negative": 0
+    }
+  },
+  "reachable": 67,
+  "unreachable": 29,
+  "invalid_reasons": {
+    "endpoint_offset": 1
+  },
+  "http_requests": 424,
+  "elapsed_seconds": 194.90600000001723,
+  "area_m2_approx": 799726.3329187596,
+  "geometry_valid": true,
+  "result_sha256": "f345ab61b0e7fc27d0697a1993e52a2d7ba59bdf77363018754b332653bd4c83"
+}

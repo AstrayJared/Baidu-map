@@ -11,17 +11,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from fastapi.testclient import TestClient
 from app.config import load_settings
 from app.main import create_app
+from app.osm_api import router as internal_osm_router
+from tools.test_origin import TEST_ORIGIN
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--lng", type=float, default=121.51108, help="BD09 longitude")
-    parser.add_argument("--lat", type=float, default=31.20415, help="BD09 latitude")
+    parser.add_argument("--lng", type=float, default=TEST_ORIGIN[0], help="BD09 longitude")
+    parser.add_argument("--lat", type=float, default=TEST_ORIGIN[1], help="BD09 latitude")
     parser.add_argument("--output", type=Path, default=Path("../.tmp/osm-smoke.json"))
     args = parser.parse_args()
     config = load_settings()
     started = time.perf_counter()
-    with TestClient(create_app(config)) as client:
+    app = create_app(config)
+    # Explicit offline harness only; production does not expose this route.
+    app.include_router(internal_osm_router)
+    with TestClient(app) as client:
         startup_ms = (time.perf_counter()-started)*1000
         body = {"origin": {"lng": args.lng, "lat": args.lat}, "coordinate_system": "bd09ll", "algorithm": "osm_offline"}
         def forbidden(*args, **kwargs):

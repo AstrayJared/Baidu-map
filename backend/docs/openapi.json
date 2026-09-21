@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Life Circle Backend",
-    "version": "0.2.0"
+    "version": "2.0.0"
   },
   "paths": {
     "/api/analyses/{task_id}/routes/{facility_id}": {
@@ -261,6 +261,437 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/analysis/hybrid": {
+      "post": {
+        "tags": [
+          "Hybrid Isochrone"
+        ],
+        "summary": "Create",
+        "operationId": "create_api_v1_analysis_hybrid_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HybridRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analysis/hybrid/by-request/{client_request_id}": {
+      "get": {
+        "tags": [
+          "Hybrid Isochrone"
+        ],
+        "summary": "By Request",
+        "operationId": "by_request_api_v1_analysis_hybrid_by_request__client_request_id__get",
+        "parameters": [
+          {
+            "name": "client_request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/analysis/hybrid/by-request/{client_request_id}/cancel": {
+      "post": {
+        "tags": [
+          "Hybrid Isochrone"
+        ],
+        "summary": "Cancel By Request",
+        "operationId": "cancel_by_request_api_v1_analysis_hybrid_by_request__client_request_id__cancel_post",
+        "parameters": [
+          {
+            "name": "client_request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/analysis/hybrid/{task_id}": {
+      "get": {
+        "tags": [
+          "Hybrid Isochrone"
+        ],
+        "summary": "Status",
+        "operationId": "status_api_v1_analysis_hybrid__task_id__get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/analysis/hybrid/{task_id}/result": {
+      "get": {
+        "tags": [
+          "Hybrid Isochrone"
+        ],
+        "summary": "Result",
+        "operationId": "result_api_v1_analysis_hybrid__task_id__result_get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridResultResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/analysis/hybrid/{task_id}/cancel": {
+      "post": {
+        "tags": [
+          "Hybrid Isochrone"
+        ],
+        "summary": "Cancel",
+        "operationId": "cancel_api_v1_analysis_hybrid__task_id__cancel_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HybridError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
           }
         }
       }
@@ -862,6 +1293,26 @@
               }
             ]
           },
+          "evidenceGeometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inferredRegion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "uncertain_region": {
             "anyOf": [
               {
@@ -1074,6 +1525,17 @@
               }
             ],
             "title": "In Circle"
+          },
+          "poiEvidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PoiEvidence"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
           }
         },
         "additionalProperties": false,
@@ -1235,14 +1697,674 @@
           "baidu_ak_configured": {
             "type": "boolean",
             "title": "Baidu Ak Configured"
+          },
+          "default_analysis_engine": {
+            "type": "string",
+            "title": "Default Analysis Engine"
+          },
+          "osm_state": {
+            "type": "string",
+            "title": "Osm State"
           }
         },
         "type": "object",
         "required": [
           "status",
-          "baidu_ak_configured"
+          "baidu_ak_configured",
+          "default_analysis_engine",
+          "osm_state"
         ],
         "title": "HealthResponse"
+      },
+      "HybridConfig": {
+        "properties": {
+          "time_limit_seconds": {
+            "type": "integer",
+            "const": 900,
+            "title": "Time Limit Seconds",
+            "default": 900
+          },
+          "endpoint_offset_limit_m": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Endpoint Offset Limit M",
+            "default": 50
+          },
+          "initial_direction_count": {
+            "type": "integer",
+            "maximum": 64.0,
+            "minimum": 4.0,
+            "title": "Initial Direction Count",
+            "default": 16
+          },
+          "analysis_half_width_m": {
+            "type": "number",
+            "maximum": 1200.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Analysis Half Width M",
+            "default": 1200
+          },
+          "initial_probe_distances_m": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Initial Probe Distances M",
+            "default": [
+              400,
+              700,
+              1000,
+              1200
+            ]
+          },
+          "max_exploration_radius_m": {
+            "type": "number",
+            "maximum": 10000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Max Exploration Radius M",
+            "default": 3200
+          },
+          "boundary_tolerance_m": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Boundary Tolerance M",
+            "default": 50
+          },
+          "max_refinement_depth": {
+            "type": "integer",
+            "maximum": 12.0,
+            "minimum": 0.0,
+            "title": "Max Refinement Depth",
+            "default": 6
+          },
+          "max_baidu_requests": {
+            "type": "integer",
+            "maximum": 400.0,
+            "minimum": 1.0,
+            "title": "Max Baidu Requests",
+            "default": 400
+          },
+          "max_direction_count": {
+            "type": "integer",
+            "maximum": 256.0,
+            "minimum": 4.0,
+            "title": "Max Direction Count",
+            "default": 64
+          },
+          "angular_refinement_threshold_m": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Angular Refinement Threshold M",
+            "default": 250
+          },
+          "angular_refinement_ratio": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Angular Refinement Ratio",
+            "default": 0.25
+          },
+          "topology_risk_threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Topology Risk Threshold",
+            "default": 0.6
+          },
+          "topology_search_radius_m": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Topology Search Radius M",
+            "default": 150
+          },
+          "max_triangle_edge_m": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Triangle Edge M",
+            "default": 400
+          },
+          "mixed_triangle_target_m": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Mixed Triangle Target M",
+            "default": 100
+          },
+          "request_qps": {
+            "type": "number",
+            "maximum": 20.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Request Qps",
+            "default": 3
+          },
+          "deadline_seconds": {
+            "type": "number",
+            "maximum": 7200.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Deadline Seconds",
+            "default": 1800
+          },
+          "failure_streak_limit": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Failure Streak Limit",
+            "default": 5
+          },
+          "origin_endpoint_failure_streak_limit": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Origin Endpoint Failure Streak Limit",
+            "default": 3
+          },
+          "interior_gap_radii_m": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Interior Gap Radii M",
+            "default": [
+              25,
+              50,
+              100
+            ]
+          },
+          "bridge_display_width_m": {
+            "type": "number",
+            "maximum": 10.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Bridge Display Width M",
+            "default": 3
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "HybridConfig"
+      },
+      "HybridError": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "HybridError"
+      },
+      "HybridIsochrone": {
+        "properties": {
+          "algorithm": {
+            "type": "string",
+            "const": "hybrid",
+            "title": "Algorithm",
+            "default": "hybrid"
+          },
+          "algorithm_version": {
+            "type": "string",
+            "title": "Algorithm Version"
+          },
+          "coordinate_system": {
+            "type": "string",
+            "const": "bd09ll",
+            "title": "Coordinate System",
+            "default": "bd09ll"
+          },
+          "quality": {
+            "type": "string",
+            "enum": [
+              "usable",
+              "partial",
+              "insufficient"
+            ],
+            "title": "Quality"
+          },
+          "coverage_policy": {
+            "type": "string",
+            "const": "continuous_land_interior",
+            "title": "Coverage Policy"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "displayGeometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Display-only shell before water subtraction; never use for analysis or area.",
+            "x-legacy-optional": true
+          },
+          "evidence_geometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inferred_fill_geometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unknown_region": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence_unknown_region": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "computation_extent": {
+            "$ref": "#/components/schemas/Geometry"
+          },
+          "extent_truncated": {
+            "type": "boolean",
+            "title": "Extent Truncated"
+          },
+          "requests_used": {
+            "type": "integer",
+            "maximum": 400.0,
+            "minimum": 0.0,
+            "title": "Requests Used"
+          },
+          "valid_baidu_samples": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Valid Baidu Samples"
+          },
+          "invalid_baidu_samples": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Invalid Baidu Samples"
+          },
+          "unknown_samples": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Unknown Samples"
+          },
+          "boundary_error_estimate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary Error Estimate"
+          },
+          "stop_reason": {
+            "type": "string",
+            "title": "Stop Reason"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "config": {
+            "$ref": "#/components/schemas/HybridConfig"
+          },
+          "readiness": {
+            "$ref": "#/components/schemas/HybridReadiness"
+          },
+          "timing_seconds": {
+            "$ref": "#/components/schemas/HybridTimings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "algorithm_version",
+          "quality",
+          "coverage_policy",
+          "geometry",
+          "evidence_geometry",
+          "inferred_fill_geometry",
+          "unknown_region",
+          "evidence_unknown_region",
+          "computation_extent",
+          "extent_truncated",
+          "requests_used",
+          "valid_baidu_samples",
+          "invalid_baidu_samples",
+          "unknown_samples",
+          "boundary_error_estimate",
+          "stop_reason",
+          "warnings",
+          "config",
+          "readiness",
+          "timing_seconds"
+        ],
+        "title": "HybridIsochrone"
+      },
+      "HybridReadiness": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "full",
+              "degraded"
+            ],
+            "title": "Mode"
+          },
+          "graph_available": {
+            "type": "boolean",
+            "title": "Graph Available"
+          },
+          "data_version_matches": {
+            "type": "boolean",
+            "title": "Data Version Matches"
+          },
+          "coverage_available": {
+            "type": "boolean",
+            "title": "Coverage Available"
+          },
+          "origin_in_coverage": {
+            "type": "boolean",
+            "title": "Origin In Coverage"
+          },
+          "extent_in_coverage": {
+            "type": "boolean",
+            "title": "Extent In Coverage"
+          },
+          "obstacle_layer_available": {
+            "type": "boolean",
+            "title": "Obstacle Layer Available"
+          },
+          "risk_layer_available": {
+            "type": "boolean",
+            "title": "Risk Layer Available"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "mode",
+          "graph_available",
+          "data_version_matches",
+          "coverage_available",
+          "origin_in_coverage",
+          "extent_in_coverage",
+          "obstacle_layer_available",
+          "risk_layer_available",
+          "warnings"
+        ],
+        "title": "HybridReadiness"
+      },
+      "HybridRequest": {
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/Origin"
+          },
+          "coordinate_system": {
+            "type": "string",
+            "const": "bd09ll",
+            "title": "Coordinate System"
+          },
+          "config": {
+            "$ref": "#/components/schemas/HybridConfig"
+          },
+          "client_request_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Client Request Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "origin",
+          "coordinate_system",
+          "client_request_id"
+        ],
+        "title": "HybridRequest"
+      },
+      "HybridResultResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Schema Version",
+            "default": "1.0"
+          },
+          "responseType": {
+            "type": "string",
+            "const": "result",
+            "title": "Responsetype",
+            "default": "result"
+          },
+          "taskId": {
+            "type": "string",
+            "title": "Taskid"
+          },
+          "taskStatus": {
+            "type": "string",
+            "const": "completed",
+            "title": "Taskstatus"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial",
+              "failed",
+              "empty"
+            ],
+            "title": "Status"
+          },
+          "businessStatus": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial",
+              "failed",
+              "empty"
+            ],
+            "title": "Businessstatus"
+          },
+          "dataSource": {
+            "type": "string",
+            "enum": [
+              "synthetic",
+              "baidu_walking"
+            ],
+            "title": "Datasource"
+          },
+          "center": {
+            "$ref": "#/components/schemas/Origin"
+          },
+          "generatedAt": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Generatedat"
+          },
+          "facilitiesStatus": {
+            "type": "string",
+            "enum": [
+              "not_integrated",
+              "complete",
+              "partial",
+              "failed"
+            ],
+            "title": "Facilitiesstatus"
+          },
+          "facilityAnalysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FacilityAnalysis"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coordinateSystem": {
+            "type": "string",
+            "const": "bd09ll",
+            "title": "Coordinatesystem",
+            "default": "bd09ll"
+          },
+          "coordinateOrder": {
+            "type": "string",
+            "const": "longitude,latitude",
+            "title": "Coordinateorder",
+            "default": "longitude,latitude"
+          },
+          "units": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Units"
+          },
+          "rules": {
+            "$ref": "#/components/schemas/Rules"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Data"
+          },
+          "algorithm": {
+            "$ref": "#/components/schemas/HybridIsochrone"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/Issue"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/Issue"
+            },
+            "type": "array",
+            "title": "Errors"
+          },
+          "isochrone": {
+            "$ref": "#/components/schemas/HybridIsochrone"
+          },
+          "config_hash": {
+            "type": "string",
+            "title": "Config Hash"
+          },
+          "result_hash": {
+            "type": "string",
+            "title": "Result Hash"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "taskId",
+          "taskStatus",
+          "status",
+          "businessStatus",
+          "dataSource",
+          "center",
+          "generatedAt",
+          "facilitiesStatus",
+          "algorithm",
+          "isochrone",
+          "config_hash",
+          "result_hash"
+        ],
+        "title": "HybridResultResponse"
+      },
+      "HybridTimings": {
+        "properties": {
+          "preparation": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Preparation"
+          },
+          "obstacle_load": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Obstacle Load"
+          },
+          "requests": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Requests"
+          },
+          "geometry_rebuilds": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Geometry Rebuilds"
+          },
+          "compute_total": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Compute Total"
+          },
+          "task_total": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Task Total"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "preparation",
+          "obstacle_load",
+          "requests",
+          "geometry_rebuilds",
+          "compute_total",
+          "task_total"
+        ],
+        "title": "HybridTimings"
       },
       "Issue": {
         "properties": {
@@ -1331,6 +2453,181 @@
           "coordinate_system"
         ],
         "title": "OsmOfflineRequest"
+      },
+      "PoiEvidence": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Version",
+            "default": "1.0"
+          },
+          "facilityId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Facilityid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "verified_reachable",
+              "verified_unreachable"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration"
+          },
+          "observedDuration": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observedduration"
+          },
+          "endpointVerified": {
+            "type": "boolean",
+            "title": "Endpointverified"
+          },
+          "requestOrigin": {
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Requestorigin"
+          },
+          "destination": {
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Destination"
+          },
+          "routeOrigin": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Routeorigin"
+          },
+          "routeDestination": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Routedestination"
+          },
+          "originOffsetM": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Originoffsetm"
+          },
+          "destinationOffsetM": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destinationoffsetm"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "facilityId",
+          "status",
+          "reason",
+          "duration",
+          "observedDuration",
+          "endpointVerified",
+          "requestOrigin",
+          "destination",
+          "routeOrigin",
+          "routeDestination",
+          "originOffsetM",
+          "destinationOffsetM"
+        ],
+        "title": "PoiEvidence",
+        "description": "Strict requested-OD evidence, not geometry membership or 1km service coverage."
       },
       "QueryEvidence": {
         "properties": {
@@ -1461,6 +2758,17 @@
             },
             "type": "array",
             "title": "Path"
+          },
+          "poiEvidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PoiEvidence"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
           }
         },
         "additionalProperties": false,
@@ -1502,7 +2810,8 @@
             "type": "string",
             "enum": [
               "implementation_only",
-              "mock_only"
+              "mock_only",
+              "baidu_sampled"
             ],
             "title": "Time Confirmation",
             "default": "implementation_only"
@@ -1768,11 +3077,8 @@
           },
           "budget": {
             "type": "integer",
-            "enum": [
-              200,
-              400,
-              800
-            ],
+            "maximum": 800.0,
+            "minimum": 1.0,
             "title": "Budget"
           },
           "elapsedSeconds": {

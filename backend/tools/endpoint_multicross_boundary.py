@@ -158,7 +158,7 @@ async def compute_multicross_boundary(request,provider,token,*,radial_step=50,ta
                                      allow_network=False,parallel_sampling=False,edge_batch_size=1,
                                      on_checkpoint=None, diverse_batches=False, coverage_first=False,
                                      edge_queue_policy=None, on_local_start=None, poi_guided=False,
-                                     poi_discovery_only=False):
+                                     poi_discovery_only=False, on_progress=None):
     if provider.network and not allow_network:raise ValueError('E8.2 requires explicit real-provider enablement')
     if not math.isfinite(radial_step) or radial_step<=0:raise ValueError('Invalid radial step')
     if type(edge_batch_size) is not int or not 1<=edge_batch_size<=30:raise ValueError('Invalid edge batch size')
@@ -299,7 +299,7 @@ async def compute_multicross_boundary(request,provider,token,*,radial_step=50,ta
         await checkpoint('final',force=True)
     result=await compute_radial_boundary(request,provider,token,directions=16,boundary_bands=True,
         target=target,on_sampling_complete=repair,on_session_start=initialize if parallel_sampling else None,
-        coverage_first=coverage_first)
+        coverage_first=coverage_first,on_progress=on_progress)
     result.update(extension)
     result['algorithm']='local-multicross-e82'
     from life_circle.coordinates import LocalProjection

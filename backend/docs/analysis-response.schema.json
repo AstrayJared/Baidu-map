@@ -152,6 +152,28 @@
           ],
           "default": null
         },
+        "evidenceGeometry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Geometry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "inferredRegion": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Geometry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "uncertain_region": {
           "anyOf": [
             {
@@ -373,6 +395,18 @@
             }
           ],
           "title": "In Circle"
+        },
+        "poiEvidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PoiEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "x-legacy-optional": true
         }
       },
       "required": [
@@ -474,6 +508,181 @@
       "title": "Origin",
       "type": "object"
     },
+    "PoiEvidence": {
+      "additionalProperties": false,
+      "description": "Strict requested-OD evidence, not geometry membership or 1km service coverage.",
+      "properties": {
+        "version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "facilityId": {
+          "minLength": 1,
+          "title": "Facilityid",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "verified_reachable",
+            "verified_unreachable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "duration": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Duration"
+        },
+        "observedDuration": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observedduration"
+        },
+        "endpointVerified": {
+          "title": "Endpointverified",
+          "type": "boolean"
+        },
+        "requestOrigin": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Requestorigin",
+          "type": "array"
+        },
+        "destination": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Destination",
+          "type": "array"
+        },
+        "routeOrigin": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Routeorigin"
+        },
+        "routeDestination": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Routedestination"
+        },
+        "originOffsetM": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Originoffsetm"
+        },
+        "destinationOffsetM": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Destinationoffsetm"
+        }
+      },
+      "required": [
+        "facilityId",
+        "status",
+        "reason",
+        "duration",
+        "observedDuration",
+        "endpointVerified",
+        "requestOrigin",
+        "destination",
+        "routeOrigin",
+        "routeDestination",
+        "originOffsetM",
+        "destinationOffsetM"
+      ],
+      "title": "PoiEvidence",
+      "type": "object"
+    },
     "Rules": {
       "additionalProperties": false,
       "properties": {
@@ -503,7 +712,8 @@
           "default": "implementation_only",
           "enum": [
             "implementation_only",
-            "mock_only"
+            "mock_only",
+            "baidu_sampled"
           ],
           "title": "Time Confirmation",
           "type": "string"

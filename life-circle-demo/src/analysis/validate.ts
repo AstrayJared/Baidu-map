@@ -41,8 +41,11 @@ export function validResult(v: unknown): v is AnalysisResult {
       && (c.count_in_circle === null || count(c.count_in_circle)))
     || !object(v.isochrone)) return false;
   const r = v.isochrone;
+  if (r.validationStatus !== undefined && !['not_independently_validated', 'independently_validated'].includes(r.validationStatus as string)) return false;
   if (r.timeBands !== undefined && (!Array.isArray(r.timeBands) || !r.timeBands.every(b => object(b) && [5,10,15].includes(b.minutes as number) && (b.geometry === null || geometry(b.geometry))))) return false;
   if (r.unreachableRegion !== undefined && r.unreachableRegion !== null && !geometry(r.unreachableRegion)) return false;
+  if (r.evidenceGeometry !== undefined && !geometry(r.evidenceGeometry)) return false;
+  if (r.inferredRegion !== undefined && !geometry(r.inferredRegion)) return false;
   if (!validFacilities(v.facilityAnalysis, v.facilitiesStatus, v.data)) return false;
   const facilities = v.data.facilities as { poiEvidence?: PoiEvidence | null }[] | null;
   if (facilities?.some(f => f.poiEvidence && (f.poiEvidence.requestOrigin[0] !== (v.center as RecordValue).lng
@@ -66,6 +69,9 @@ export function validResult(v: unknown): v is AnalysisResult {
   return count(s.requests) && count(s.network_requests) && count(s.retries) && count(s.unfinished_boundary)
     && finite(s.total_seconds) && s.total_seconds >= 0 && finite(s.unknown_area) && s.unknown_area >= 0
     && object(s.failures) && Object.values(s.failures).every(count)
+    && ['matrix_route_pairs', 'detailed_route_requests', 'sends', 'responses', 'terminations', 'transport_failures',
+      'cancellations', 'endpoint_invalid'].every(key => s[key] === undefined || count(s[key]))
+    && (s.unfinished_boundary_length_m === undefined || (finite(s.unfinished_boundary_length_m) && s.unfinished_boundary_length_m >= 0))
     && point(r.config.origin) && (r.config.origin as number[])[0] === v.center.lng
     && (r.config.origin as number[])[1] === v.center.lat
     && [200, 400, 800].includes(r.config.budget as number) && count(r.config.seed);

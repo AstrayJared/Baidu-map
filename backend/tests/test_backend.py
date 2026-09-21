@@ -34,7 +34,12 @@ def test_health_never_calls_baidu(key, configured, monkeypatch):
     with TestClient(create_app(config(key))) as client:
         response = client.request("GET", "/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "baidu_ak_configured": configured}
+    assert response.json() == {
+        "status": "ok",
+        "baidu_ak_configured": configured,
+        "default_analysis_engine": "baidu",
+        "osm_state": "unloaded",
+    }
     assert SECRET not in response.text
 
 

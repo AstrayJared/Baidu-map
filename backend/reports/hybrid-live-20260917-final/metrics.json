@@ -1,0 +1,3869 @@
+{
+  "outcome": "insufficient_evidence",
+  "overall": {
+    "planned": 100,
+    "decidable": 78,
+    "tp": 36,
+    "tn": 32,
+    "fp": 3,
+    "fn": 3,
+    "within_tolerance": 4,
+    "api_unknown": 8,
+    "algorithm_unknown": 14,
+    "accuracy": 0.9230769230769231,
+    "accuracy_wilson_95": [
+      0.8421677019381915,
+      0.9642695359976443
+    ],
+    "false_inclusion_rate": 0.075,
+    "false_exclusion_rate": 0.07142857142857142,
+    "false_inclusion_wilson_95": [
+      0.025836025774588198,
+      0.19864233524310543
+    ],
+    "false_exclusion_wilson_95": [
+      0.02459040987330592,
+      0.19009426801158313
+    ],
+    "unknown_fraction": 0.22
+  },
+  "strata": {
+    "boundary": {
+      "planned": 88,
+      "decidable": 66,
+      "tp": 26,
+      "tn": 30,
+      "fp": 3,
+      "fn": 3,
+      "within_tolerance": 4,
+      "api_unknown": 8,
+      "algorithm_unknown": 14,
+      "accuracy": 0.9090909090909091,
+      "accuracy_wilson_95": [
+        0.8155127011503411,
+        0.9576670249294885
+      ],
+      "false_inclusion_rate": 0.1,
+      "false_exclusion_rate": 0.09375,
+      "false_inclusion_wilson_95": [
+        0.03459988874733419,
+        0.25621082579184085
+      ],
+      "false_exclusion_wilson_95": [
+        0.032401551298366194,
+        0.24218154728387864
+      ],
+      "unknown_fraction": 0.25
+    },
+    "inferred_fill": {
+      "planned": 5,
+      "decidable": 5,
+      "tp": 5,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0,
+      "within_tolerance": 0,
+      "api_unknown": 0,
+      "algorithm_unknown": 0,
+      "accuracy": 1.0,
+      "accuracy_wilson_95": [
+        0.5655175352168251,
+        1
+      ],
+      "false_inclusion_rate": 0.0,
+      "false_exclusion_rate": 0.0,
+      "false_inclusion_wilson_95": [
+        0,
+        0.43448246478317476
+      ],
+      "false_exclusion_wilson_95": [
+        0,
+        0.43448246478317476
+      ],
+      "unknown_fraction": 0.0
+    },
+    "interior": {
+      "planned": 5,
+      "decidable": 5,
+      "tp": 5,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0,
+      "within_tolerance": 0,
+      "api_unknown": 0,
+      "algorithm_unknown": 0,
+      "accuracy": 1.0,
+      "accuracy_wilson_95": [
+        0.5655175352168251,
+        1
+      ],
+      "false_inclusion_rate": 0.0,
+      "false_exclusion_rate": 0.0,
+      "false_inclusion_wilson_95": [
+        0,
+        0.43448246478317476
+      ],
+      "false_exclusion_wilson_95": [
+        0,
+        0.43448246478317476
+      ],
+      "unknown_fraction": 0.0
+    },
+    "exterior": {
+      "planned": 2,
+      "decidable": 2,
+      "tp": 0,
+      "tn": 2,
+      "fp": 0,
+      "fn": 0,
+      "within_tolerance": 0,
+      "api_unknown": 0,
+      "algorithm_unknown": 0,
+      "accuracy": 1.0,
+      "accuracy_wilson_95": [
+        0.34238022750665303,
+        1
+      ],
+      "false_inclusion_rate": null,
+      "false_exclusion_rate": null,
+      "false_inclusion_wilson_95": null,
+      "false_exclusion_wilson_95": null,
+      "unknown_fraction": 0.0
+    }
+  },
+  "cases": [
+    {
+      "id": "v001",
+      "group": "boundary",
+      "coordinate": [
+        121.517446,
+        31.315434
+      ],
+      "xy": [
+        357876.35026138,
+        3465114.9511194034
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 37.08340915340916,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 599,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51714971778,
+          31.315137367444
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 43.2230790112907,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v002",
+      "group": "boundary",
+      "coordinate": [
+        121.518601,
+        31.314609
+      ],
+      "xy": [
+        357985.7986824287,
+        3465021.0564389643
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 5.822076671350242,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 933,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51870494804,
+          31.314603922568
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.980578816558603,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v003",
+      "group": "boundary",
+      "coordinate": [
+        121.518084,
+        31.314602
+      ],
+      "xy": [
+        357936.2733395236,
+        3465021.4146938412
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 37.03734543113273,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 585,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51781715954,
+          31.314234083289
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 47.901564395607245,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v004",
+      "group": "boundary",
+      "coordinate": [
+        121.51703,
+        31.316603
+      ],
+      "xy": [
+        357838.16435246344,
+        3465245.3250070964
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 25.085886624953222,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 950,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51699153921,
+          31.316726134418
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 14.16226636457314,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v005",
+      "group": "boundary",
+      "coordinate": [
+        121.521552,
+        31.313092
+      ],
+      "xy": [
+        358266.3780161218,
+        3464846.084973072
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 35.28061031687084,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 855,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52143511957,
+          31.31333759648
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 29.56017208043505,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v006",
+      "group": "boundary",
+      "coordinate": [
+        121.512666,
+        31.318128
+      ],
+      "xy": [
+        357422.66292489483,
+        3465422.373900182
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 49.0398548708698,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 707,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51257191486,
+          31.318121346536
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.028022386260123,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v007",
+      "group": "boundary",
+      "coordinate": [
+        121.516506,
+        31.308543
+      ],
+      "xy": [
+        357776.547967708,
+        3464353.4759082464
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 9.772893821361853,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 960,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51645650639,
+          31.308619376059
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.732891687783681,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v008",
+      "group": "boundary",
+      "coordinate": [
+        121.521948,
+        31.312806
+      ],
+      "xy": [
+        358303.9238195586,
+        3464813.418965085
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 14.413284003453072,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 933,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52249125076,
+          31.31322217606
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 69.09368293293444,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "classification": "api_unknown",
+      "strict_classification": "api_unknown"
+    },
+    {
+      "id": "v009",
+      "group": "boundary",
+      "coordinate": [
+        121.520956,
+        31.312745
+      ],
+      "xy": [
+        358208.77531829913,
+        3464809.0974875265
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 29.92925349874674,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 852,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52076700808,
+          31.312848674561
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 21.56922634086951,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v010",
+      "group": "boundary",
+      "coordinate": [
+        121.514105,
+        31.317958
+      ],
+      "xy": [
+        357560.09581446624,
+        3465401.0791874994
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 22.550882730203632,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1071,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51412903691,
+          31.317901618684
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.669452419708568,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v011",
+      "group": "boundary",
+      "coordinate": [
+        121.517331,
+        31.316934
+      ],
+      "xy": [
+        357867.4511418663,
+        3465281.3657093276
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 25.270468666494878,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 980,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51734071424,
+          31.316819673264
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.708970777872251,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v012",
+      "group": "boundary",
+      "coordinate": [
+        121.517993,
+        31.315782
+      ],
+      "xy": [
+        357929.22266525624,
+        3465152.3347772732
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 23.64103776940013,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1070,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51829715035,
+          31.315779608062
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 29.139785282197575,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v013",
+      "group": "boundary",
+      "coordinate": [
+        121.520598,
+        31.312477
+      ],
+      "xy": [
+        358174.09303132945,
+        3464780.2672933363
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 24.0707532990333,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 881,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5206172061,
+          31.312466667219
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.179530356558058,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v014",
+      "group": "boundary",
+      "coordinate": [
+        121.517525,
+        31.315606
+      ],
+      "xy": [
+        357884.1576571358,
+        3465133.838581095
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 22.056850737973434,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 615,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51696036169,
+          31.315315515663
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 62.67819448765945,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "classification": "api_unknown",
+      "strict_classification": "api_unknown"
+    },
+    {
+      "id": "v015",
+      "group": "boundary",
+      "coordinate": [
+        121.516146,
+        31.317812
+      ],
+      "xy": [
+        357755.232136164,
+        3465381.0537964827
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 48.87533811229465,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1038,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51641378026,
+          31.317590740822
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 35.61826753323881,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v016",
+      "group": "boundary",
+      "coordinate": [
+        121.516573,
+        31.317579
+      ],
+      "xy": [
+        357795.7829054219,
+        3465354.3843981824
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 7.862465988997988,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 869,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51657327855,
+          31.317472227713
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 11.829542510012402,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "fn",
+      "strict_classification": "fn"
+    },
+    {
+      "id": "v017",
+      "group": "boundary",
+      "coordinate": [
+        121.517345,
+        31.315983
+      ],
+      "xy": [
+        357867.45281891315,
+        3465175.9831137834
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 9.764944487741513,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 633,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51671130641,
+          31.315673154327
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 69.45877133774988,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "classification": "api_unknown",
+      "strict_classification": "api_unknown"
+    },
+    {
+      "id": "v018",
+      "group": "boundary",
+      "coordinate": [
+        121.513284,
+        31.318721
+      ],
+      "xy": [
+        357482.61759553535,
+        3465487.0356528084
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 34.36313323162758,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1020,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51327152182,
+          31.318895885671
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 19.418263842856554,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v019",
+      "group": "boundary",
+      "coordinate": [
+        121.515237,
+        31.318497
+      ],
+      "xy": [
+        357669.1854957107,
+        3465458.7049183105
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 13.505229470712303,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 891,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5148979026,
+          31.318327649341
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 37.379263907530465,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v020",
+      "group": "boundary",
+      "coordinate": [
+        121.517944,
+        31.309454
+      ],
+      "xy": [
+        357915.55423673225,
+        3464451.398101463
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 5.952102323274281,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 875,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51788335102,
+          31.309473899185
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.2339256823290405,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "fn",
+      "strict_classification": "fn"
+    },
+    {
+      "id": "v021",
+      "group": "boundary",
+      "coordinate": [
+        121.51357,
+        31.317278
+      ],
+      "xy": [
+        357507.9478203317,
+        3465326.6883910135
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 38.37289823663173,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 722,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51356945744,
+          31.317247494524
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.3798256310979213,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v022",
+      "group": "boundary",
+      "coordinate": [
+        121.515017,
+        31.307209
+      ],
+      "xy": [
+        357632.0853410261,
+        3464208.5869217142
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 40.5338686085534,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1109,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51505875289,
+          31.307056774473
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 17.359300056198496,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v023",
+      "group": "boundary",
+      "coordinate": [
+        121.517363,
+        31.315989
+      ],
+      "xy": [
+        357869.18486009433,
+        3465176.6099628718
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 7.953828240587406,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 635,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51671128881,
+          31.315653149805
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 72.37931821423103,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "classification": "api_unknown",
+      "strict_classification": "api_unknown"
+    },
+    {
+      "id": "v024",
+      "group": "boundary",
+      "coordinate": [
+        121.519097,
+        31.315314
+      ],
+      "xy": [
+        358034.30140577955,
+        3465098.0478782603
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 45.36755113898875,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 890,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51930370032,
+          31.315241002991
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 21.47477262743258,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "within_tolerance",
+      "strict_classification": "fn"
+    },
+    {
+      "id": "v025",
+      "group": "boundary",
+      "coordinate": [
+        121.520464,
+        31.311416
+      ],
+      "xy": [
+        358159.74958863313,
+        3464663.0440005
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 30.042640034054095,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 877,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52052672333,
+          31.311445316894
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.798659437183039,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v026",
+      "group": "boundary",
+      "coordinate": [
+        121.50874,
+        31.317616
+      ],
+      "xy": [
+        357046.5640426511,
+        3465371.2578477585
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 29.509943068284077,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 914,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50878540769,
+          31.317605871736
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 4.4826094089603625,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v027",
+      "group": "boundary",
+      "coordinate": [
+        121.515228,
+        31.318703
+      ],
+      "xy": [
+        357668.61361192365,
+        3465481.5427782116
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 29.804563339062817,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 909,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51479826956,
+          31.318496889972
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 46.910343719918586,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v028",
+      "group": "boundary",
+      "coordinate": [
+        121.504571,
+        31.313887
+      ],
+      "xy": [
+        356643.03896725667,
+        3464962.2660025144
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 2.3795516439327216,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 937,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50455212514,
+          31.313774659261
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.58514449004432,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "fp",
+      "strict_classification": "fp"
+    },
+    {
+      "id": "v029",
+      "group": "boundary",
+      "coordinate": [
+        121.518612,
+        31.309868
+      ],
+      "xy": [
+        357980.1254429086,
+        3464495.802936716
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 13.817940427247397,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 821,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51870140329,
+          31.31003301261
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 20.109729418070533,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "fn",
+      "strict_classification": "fn"
+    },
+    {
+      "id": "v030",
+      "group": "boundary",
+      "coordinate": [
+        121.514089,
+        31.318178
+      ],
+      "xy": [
+        357558.87447949033,
+        3465425.479492391
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 43.9355914336468,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1064,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51419894113,
+          31.317942144866
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 28.22757752277156,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v031",
+      "group": "boundary",
+      "coordinate": [
+        121.510378,
+        31.317715
+      ],
+      "xy": [
+        357203.2757166666,
+        3465380.088510013
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 11.594478905060926,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1226,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51040425047,
+          31.317710742135
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.5547719478912376,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v032",
+      "group": "boundary",
+      "coordinate": [
+        121.513268,
+        31.319005
+      ],
+      "xy": [
+        357481.4864396944,
+        3465518.5244865697
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 43.41130716826662,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1021,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51326153869,
+          31.318895820248
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.10861675315548,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v033",
+      "group": "boundary",
+      "coordinate": [
+        121.513455,
+        31.317302
+      ],
+      "xy": [
+        357496.97894623457,
+        3465329.545413937
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 41.56977247849409,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 712,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51344966693,
+          31.317246681914
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.147246827499297,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v034",
+      "group": "boundary",
+      "coordinate": [
+        121.508658,
+        31.310446
+      ],
+      "xy": [
+        357028.5210058242,
+        3464577.0402419595
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 42.32637691057286,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1589,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50861957674,
+          31.310484015097
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.587185764345638,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v035",
+      "group": "boundary",
+      "coordinate": [
+        121.506292,
+        31.313469
+      ],
+      "xy": [
+        356806.7883939854,
+        3464914.4906956
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 0.48486697860355626,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1098,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50628233946,
+          31.31340256399
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 7.42097905467966,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v036",
+      "group": "boundary",
+      "coordinate": [
+        121.508275,
+        31.313287
+      ],
+      "xy": [
+        356995.9816327312,
+        3464892.234379322
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 2.093795891148472,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 935,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50825188637,
+          31.313273878596
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.645241621225233,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "fp",
+      "strict_classification": "fp"
+    },
+    {
+      "id": "v037",
+      "group": "boundary",
+      "coordinate": [
+        121.520544,
+        31.315161
+      ],
+      "xy": [
+        358172.70834854397,
+        3465077.7380290045
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 9.727258639345095,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 872,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5205297294,
+          31.315166088892
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.485687039815095,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v038",
+      "group": "boundary",
+      "coordinate": [
+        121.515759,
+        31.308728
+      ],
+      "xy": [
+        357705.2966662786,
+        3464375.4551489796
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 11.695591447684839,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 846,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51571835494,
+          31.308782653932
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 7.22243549904491,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v039",
+      "group": "boundary",
+      "coordinate": [
+        121.520734,
+        31.311045
+      ],
+      "xy": [
+        358185.09328580403,
+        3464621.2980701826
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 3.042493192432247,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 908,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52067596966,
+          31.311097170922
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 8.070426334739807,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v040",
+      "group": "boundary",
+      "coordinate": [
+        121.513234,
+        31.317554
+      ],
+      "xy": [
+        357476.1906687489,
+        3465357.8394462727
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 35.408967956210326,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 694,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51323004197,
+          31.317245227139
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 34.20916471237344,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v041",
+      "group": "boundary",
+      "coordinate": [
+        121.520949,
+        31.315471
+      ],
+      "xy": [
+        358211.94978312415,
+        3465111.1086296965
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 41.20670377511994,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 930,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52093853141,
+          31.31536141983
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.169372242989603,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v042",
+      "group": "boundary",
+      "coordinate": [
+        121.508931,
+        31.311144
+      ],
+      "xy": [
+        357055.6139564309,
+        3464654.0354332654
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 39.08684540523404,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 759,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50896987943,
+          31.311174915729
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.054066097510613,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v043",
+      "group": "boundary",
+      "coordinate": [
+        121.513392,
+        31.307863
+      ],
+      "xy": [
+        357477.5148623426,
+        3464283.958856929
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 37.78031606787407,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 882,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51339240921,
+          31.30781446286
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.378155429380966,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v044",
+      "group": "boundary",
+      "coordinate": [
+        121.507883,
+        31.311578
+      ],
+      "xy": [
+        356956.08134523116,
+        3464703.351697061
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 23.46966617805692,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 920,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50788068773,
+          31.311562987417
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.678184240262993,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v045",
+      "group": "boundary",
+      "coordinate": [
+        121.513881,
+        31.3182
+      ],
+      "xy": [
+        357539.002987153,
+        3465428.285363716
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 48.45314241041834,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 975,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51413973389,
+          31.318661876111
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 56.716558866466876,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "classification": "api_unknown",
+      "strict_classification": "api_unknown"
+    },
+    {
+      "id": "v046",
+      "group": "boundary",
+      "coordinate": [
+        121.510412,
+        31.309295
+      ],
+      "xy": [
+        357194.540643557,
+        3464447.241639759
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 31.847618149868005,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 737,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5104373376,
+          31.309239130589
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.6511477101974075,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v047",
+      "group": "boundary",
+      "coordinate": [
+        121.521276,
+        31.312415
+      ],
+      "xy": [
+        358238.9719826683,
+        3464771.7613292383
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 17.083325047635817,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 906,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52092603323,
+          31.312290639079
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 36.10492459186539,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v048",
+      "group": "boundary",
+      "coordinate": [
+        121.511868,
+        31.319108
+      ],
+      "xy": [
+        357347.7165262031,
+        3465532.2111966745
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 27.014894593156974,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 944,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51182414395,
+          31.319337498834
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 25.784199919265927,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v049",
+      "group": "boundary",
+      "coordinate": [
+        121.521805,
+        31.314403
+      ],
+      "xy": [
+        358292.4729994214,
+        3464990.6957779797
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 6.914251211544223,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 928,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52183458202,
+          31.314383237597
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.605579107874256,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v050",
+      "group": "boundary",
+      "coordinate": [
+        121.513324,
+        31.307814
+      ],
+      "xy": [
+        357470.93791861075,
+        3464278.64635246
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 31.86329332880851,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 876,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51333249374,
+          31.307784059762
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.419249974459109,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v051",
+      "group": "boundary",
+      "coordinate": [
+        121.509721,
+        31.308942
+      ],
+      "xy": [
+        357127.96811995085,
+        3464409.0729202153
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 21.26034893721986,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1211,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50986762216,
+          31.308877047081
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 15.76382038650218,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v052",
+      "group": "boundary",
+      "coordinate": [
+        121.51234,
+        31.30784
+      ],
+      "xy": [
+        357376.83560059406,
+        3464283.1537326723
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 20.838113183048776,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 834,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51231416022,
+          31.307867819609
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.958441559516116,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v053",
+      "group": "boundary",
+      "coordinate": [
+        121.507245,
+        31.310818
+      ],
+      "xy": [
+        356894.03285582876,
+        3464619.84786797
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 34.83633536294492,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1044,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50723020846,
+          31.310692191602
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 14.013189495839805,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v054",
+      "group": "boundary",
+      "coordinate": [
+        121.522697,
+        31.313173
+      ],
+      "xy": [
+        358376.2277211343,
+        3464852.186775092
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 47.22665452619883,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 950,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52265060113,
+          31.313144430935
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.424028773344022,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v055",
+      "group": "boundary",
+      "coordinate": [
+        121.521938,
+        31.314923
+      ],
+      "xy": [
+        358305.95100419683,
+        3465047.9716469194
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 40.73539340913038,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 977,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52183502385,
+          31.314903351108
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 10.080803823317265,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v056",
+      "group": "boundary",
+      "coordinate": [
+        121.520791,
+        31.315477
+      ],
+      "xy": [
+        358196.8191306779,
+        3465112.1540517886
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 31.619492767783434,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 927,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52076919629,
+          31.315469236626
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.250013146386185,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v057",
+      "group": "boundary",
+      "coordinate": [
+        121.516567,
+        31.317439
+      ],
+      "xy": [
+        357795.0116021269,
+        3465338.887236934
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 3.013556093656278,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 866,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51654332451,
+          31.317441934757
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.293073913471652,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v058",
+      "group": "boundary",
+      "coordinate": [
+        121.520436,
+        31.310615
+      ],
+      "xy": [
+        358155.9285248348,
+        3464574.37138456
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 6.82842398189635,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 908,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52060590368,
+          31.310686196281
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 18.009034399754963,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v059",
+      "group": "boundary",
+      "coordinate": [
+        121.508467,
+        31.310981
+      ],
+      "xy": [
+        357011.03412587213,
+        3464636.5391447414
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 15.194002149865028,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 816,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50846005594,
+          31.311033804951
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.887694501969746,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v060",
+      "group": "boundary",
+      "coordinate": [
+        121.520715,
+        31.310383
+      ],
+      "xy": [
+        358182.33145612676,
+        3464548.003502988
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 43.53768211089354,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 940,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52072525741,
+          31.310337674543
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.128905686939497,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v061",
+      "group": "boundary",
+      "coordinate": [
+        121.513521,
+        31.318465
+      ],
+      "xy": [
+        357504.9316223316,
+        3465458.2698987448
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 40.19822998878882,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 980,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51376067534,
+          31.318909208483
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 54.18192098544763,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "classification": "api_unknown",
+      "strict_classification": "api_unknown"
+    },
+    {
+      "id": "v062",
+      "group": "boundary",
+      "coordinate": [
+        121.505917,
+        31.314275
+      ],
+      "xy": [
+        356772.1214814765,
+        3465004.129592282
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 20.35033126363734,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 909,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50591307417,
+          31.314342944807
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 7.535827717366773,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v063",
+      "group": "boundary",
+      "coordinate": [
+        121.507959,
+        31.310847
+      ],
+      "xy": [
+        356962.2961270388,
+        3464622.2819088087
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 13.253586359013632,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 858,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50795027641,
+          31.311042981192
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 21.72881086200601,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v064",
+      "group": "boundary",
+      "coordinate": [
+        121.517507,
+        31.317387
+      ],
+      "xy": [
+        357884.9409928317,
+        3465331.1784687806
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 49.32211386699767,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 933,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51750076678,
+          31.317341438231
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.077384989244163,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v065",
+      "group": "boundary",
+      "coordinate": [
+        121.518895,
+        31.310132
+      ],
+      "xy": [
+        358007.60963120183,
+        3464524.4195726896
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 25.770972781371082,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 813,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51866156857,
+          31.310102572556
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 22.568490903892133,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v066",
+      "group": "boundary",
+      "coordinate": [
+        121.505218,
+        31.314318
+      ],
+      "xy": [
+        356705.43029402127,
+        3465009.499797437
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 22.853855288067773,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 938,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50520287843,
+          31.314333671595
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.2536219455195825,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v067",
+      "group": "boundary",
+      "coordinate": [
+        121.516259,
+        31.316656
+      ],
+      "xy": [
+        357764.4230228914,
+        3465252.7656526435
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 22.235322794073614,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 679,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51599379024,
+          31.316506615246
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 30.199879365141303,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v068",
+      "group": "boundary",
+      "coordinate": [
+        121.509358,
+        31.308983
+      ],
+      "xy": [
+        357093.32597892056,
+        3464414.0879087932
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 47.001163159060056,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1365,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50930817217,
+          31.309055401493
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.331202693505295,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v069",
+      "group": "boundary",
+      "coordinate": [
+        121.517391,
+        31.316211
+      ],
+      "xy": [
+        357872.17873408133,
+        3465201.1445713677
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 8.582086787999677,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 968,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51720103471,
+          31.316768241968
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 64.52234215593921,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "classification": "api_unknown",
+      "strict_classification": "api_unknown"
+    },
+    {
+      "id": "v070",
+      "group": "boundary",
+      "coordinate": [
+        121.519907,
+        31.315823
+      ],
+      "xy": [
+        358112.611306748,
+        3465152.576835001
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 12.437858967821112,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 891,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51997210694,
+          31.315809213967
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.440667879043118,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "within_tolerance",
+      "strict_classification": "fn"
+    },
+    {
+      "id": "v071",
+      "group": "boundary",
+      "coordinate": [
+        121.52184,
+        31.312869
+      ],
+      "xy": [
+        358293.6626217477,
+        3464820.667329932
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 2.0012495726369077,
+      "evidence": {
+        "validity": "INVALID_ENDPOINT_OFFSET",
+        "reason": "endpoint_offset",
+        "duration": 869,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52159461301,
+          31.313399763613
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 63.62058956140357,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": null
+      },
+      "classification": "api_unknown",
+      "strict_classification": "api_unknown"
+    },
+    {
+      "id": "v072",
+      "group": "boundary",
+      "coordinate": [
+        121.507478,
+        31.310859
+      ],
+      "xy": [
+        356916.3531794002,
+        3464624.142102361
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 12.343466895448653,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1084,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50758024291,
+          31.310842506909
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 9.93613749536577,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v073",
+      "group": "boundary",
+      "coordinate": [
+        121.507366,
+        31.311454
+      ],
+      "xy": [
+        356906.50523898774,
+        3464690.179490798
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 45.730212952211176,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 962,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50737083998,
+          31.311582460505
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 14.241058759051903,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v074",
+      "group": "boundary",
+      "coordinate": [
+        121.515376,
+        31.307534
+      ],
+      "xy": [
+        357666.91728158016,
+        3464243.9133774657
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 24.051896051374282,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1179,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51536835416,
+          31.307519429976
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.7679008834431778,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v075",
+      "group": "boundary",
+      "coordinate": [
+        121.515496,
+        31.318461
+      ],
+      "xy": [
+        357693.92463350325,
+        3465454.221786573
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 29.520153133945968,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1243,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51514734816,
+          31.318299683215
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 37.746630435755186,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v076",
+      "group": "boundary",
+      "coordinate": [
+        121.521498,
+        31.31505
+      ],
+      "xy": [
+        358263.9641811111,
+        3465063.130871636
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 13.642451845646766,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 935,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52149630746,
+          31.315008760836
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 4.569713903282846,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v077",
+      "group": "boundary",
+      "coordinate": [
+        121.516359,
+        31.317762
+      ],
+      "xy": [
+        357775.55269298266,
+        3465375.089221123
+      ],
+      "polygon_inside": false,
+      "prediction": null,
+      "boundary_distance_m": 36.46947452671904,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1047,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51648367502,
+          31.317661417773
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 16.39887503381436,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "algorithm_unknown",
+      "strict_classification": "algorithm_unknown"
+    },
+    {
+      "id": "v078",
+      "group": "boundary",
+      "coordinate": [
+        121.522332,
+        31.314178
+      ],
+      "xy": [
+        358342.6619755433,
+        3464964.450080059
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 32.97328073768231,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1014,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5223226474,
+          31.314169981807
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.2535968788597551,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v079",
+      "group": "boundary",
+      "coordinate": [
+        121.508837,
+        31.310823
+      ],
+      "xy": [
+        357046.1696862442,
+        3464618.588918599
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 2.8136970504677956,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 786,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50903962277,
+          31.310885030057
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 20.551420954827424,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v080",
+      "group": "boundary",
+      "coordinate": [
+        121.513805,
+        31.317537
+      ],
+      "xy": [
+        357530.7974885267,
+        3465354.971285644
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 2.362925007178403,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1124,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51382925946,
+          31.317539370017
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 2.3349167282991923,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "fp",
+      "strict_classification": "fp"
+    },
+    {
+      "id": "v081",
+      "group": "boundary",
+      "coordinate": [
+        121.513353,
+        31.307502
+      ],
+      "xy": [
+        357473.26307131606,
+        3464244.03074175
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 2.368869041742674,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 888,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5132424372,
+          31.307433414895
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.997123517206353,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "within_tolerance",
+      "strict_classification": "fn"
+    },
+    {
+      "id": "v082",
+      "group": "boundary",
+      "coordinate": [
+        121.507983,
+        31.315809
+      ],
+      "xy": [
+        356971.6655790064,
+        3465171.964266598
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 36.61294155165257,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 853,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50789418398,
+          31.315813898502
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 8.503878951059637,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v083",
+      "group": "boundary",
+      "coordinate": [
+        121.521106,
+        31.312705
+      ],
+      "xy": [
+        358223.09208556486,
+        3464804.3027363396
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 15.979680803064012,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 852,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52076700808,
+          31.312848674561
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 36.3596712591105,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v084",
+      "group": "boundary",
+      "coordinate": [
+        121.510844,
+        31.318284
+      ],
+      "xy": [
+        357248.63337469136,
+        3465442.4619288226
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 28.560338349162365,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1216,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51082424823,
+          31.31817253036
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.488905184191378,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v085",
+      "group": "boundary",
+      "coordinate": [
+        121.504797,
+        31.314064
+      ],
+      "xy": [
+        356664.8692777576,
+        3464981.70038056
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 6.719687652976185,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1013,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5047824797,
+          31.314064281124
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.3866334880144595,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v086",
+      "group": "boundary",
+      "coordinate": [
+        121.521734,
+        31.313989
+      ],
+      "xy": [
+        358285.08539842546,
+        3464945.0078443605
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 24.856945652780958,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 909,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.52182428289,
+          31.313983014811
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 8.689019598386839,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "within_tolerance",
+      "strict_classification": "fp"
+    },
+    {
+      "id": "v087",
+      "group": "boundary",
+      "coordinate": [
+        121.515266,
+        31.317682
+      ],
+      "xy": [
+        357670.81493586476,
+        3465368.3635529797
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 32.42304684163898,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 845,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51530643286,
+          31.317690872441
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 3.9867086602139614,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v088",
+      "group": "boundary",
+      "coordinate": [
+        121.519919,
+        31.309807
+      ],
+      "xy": [
+        358105.2434725327,
+        3464486.0723750186
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 10.185008440986905,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 930,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51990754938,
+          31.309797256741
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.5305082638271452,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v089",
+      "group": "inferred_fill",
+      "coordinate": [
+        121.51598,
+        31.314523
+      ],
+      "xy": [
+        357734.7037224026,
+        3465017.0213634525
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 202.88698859286595,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 377,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51593216073,
+          31.314485620533
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 6.151136087672237,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v090",
+      "group": "inferred_fill",
+      "coordinate": [
+        121.517107,
+        31.313805
+      ],
+      "xy": [
+        357841.58806693647,
+        3464935.1964163156
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 154.76530362677101,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 426,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5170886641,
+          31.313706456355
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 11.042722002733973,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v091",
+      "group": "inferred_fill",
+      "coordinate": [
+        121.516707,
+        31.311128
+      ],
+      "xy": [
+        357799.48763891286,
+        3464639.4509883365
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 179.21690353914371,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 633,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51688716689,
+          31.311133960675
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 17.26174827524091,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v092",
+      "group": "inferred_fill",
+      "coordinate": [
+        121.517643,
+        31.314081
+      ],
+      "xy": [
+        357893.30438630865,
+        3464964.6447175825
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 95.72724020011367,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 565,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51754769713,
+          31.314001201856
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.648071541033419,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v093",
+      "group": "inferred_fill",
+      "coordinate": [
+        121.516743,
+        31.31198
+      ],
+      "xy": [
+        357804.1468317733,
+        3464733.76629324
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 252.8273979165472,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 528,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51673826737,
+          31.312092683524
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 12.496712020837942,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v094",
+      "group": "interior",
+      "coordinate": [
+        121.51446,
+        31.314724
+      ],
+      "xy": [
+        357589.50268598576,
+        3465042.1713611865
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 280.715749185088,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 256,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51445553893,
+          31.314713358961
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.2513716621837225,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v095",
+      "group": "interior",
+      "coordinate": [
+        121.513818,
+        31.31388
+      ],
+      "xy": [
+        357526.87266457826,
+        3464949.818548141
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 389.8060994402716,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 146,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51381599519,
+          31.313808456519
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 7.927729157125872,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v096",
+      "group": "interior",
+      "coordinate": [
+        121.510067,
+        31.313717
+      ],
+      "xy": [
+        357167.8776665281,
+        3464937.6095752376
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 173.18567488886032,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 436,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51006105894,
+          31.313728609591
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.406817101495927,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v097",
+      "group": "interior",
+      "coordinate": [
+        121.510789,
+        31.311153
+      ],
+      "xy": [
+        357233.25279822724,
+        3464652.5485993
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 126.12561120433655,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 572,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51088824732,
+          31.311201305966
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 10.886227979186724,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v098",
+      "group": "interior",
+      "coordinate": [
+        121.512488,
+        31.316081
+      ],
+      "xy": [
+        357402.7475509398,
+        3465195.894279872
+      ],
+      "polygon_inside": true,
+      "prediction": true,
+      "boundary_distance_m": 204.66386983479126,
+      "evidence": {
+        "validity": "VALID_REACHABLE",
+        "reason": null,
+        "duration": 520,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.5124103204,
+          31.316119945997
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 8.60855945942599,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": true
+      },
+      "classification": "tp",
+      "strict_classification": "tp"
+    },
+    {
+      "id": "v099",
+      "group": "exterior",
+      "coordinate": [
+        121.519331,
+        31.305611
+      ],
+      "xy": [
+        358042.8907010505,
+        3464022.5585474493
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 383.65118596334554,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1699,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.51931689182,
+          31.305619507846
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 1.6564585556590063,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    },
+    {
+      "id": "v100",
+      "group": "exterior",
+      "coordinate": [
+        121.503354,
+        31.320055
+      ],
+      "xy": [
+        356535.62989979517,
+        3465646.4102549106
+      ],
+      "polygon_inside": false,
+      "prediction": false,
+      "boundary_distance_m": 563.1665361817984,
+      "evidence": {
+        "validity": "VALID_UNREACHABLE",
+        "reason": null,
+        "duration": 1628,
+        "returned_origin": [
+          121.51391521603,
+          31.313079014247
+        ],
+        "returned_destination": [
+          121.50340705548,
+          31.320049110044
+        ],
+        "origin_offset_m": 0.9363843148979053,
+        "destination_offset_m": 5.101581565227819,
+        "http_status": 200,
+        "business_status": 0,
+        "transport_error_type": null,
+        "reachable": false
+      },
+      "classification": "tn",
+      "strict_classification": "tn"
+    }
+  ],
+  "generation_requests": 400,
+  "validation_requests": 100,
+  "total_new_requests": 500,
+  "validation_stop_reason": null,
+  "confidence_scope": "conditional_on_fixed_stratified_valid_decidable_samples_not_area_or_global_boundary",
+  "schema_version": "hybrid-validation-v3",
+  "strict_overall": {
+    "planned": 100,
+    "decidable": 78,
+    "tp": 36,
+    "tn": 32,
+    "fp": 4,
+    "fn": 6,
+    "api_unknown": 8,
+    "algorithm_unknown": 14,
+    "accuracy": 0.8717948717948718,
+    "accuracy_wilson_95": [
+      0.7798404960135338,
+      0.9288467736876552
+    ],
+    "false_inclusion_rate": 0.1,
+    "false_exclusion_rate": 0.14285714285714285,
+    "false_inclusion_wilson_95": [
+      0.03957952868260638,
+      0.23051775227522298
+    ],
+    "false_exclusion_wilson_95": [
+      0.06715967015962647,
+      0.27841089474444775
+    ],
+    "unknown_fraction": 0.22
+  },
+  "strict_strata": {
+    "boundary": {
+      "planned": 88,
+      "decidable": 66,
+      "tp": 26,
+      "tn": 30,
+      "fp": 4,
+      "fn": 6,
+      "api_unknown": 8,
+      "algorithm_unknown": 14,
+      "accuracy": 0.8484848484848485,
+      "accuracy_wilson_95": [
+        0.7430709513021234,
+        0.9155636301732872
+      ],
+      "false_inclusion_rate": 0.13333333333333333,
+      "false_exclusion_rate": 0.1875,
+      "false_inclusion_wilson_95": [
+        0.053096554840547455,
+        0.296813266820363
+      ],
+      "false_exclusion_wilson_95": [
+        0.08889544689565954,
+        0.3530915520137596
+      ],
+      "unknown_fraction": 0.25
+    },
+    "inferred_fill": {
+      "planned": 5,
+      "decidable": 5,
+      "tp": 5,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0,
+      "api_unknown": 0,
+      "algorithm_unknown": 0,
+      "accuracy": 1.0,
+      "accuracy_wilson_95": [
+        0.5655175352168251,
+        1
+      ],
+      "false_inclusion_rate": 0.0,
+      "false_exclusion_rate": 0.0,
+      "false_inclusion_wilson_95": [
+        0,
+        0.43448246478317476
+      ],
+      "false_exclusion_wilson_95": [
+        0,
+        0.43448246478317476
+      ],
+      "unknown_fraction": 0.0
+    },
+    "interior": {
+      "planned": 5,
+      "decidable": 5,
+      "tp": 5,
+      "tn": 0,
+      "fp": 0,
+      "fn": 0,
+      "api_unknown": 0,
+      "algorithm_unknown": 0,
+      "accuracy": 1.0,
+      "accuracy_wilson_95": [
+        0.5655175352168251,
+        1
+      ],
+      "false_inclusion_rate": 0.0,
+      "false_exclusion_rate": 0.0,
+      "false_inclusion_wilson_95": [
+        0,
+        0.43448246478317476
+      ],
+      "false_exclusion_wilson_95": [
+        0,
+        0.43448246478317476
+      ],
+      "unknown_fraction": 0.0
+    },
+    "exterior": {
+      "planned": 2,
+      "decidable": 2,
+      "tp": 0,
+      "tn": 2,
+      "fp": 0,
+      "fn": 0,
+      "api_unknown": 0,
+      "algorithm_unknown": 0,
+      "accuracy": 1.0,
+      "accuracy_wilson_95": [
+        0.34238022750665303,
+        1
+      ],
+      "false_inclusion_rate": null,
+      "false_exclusion_rate": null,
+      "false_inclusion_wilson_95": null,
+      "false_exclusion_wilson_95": null,
+      "unknown_fraction": 0.0
+    }
+  },
+  "scope": "spatial_membership_with_15s_tolerance_not_contour_duration_or_global_boundary_error"
+}

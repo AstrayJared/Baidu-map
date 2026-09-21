@@ -28,6 +28,7 @@ backend/.venv/
 **/.pytest_cache/
 backend/logs/
 backend/.poi-ledgers/
+backend/.hybrid-ledgers/
 
 # Python algorithm artifacts (environments and large outputs live on D:)
 *.egg-info/

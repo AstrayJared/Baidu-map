@@ -142,6 +142,10 @@ class BaiduProvider:
         candidates = valid or offset_routes
         return min(candidates, key=lambda o: o.distance_m if self.route_metric == "distance" else o.observed_duration) if candidates else unknown(reason)
 
+    def transport_failure(self, destination, reason, *, http_status=None, error_type=None):
+        """Overridable diagnostics hook; legacy observation behavior is retained."""
+        return RouteObservation(destination, reason=reason)
+
     async def query_walking_time(self, origin, destination, deadline):
         if self.client is None:
             raise RuntimeError("请通过 async with BaiduProvider() 使用适配器")
@@ -162,13 +166,13 @@ class BaiduProvider:
             if response.status_code != 200:
                 code = response.status_code
                 reason = "rate_limit" if code == 429 else "temporary" if code >= 500 else "permission" if code in (401, 403) else "invalid_parameter" if code == 400 else "http_error"
-                return RouteObservation(destination, reason=reason)
+                return self.transport_failure(destination, reason, http_status=code)
             try:
                 payload = response.json()
             except ValueError:
-                return RouteObservation(destination, reason="invalid_response")
+                return self.transport_failure(destination, "invalid_response", http_status=200)
             return self.parse(payload, origin, destination)
-        except httpx.TimeoutException:
-            return RouteObservation(destination, reason="timeout")
-        except httpx.RequestError:
-            return RouteObservation(destination, reason="temporary")
+        except httpx.TimeoutException as exc:
+            return self.transport_failure(destination, "timeout", error_type=type(exc).__name__)
+        except httpx.RequestError as exc:
+            return self.transport_failure(destination, "temporary", error_type=type(exc).__name__)

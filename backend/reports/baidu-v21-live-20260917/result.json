@@ -1,0 +1,520 @@
+{
+  "coordinateSystem": "bd09ll",
+  "geometry": null,
+  "uncertainRegion": {
+    "type": "MultiPolygon",
+    "coordinates": [],
+    "coordinateSystem": "bd09ll"
+  },
+  "unknownRegion": {
+    "type": "MultiPolygon",
+    "coordinates": [
+      [
+        [
+          [
+            121.49739473100995,
+            31.29850650225529
+          ],
+          [
+            121.49695703887461,
+            31.327391232982944
+          ],
+          [
+            121.530407030133,
+            31.32788819442222
+          ],
+          [
+            121.53083121858737,
+            31.299015298766086
+          ],
+          [
+            121.49739473100995,
+            31.29850650225529
+          ]
+        ]
+      ]
+    ],
+    "coordinateSystem": "bd09ll"
+  },
+  "unreachableRegion": null,
+  "computationExtent": {
+    "type": "MultiPolygon",
+    "coordinates": [
+      [
+        [
+          [
+            121.53083121858737,
+            31.299015298766086
+          ],
+          [
+            121.530407030133,
+            31.32788819442222
+          ],
+          [
+            121.49695703887461,
+            31.327391232982944
+          ],
+          [
+            121.49739473100995,
+            31.29850650225529
+          ],
+          [
+            121.53083121858737,
+            31.299015298766086
+          ]
+        ]
+      ]
+    ],
+    "coordinateSystem": "bd09ll"
+  },
+  "quality": "insufficient",
+  "stopReason": "upstream_failure",
+  "statistics": {
+    "requests": 80,
+    "network_requests": 4,
+    "unique_positions": 78,
+    "cache_hits": 0,
+    "retries": 1,
+    "failures": {
+      "temporary": 78
+    },
+    "latencies": [],
+    "total_seconds": 17.53100000001723,
+    "compute_seconds": 0,
+    "network_wait_seconds": 0,
+    "cells_by_size": {},
+    "unknown_area": 10240000.0,
+    "unfinished_boundary": 0,
+    "active_points": 0,
+    "exploration_requests": 0,
+    "matrix_route_pairs": 78,
+    "detailed_route_requests": 0,
+    "sends": 4,
+    "responses": 2,
+    "terminations": 2,
+    "transport_failures": 0,
+    "cancellations": 0,
+    "endpoint_invalid": 0,
+    "unfinished_boundary_length_m": 0
+  },
+  "warnings": [
+    "unknown_region_preserved",
+    "upstream_failure"
+  ],
+  "config": {
+    "origin": [
+      121.513925,
+      31.313079
+    ],
+    "coordinate_system": "bd09ll",
+    "threshold": 900,
+    "extent": 1600,
+    "max_extent": 3200,
+    "coarse_size": 400,
+    "min_size": 50,
+    "raster_size": 25,
+    "boundary_band": 120,
+    "residual_target": 30,
+    "min_spacing": 25,
+    "budget": 400,
+    "exploration_fraction": 0.1,
+    "max_attempts": 2,
+    "timeout": 8,
+    "deadline_seconds": 600,
+    "concurrency": 2,
+    "qps": null,
+    "seed": 20260911,
+    "active_sampling": true,
+    "expand": false,
+    "time_bands": [
+      15
+    ],
+    "config_version": "baidu-road-v2.1-refined"
+  },
+  "timeBands": [
+    {
+      "minutes": 15,
+      "geometry": null
+    }
+  ],
+  "algorithm": "baidu_road",
+  "algorithmVersion": "2.1.0",
+  "upstream": "baidu_route_matrix_refined",
+  "fallbackReason": "isochrone_transient_failure",
+  "evidenceGeometry": {
+    "type": "MultiPolygon",
+    "coordinates": [],
+    "coordinateSystem": "bd09ll"
+  },
+  "inferredRegion": {
+    "type": "MultiPolygon",
+    "coordinates": [],
+    "coordinateSystem": "bd09ll"
+  },
+  "validationStatus": "not_independently_validated",
+  "callLedger": [
+    {
+      "source": "native_isochrone",
+      "units": 1,
+      "coordinates": [
+        [
+          121.513925,
+          31.313079
+        ]
+      ],
+      "sentAt": 1789630196.4183362,
+      "state": "terminated",
+      "completedAt": 1789630196.4564145,
+      "reason": "isochrone_transient_failure"
+    },
+    {
+      "source": "native_isochrone",
+      "units": 1,
+      "coordinates": [
+        [
+          121.513925,
+          31.313079
+        ]
+      ],
+      "sentAt": 1789630196.7993014,
+      "state": "terminated",
+      "completedAt": 1789630196.8043153,
+      "reason": "isochrone_transient_failure"
+    },
+    {
+      "source": "matrix",
+      "units": 50,
+      "coordinates": [
+        [
+          121.518103,
+          31.313153
+        ],
+        [
+          121.517764,
+          31.314528
+        ],
+        [
+          121.516842,
+          31.315682
+        ],
+        [
+          121.515475,
+          31.31644
+        ],
+        [
+          121.513872,
+          31.316688
+        ],
+        [
+          121.512276,
+          31.316389
+        ],
+        [
+          121.510931,
+          31.315588
+        ],
+        [
+          121.510042,
+          31.314406
+        ],
+        [
+          121.509744,
+          31.31302
+        ],
+        [
+          121.510083,
+          31.311643
+        ],
+        [
+          121.511007,
+          31.310483
+        ],
+        [
+          121.512376,
+          31.309719
+        ],
+        [
+          121.513979,
+          31.309469
+        ],
+        [
+          121.515574,
+          31.30977
+        ],
+        [
+          121.516917,
+          31.310577
+        ],
+        [
+          121.517805,
+          31.311765
+        ],
+        [
+          121.521233,
+          31.313218
+        ],
+        [
+          121.520642,
+          31.315623
+        ],
+        [
+          121.519028,
+          31.317639
+        ],
+        [
+          121.516637,
+          31.318963
+        ],
+        [
+          121.513832,
+          31.319396
+        ],
+        [
+          121.511039,
+          31.318874
+        ],
+        [
+          121.508684,
+          31.317476
+        ],
+        [
+          121.507127,
+          31.315411
+        ],
+        [
+          121.506605,
+          31.312988
+        ],
+        [
+          121.507199,
+          31.310575
+        ],
+        [
+          121.508817,
+          31.308542
+        ],
+        [
+          121.511213,
+          31.307201
+        ],
+        [
+          121.51402,
+          31.306762
+        ],
+        [
+          121.51681,
+          31.307291
+        ],
+        [
+          121.51916,
+          31.308706
+        ],
+        [
+          121.520713,
+          31.310789
+        ],
+        [
+          121.524362,
+          31.31329
+        ],
+        [
+          121.523518,
+          31.316724
+        ],
+        [
+          121.521214,
+          31.3196
+        ],
+        [
+          121.5178,
+          31.321486
+        ],
+        [
+          121.513793,
+          31.322103
+        ],
+        [
+          121.509802,
+          31.321361
+        ],
+        [
+          121.506436,
+          31.319369
+        ],
+        [
+          121.504209,
+          31.316424
+        ],
+        [
+          121.503463,
+          31.312965
+        ],
+        [
+          121.504313,
+          31.309516
+        ],
+        [
+          121.506627,
+          31.306606
+        ],
+        [
+          121.510051,
+          31.304685
+        ],
+        [
+          121.514061,
+          31.304054
+        ],
+        [
+          121.518046,
+          31.304812
+        ],
+        [
+          121.521402,
+          31.306839
+        ],
+        [
+          121.523619,
+          31.309818
+        ],
+        [
+          121.528532,
+          31.313395
+        ],
+        [
+          121.527351,
+          31.318201
+        ]
+      ],
+      "sentAt": 1789630197.1421633,
+      "state": "responded",
+      "completedAt": 1789630197.1491554,
+      "reason": "temporary"
+    },
+    {
+      "source": "matrix",
+      "units": 28,
+      "coordinates": [
+        [
+          121.524127,
+          31.322221
+        ],
+        [
+          121.519349,
+          31.324853
+        ],
+        [
+          121.51374,
+          31.325713
+        ],
+        [
+          121.508151,
+          31.324678
+        ],
+        [
+          121.503436,
+          31.321901
+        ],
+        [
+          121.500316,
+          31.317788
+        ],
+        [
+          121.499271,
+          31.31295
+        ],
+        [
+          121.500461,
+          31.308117
+        ],
+        [
+          121.503704,
+          31.304031
+        ],
+        [
+          121.508501,
+          31.301332
+        ],
+        [
+          121.514116,
+          31.300445
+        ],
+        [
+          121.519694,
+          31.30151
+        ],
+        [
+          121.52439,
+          31.304355
+        ],
+        [
+          121.527492,
+          31.308532
+        ],
+        [
+          121.4974,
+          31.298511
+        ],
+        [
+          121.530826,
+          31.29902
+        ],
+        [
+          121.530402,
+          31.327884
+        ],
+        [
+          121.496962,
+          31.327387
+        ],
+        [
+          121.513997,
+          31.308267
+        ],
+        [
+          121.505489,
+          31.317792
+        ],
+        [
+          121.522441,
+          31.302016
+        ],
+        [
+          121.501396,
+          31.311351
+        ],
+        [
+          121.517984,
+          31.321172
+        ],
+        [
+          121.509866,
+          31.305001
+        ],
+        [
+          121.52642,
+          31.314945
+        ],
+        [
+          121.499108,
+          31.324179
+        ],
+        [
+          121.516215,
+          31.29975
+        ],
+        [
+          121.50771,
+          31.309255
+        ]
+      ],
+      "sentAt": 1789630213.816239,
+      "state": "responded",
+      "completedAt": 1789630213.8288126,
+      "reason": "temporary"
+    }
+  ],
+  "pairedInterfaceSamples": 0,
+  "boundaryConflicts": 0,
+  "nativeAttempts": 2
+}

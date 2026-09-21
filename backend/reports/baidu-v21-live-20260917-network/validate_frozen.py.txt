@@ -1,0 +1,161 @@
+"""One-shot real v2 core verification; no POI calls or production changes."""
+import asyncio
+import hashlib
+import json
+import random
+import time
+from collections import Counter
+from dataclasses import asdict
+from datetime import datetime, timezone
+from pathlib import Path
+
+import httpx
+from shapely.geometry import Point, mapping, shape
+from shapely.ops import transform
+from types import SimpleNamespace
+
+from app.analyses import AnalysisInput, AnalysisManager, Job
+from app.config import load_settings
+from app.test_origin import NORMALIZED_TEST_ORIGIN as ORIGIN
+from life_circle.coordinates import LocalProjection, normalize
+from life_circle.providers import BaiduProvider
+
+OUT = Path('reports/baidu-v21-live-20260917-network')
+
+def save(name, value):
+    (OUT / name).write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False), encoding='utf-8')
+
+async def main():
+    settings = load_settings()
+    assert settings.ak_configured and settings.analysis_qps, 'Missing AK or QPS'
+    OUT.mkdir(parents=True, exist_ok=True)
+    with (OUT / 'validation-started.json').open('x', encoding='utf-8') as f:
+        json.dump({'utc': datetime.now(timezone.utc).isoformat(), 'origin': ORIGIN,
+                   'generation_pair_budget': 400, 'validation_budget': 100,
+                   'qps': settings.analysis_qps, 'seed': 20260917}, f)
+    manager = AnalysisManager(settings)
+    payload = AnalysisInput(center={'lng': ORIGIN[0], 'lat': ORIGIN[1]}, coordinateSystem='bd09ll', budget=400, clientRequestId='v21-live-audit')
+    job = Job('v21-live-audit', payload, 'baidu_walking')
+    phase = 'generation'
+    events = [json.loads(line) for line in (OUT / 'events.jsonl').read_text().splitlines()]
+    async def response_hook(response):
+        await response.aread()
+        try:
+            status = response.json().get('status')
+        except Exception:
+            status = None
+        event = {'phase': phase, 'path': response.request.url.path,
+                 'http_status': response.status_code, 'baidu_status': status,
+                 'elapsed': time.monotonic() - job.started}
+        events.append(event)
+        with (OUT / 'events.jsonl').open('a', encoding='utf-8') as f:
+            f.write(json.dumps(event) + '\n')
+    async with httpx.AsyncClient(trust_env=False, follow_redirects=False, event_hooks={'response': [response_hook]}) as client:
+        core = json.loads((OUT / 'result.json').read_text(encoding='utf-8'))
+        projection = LocalProjection(ORIGIN)
+        g = transform(lambda x,y: projection.to_local((x,y)), shape(core['geometry']))
+        samples = json.loads((OUT / 'generation-samples.json').read_text(encoding='utf-8'))
+        result = SimpleNamespace(quality=core['quality'], stop_reason=core['stopReason'], warnings=core['warnings'], sample_observations=[SimpleNamespace(destination=x['destination']) for x in samples])
+        rng = random.Random(20260917)
+        seen = {normalize(x.destination) for x in result.sample_observations}
+        groups = {'boundary': [], 'interior': [], 'exterior': []}
+        targets = {'boundary': 87, 'interior': 8, 'exterior': 2}
+        bounds = g.buffer(200).bounds
+        for _ in range(1000000):
+            if all(len(groups[k]) == targets[k] for k in groups):
+                break
+            coordinate = normalize(projection.to_geographic((rng.uniform(bounds[0], bounds[2]), rng.uniform(bounds[1], bounds[3]))))
+            if coordinate in seen:
+                continue
+            point = Point(projection.to_local(coordinate))
+            inside = g.covers(point)
+            distance = g.boundary.distance(point)
+            group = 'boundary' if distance <= 50 else 'interior' if inside else 'exterior'
+            if len(groups[group]) >= targets[group]:
+                continue
+            seen.add(coordinate)
+            groups[group].append({'coordinate': coordinate, 'group': group, 'inside': inside, 'boundary_distance_m': distance})
+        plan = [p for values in groups.values() for p in values]
+        assert len(plan) == 97, 'Insufficient reference points'
+        result_hash = hashlib.sha256((OUT / 'result.json').read_bytes()).hexdigest()
+        save('validation-plan.json', {'result_sha256': result_hash, 'points': plan,
+             'criteria': '>=80 valid, >=80% valid per group, >=20 reachable and unreachable; tolerance accuracy >=90%, boundary >=95%'})
+        phase = 'validation'
+        provider = BaiduProvider(settings.baidu_map_ak.get_secret_value(), client=client)
+        rows = []
+        for index, point in enumerate(plan):
+            deadline = time.monotonic() + 30
+            await manager.gate.wait(deadline)
+            observation = await provider.query_walking_time(ORIGIN, tuple(point['coordinate']), deadline)
+            manager.gate.completed(observation.reason)
+            valid = observation.duration is not None and observation.endpoint_verified
+            row = {**point, 'duration': observation.duration, 'reason': observation.reason,
+                   'endpoint_verified': observation.endpoint_verified, 'valid': valid,
+                   'route_origin': observation.route_origin, 'route_destination': observation.route_destination}
+            row['strict_correct'] = valid and (point['inside'] == (observation.duration <= 900))
+            row['tolerant_correct'] = valid and (row['strict_correct'] or 885 <= observation.duration <= 915)
+            rows.append(row)
+            save('validation-results.json', rows)
+            if (index + 1) % 20 == 0:
+                print(f'Validated {index + 1}/97', flush=True)
+    def metric(items):
+        valid = [r for r in items if r['valid']]
+        return {'planned': len(items), 'valid': len(valid),
+                'strict_accuracy': sum(r['strict_correct'] for r in valid) / len(valid) if valid else None,
+                'tolerance_accuracy': sum(r['tolerant_correct'] for r in valid) / len(valid) if valid else None,
+                'false_positive': sum(not r['tolerant_correct'] and r['inside'] for r in valid),
+                'false_negative': sum(not r['tolerant_correct'] and not r['inside'] for r in valid)}
+    total = metric(rows)
+    strata = {k: metric([r for r in rows if r['group'] == k]) for k in groups}
+    reachable = sum(r['valid'] and r['duration'] <= 900 for r in rows)
+    unreachable = total['valid'] - reachable
+    sufficient = total['valid'] >= 80 and min(reachable, unreachable) >= 20 and all(m['valid'] >= .8 * m['planned'] for m in strata.values())
+    outcome = '证据不足' if not sufficient else '通过' if total['tolerance_accuracy'] >= .9 and strata['boundary']['tolerance_accuracy'] >= .95 else '未通过'
+    summary = {'outcome': outcome, 'total': total, 'strata': strata, 'reachable': reachable, 'unreachable': unreachable,
+               'invalid_reasons': dict(Counter(r['reason'] or 'missing_endpoint' for r in rows if not r['valid'])),
+               'http_requests': len(events), 'elapsed_seconds': core['statistics']['total_seconds'] + time.monotonic() - job.started,
+               'area_m2_approx': g.area, 'geometry_valid': g.is_valid, 'result_sha256': result_hash}
+    save('summary.json', summary)
+    pct = lambda v: '无有效样本' if v is None else f'{v:.2%}'
+    table = '\n'.join(f"| {k} | {m['planned']} | {m['valid']} | {pct(m['strict_accuracy'])} | {pct(m['tolerance_accuracy'])} | {m['false_positive']} / {m['false_negative']} |" for k,m in strata.items())
+    report = f'''# 百度路网 2.1 真实 API 验证报告
+
+日期：2026-09-17。结论：**{outcome}**。
+
+固定起点 BD09LL `{ORIGIN}`；15 分钟（900 秒）步行圈。调用生产成圈方法 `AnalysisManager.compute_baidu_v2`，不包含 HTTP 任务封装、POI 检索或前端验收。
+
+## 真实调用结果
+
+- 算法版本：{core.get('algorithmVersion')}；实际来源：`{core.get('upstream')}`。
+- 降级原因：`{core.get('fallbackReason')}`；质量：`{result.quality}`；停止原因：`{result.stop_reason}`。
+- 生成路线对统计：{core['statistics']['requests']}；生成网络请求：{core['statistics']['network_requests']}；独立核验：97 次；收到响应合计：{len(events)}。
+- 总耗时：{summary['elapsed_seconds']:.1f} 秒；几何有效：{g.is_valid}；近似面积：{g.area/1e6:.3f} 平方公里。
+- 警告：`{result.warnings}`。
+
+## 独立精度核验
+
+成圈结果先保存并计算 SHA256，随后固定种子选点，与生成样本去重。边界两侧 50 米带 87 点、内部 8 点、外部 2 点；不使用参考标签修改圈面。参考接口为百度步行路线规划，要求返回端点存在且偏移不超过 50 米。无效点弃判且计入有效率分母；不补点、不重试核验。
+
+| 分层 | 计划 | 有效 | 严格 900 秒一致率 | ±15 秒容差一致率 | 容差误纳 / 漏纳 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+{table}
+
+总体有效 {total['valid']}/97，可达 {reachable}、不可达 {unreachable}；严格一致率 {pct(total['strict_accuracy'])}，容差一致率 {pct(total['tolerance_accuracy'])}。无效原因：`{summary['invalid_reasons']}`。
+
+参照项目既有门槛：总体至少 80 个有效点，各层至少 80% 有效，可达与不可达各至少 20 点；总体容差一致率至少 90%，边界至少 95%。本轮分层适配 v2 输出，不与旧 Hybrid 结果视为完全同口径对比。885—915 秒内差异仅在容差列豁免，严格列保留。
+
+该结果只代表一个地点的一次空间分类抽样；百度预测耗时并非现场实走真值，不证明整条边界误差 ≤15 秒。路线矩阵生成样本的端点无法由矩阵响应直接验证。
+
+## 证据文件
+
+同目录保存 `started.json`、`events.jsonl`、`result.json`、`generation-samples.json`、`validation-plan.json`、`validation-results.json`、`summary.json`。响应账本只记录路径和状态，不记录密钥或带密钥 URL。
+
+冻结结果 SHA256：`{result_hash}`。
+'''
+    (OUT / 'report.md').write_text(report, encoding='utf-8')
+    print(json.dumps(summary, ensure_ascii=False), flush=True)
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
+

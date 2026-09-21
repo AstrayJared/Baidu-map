@@ -123,6 +123,8 @@ test('real HTTP algorithm chain, direct BD09 polygons and responsive layout', as
   await page.goto('/');
   await expect(page.getByText('设施统计尚未接入', { exact: true })).toBeVisible();
   const result = await analyze(page);
+  expect(result.isochrone.algorithm).toBe('local-multicross-e82');
+  expect(result.isochrone.timeBands.map((b: any) => b.minutes)).toEqual([15]);
   expect(result.isochrone.statistics.requests).toBeLessThanOrEqual(400);
   expect(result.isochrone.statistics.network_requests).toBe(0);
   await expect(page.getByText('合成数据 · 离线验收', { exact: true })).toBeVisible();
@@ -134,8 +136,49 @@ test('real HTTP algorithm chain, direct BD09 polygons and responsive layout', as
   await page.screenshot({ path: info.outputPath('mobile.png'), fullPage: true });
 });
 
-test('holes and multiple components survive transport and map conversion', async ({ page }) => {
+test('switches independent algorithms and renders Hybrid as exterior lines only', async ({ page }, info) => {
+  // Hybrid runs its own OSM/百度 search rebuild on every pass and is far slower
+  // than the offline grid path, so this case uses the smallest supported budget
+  // and its own generous timeout.
+  test.setTimeout(300_000);
   await mockMap(page);
+  await page.goto('/');
+  const baidu = await analyze(page);
+  await page.getByText('OSM＋百度', { exact: true }).click();
+  await page.getByRole('combobox', { name: '百度验证预算' }).click();
+  await page.getByTitle('200 次', { exact: true }).click();
+  const response = page.waitForResponse(r => /\/api\/v1\/analysis\/hybrid\/[^/]+\/result$/.test(r.url()) && r.status() === 200);
+  await page.getByRole('button', { name: '开始分析', exact: true }).click();
+  const result = await (await response).json();
+  expect(result.taskId).not.toBe(baidu.taskId);
+  expect(result.isochrone.algorithm).toBe('hybrid');
+  await expect(page.getByText('结果质量：部分结果', { exact: true })).toBeVisible();
+  const polygons = await page.evaluate(() => (window as any).__polygons);
+  expect(polygons.length).toBeGreaterThan(0);
+  expect(polygons.every((p: any) => p.options.fillOpacity === 0 && p.points.length === 1)).toBe(true);
+  expect(polygons.map((p: any) => p.points)).toEqual(result.isochrone.displayGeometry.coordinates.map(
+    (p: number[][][]) => [p[0].map(x => x.join(',')).join(';')]));
+  await page.screenshot({ path: info.outputPath('hybrid-outline.png'), fullPage: true });
+  await page.getByText('百度边界搜索（E8.2）', { exact: true }).click();
+  await expect(page.getByText('结果质量：部分结果', { exact: true })).toHaveCount(0);
+  expect(await page.evaluate(() => (window as any).__polygons)).toEqual([]);
+});
+
+test('geometry contract preserves supplied holes and components independently of the search strategy', async ({ page }) => {
+  await mockMap(page);
+  // This verifies rendering, not E8.2's ability to discover unsampled interior islands.
+  await page.route('**/api/analyses/*/result', async route => {
+    const data = await (await route.fetch()).json();
+    const { lng: x, lat: y } = data.center;
+    const ring = [[x-.002,y-.002],[x+.002,y-.002],[x+.002,y+.002],[x-.002,y+.002],[x-.002,y-.002]];
+    const hole = [[x-.001,y-.001],[x-.001,y+.001],[x+.001,y+.001],[x+.001,y-.001],[x-.001,y-.001]];
+    const coordinates = x === 116.405 ? [[ring, hole]] : [[ring], [ring.map(([a,b]) => [a+.01,b])]];
+    const geometry = { type: 'MultiPolygon', coordinateSystem: 'bd09ll', coordinates };
+    data.data.geometry = geometry;
+    data.isochrone.geometry = geometry; data.isochrone.timeBands = [{ minutes: 15, geometry }];
+    data.algorithm = data.isochrone;
+    await route.fulfill({ json: data });
+  });
   await page.goto('/');
   const hole = await analyze(page, '116.405');
   expect(hole.isochrone.geometry.coordinates.some((polygon: unknown[]) => polygon.length > 1)).toBe(true);
@@ -145,21 +188,23 @@ test('holes and multiple components survive transport and map conversion', async
   expect(components.isochrone.geometry.coordinates.length).toBeGreaterThan(1);
 });
 
-test('unknown evidence and supported empty geometry have different UI', async ({ page }) => {
+test('missing endpoint evidence never becomes a claimed empty reachable region', async ({ page }) => {
   await mockMap(page);
   await page.goto('/');
   const unknown = await analyze(page, '116.407');
   expect(unknown.isochrone.geometry).toBeNull();
   await expect(page.getByText('证据不足，无法确定可达区域', { exact: true })).toBeVisible();
   const empty = await analyze(page, '116.408');
-  expect(empty.isochrone.geometry.coordinates).toEqual([]);
-  await expect(page.getByText('有效证据范围内，可达区域为空', { exact: true })).toBeVisible();
+  expect(empty.isochrone.quality).toBe('insufficient');
+  await expect(page.getByText('证据不足，无法确定可达区域', { exact: true })).toBeVisible();
 });
 
 test('local unknown remains a separate layer', async ({ page }) => {
   await mockMap(page);
   await page.goto('/');
-  const result = await analyze(page, '116.410');
+  // 116.410 is only an unsupported neighbourhood for the offline harness; the
+  // partial scene below is the one that carries local unlocalised faces.
+  const result = await analyze(page, '116.405');
   expect(result.isochrone.unknownRegion.coordinates.length).toBeGreaterThan(0);
   const unknown = await page.evaluate(() => (window as any).__polygons.filter((p: any) => p.options.fillColor === '#64748b'));
   expect(unknown.length).toBe(result.isochrone.unknownRegion.coordinates.length);
@@ -412,7 +457,8 @@ test('facility report, category filtering, route and time layers share one analy
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('analysis-report')).not.toBeVisible();
   await page.getByRole('combobox', { name: '步行时间层' }).click();
-  await page.getByTitle('5 分钟', { exact: true }).click();
+  await expect(page.getByTitle('5 分钟', { exact: true })).toHaveCount(0);
+  await page.getByTitle('15 分钟', { exact: true }).last().click();
   await expect(page.getByText('离线业务样例：1处设施，未知不当盲区。', { exact: true })).toBeVisible();
   await page.screenshot({ path: info.outputPath('facilities-desktop.png'), fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });

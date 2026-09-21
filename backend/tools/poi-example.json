@@ -1,7 +1,7 @@
 {
   "request": {
     "schemaVersion": "poi-v1",
-    "center": {"lng": 121.513926, "lat": 31.313077},
+    "center": {"lng": 121.51392519758, "lat": 31.313079085826},
     "coordinateSystem": "bd09ll",
     "analysisHalfWidthMeters": 1600,
     "searchMarginMeters": 1000,

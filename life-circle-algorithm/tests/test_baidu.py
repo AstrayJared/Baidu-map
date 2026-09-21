@@ -97,7 +97,7 @@ def test_real_qps_required_and_retry_uses_budget():
 def test_real_endpoint_string_fixture_is_verified():
     # Minimized from live diagnostic #9: first and last of four steps only.
     payload = json.loads((Path(__file__).parent / 'fixtures/guodingyi_endpoint_strings.json').read_text())
-    observation = BaiduProvider('fixture-only').parse(payload, (121.513926, 31.313077), (121.516031, 31.313077))
+    observation = BaiduProvider('fixture-only').parse(payload, (121.51392519758, 31.313079085826), (121.516031, 31.313077))
     assert observation.duration == 367 and observation.endpoint_verified
     assert observation.route_origin == (121.51392519758, 31.313079085826)
     assert observation.route_destination == (121.51564164149, 31.313052749898)
