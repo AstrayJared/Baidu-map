@@ -15,8 +15,8 @@ export default function AlgorithmApp() {
         value={algorithm}
         onChange={setAlgorithm}
         options={[
-          { label: '纯百度（更快）', value: 'baidu' },
-          { label: 'OSM＋百度（更准确）', value: 'hybrid' },
+          { label: '百度边界搜索（E8.2）', value: 'baidu' },
+          { label: 'OSM＋百度', value: 'hybrid' },
         ]}
       />
     </nav>

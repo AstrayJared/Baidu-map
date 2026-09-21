@@ -83,7 +83,7 @@ export default function ApiApp() {
     void controller.current?.start({ center: next, budget });
   }
   return <div className="api-app">
-    <header className="api-header"><div><span className="api-brand">15</span><div><h1>15 分钟生活圈</h1><p>自适应网格 · 步行等时圈分析</p></div></div><Tag color="teal">后端算法入口</Tag></header>
+    <header className="api-header"><div><span className="api-brand">15</span><div><h1>15 分钟生活圈</h1><p>百度边界搜索 · 实际端点证据与局部细化</p></div></div><Tag color="teal">E8.2</Tag></header>
     <main className="api-layout">
       <section className="api-controls" aria-label="分析条件">
         <Card title="选择分析中心"><p className="api-muted">在地图上选点、获取当前位置或搜索地点，也可输入百度坐标。默认坐标仅用于选点起始位置，尚未进行社区实验验证。</p>
@@ -97,7 +97,7 @@ export default function ApiApp() {
             {(busy || (state.phase === 'error' && state.task)) && <Button onClick={() => void controller.current?.cancel()} disabled={state.phase === 'cancelling'}>取消任务</Button>}</Space>
         </Card>
         <Card title="地图图层"><div className="api-layer-list">{([['reachable', '可达区域'], ['unreachable', '已知不可达区域'], ['unknown', '未核验区域（灰色）'], ['serviceBlind', '设施服务盲区（灰色）'], ['uncertain', '不确定区域'], ['extent', '计算范围']] as const).map(([key, label]) => <Checkbox key={key} checked={layers[key]} onChange={event => setLayers({ ...layers, [key]: event.target.checked })}><i className={`api-swatch ${key}`} />{label}</Checkbox>)}</div></Card>
-        <label className="api-label">步行时间层<Select aria-label="步行时间层" value={minutes} onChange={setMinutes} options={[5,10,15].map(value=>({value,label:`${value} 分钟`}))}/></label>
+        <label className="api-label">步行时间层<Select aria-label="步行时间层" value={minutes} onChange={setMinutes} options={[15].map(value=>({value,label:`${value} 分钟`}))}/></label>
         <Checkbox checked={showFacilities} onChange={e=>setShowFacilities(e.target.checked)}>设施标记</Checkbox>
         <Checkbox checked={showAssessments} onChange={e=>setShowAssessments(e.target.checked)}>点位三态</Checkbox>
         {!displayedResult?.facilityAnalysis && <Alert type="info" title="设施统计尚未接入" description="真实步行分析结束后将继续检索设施并核对抽样点；合成模式只验证等时圈。" />}

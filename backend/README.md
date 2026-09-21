@@ -1,6 +1,6 @@
 # 15 分钟生活圈双算法后端
 
-后端同时提供两种 900 秒生活圈算法：纯百度自适应网格方案速度较快；Hybrid v1.5 以 OSM 路网提供参考、百度详细步行路线核验，耗时更长但用于追求更准确的边界。两者必须并存以供用户选择和开发对比。
+后端同时提供两种 900 秒生活圈算法：百度边界搜索（E8.2，`local-multicross-e82`）使用真实步行端点证据做径向搜索与局部多边界重建；Hybrid v1.5 以 OSM 路网提供参考、百度详细步行路线核验。两者并存以供用户选择和开发对比，界面不标注速度或精度优劣。
 
 ## 启动
 
@@ -19,14 +19,16 @@ OSM图缓存、版本、覆盖边界、障碍和风险层见 [数据说明](../d
 
 两个任务入口相互独立：
 
-- `POST /api/analyses`：纯百度算法，使用原 `center` / `coordinateSystem` / `budget` / `clientRequestId` 请求。
+- `POST /api/analyses`：百度边界搜索（E8.2），使用原 `center` / `coordinateSystem` / `budget` / `clientRequestId` 请求。默认预算 400，保留 200/800 档；结果 `algorithm=local-multicross-e82`，只提供真实计算的 15 分钟圈，未知或未收敛结果保持部分结果语义。请求通过薄适配层进入团队 E8.2 核心，不经过旧自适应网格实现。
 - `POST /api/v1/analysis/hybrid`：OSM＋百度算法，使用 HybridRequest：
 
 ```json
 {"origin":{"lng":121.513925,"lat":31.313079},"coordinate_system":"bd09ll","config":{"max_baidu_requests":400},"client_request_id":"example-unique-id"}
 ```
 
-两个前缀都支持任务查询、结果和取消；Hybrid 还支持按请求 ID 查询恢复。请求契约不可混用，服务端不会静默改用另一算法。
+两个前缀都支持任务查询、结果和取消；Hybrid 还支持按请求 ID 查询恢复。请求契约不可混用，服务端不会静默改用另一算法。Hybrid 结果额外提供只读的 `displayGeometry`：扣除 OSM 水体前的圈面外壳，仅用于地图外轮廓展示（不填色、不画内孔），计算几何、面积统计与诊断仍以 `geometry` 等原字段为准；旧响应缺少该字段时前端退回原几何外环显示。
+
+E8.3（POI 引导联合构圈）仍为离线实验，不接入浏览器或生产 HTTP 入口，代码保留在 `backend/tools/endpoint_e83_*`。旧自适应网格实现保留作历史基线。
 
 独立 `/api/v1/analysis/osm_offline` 继续作为离线基线接口。`ANALYSIS_PROVIDER=baidu` 控制纯百度任务的 Provider；`synthetic` 仅用于离线测试。Hybrid 始终从自己的入口运行。
 

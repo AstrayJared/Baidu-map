@@ -156,6 +156,7 @@ class HybridIsochroneProvider:
         result = {"algorithm": "hybrid", "algorithm_version": ALGORITHM_VERSION, "quality": quality,
                   "extent_truncated": extent_truncated,
                   "coverage_policy": "continuous_land_interior",
+                  "displayGeometry": public(coverage.shell),
                   "geometry": public(coverage.geometry), "unknown_region": public(built.unknown.difference(coverage.geometry).difference(coverage.mask)),
                   "evidence_geometry": public(built.geometry), "inferred_fill_geometry": public(coverage.inferred),
                   "evidence_unknown_region": public(built.unknown),

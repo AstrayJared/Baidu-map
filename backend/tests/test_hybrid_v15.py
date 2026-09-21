@@ -23,6 +23,23 @@ from tools.validate_hybrid import metrics, wilson, claim
 
 
 @pytest.mark.anyio
+async def test_display_shell_does_not_replace_water_clipped_calculation():
+    from app.algorithms.hybrid_isochrone.hard_obstacles import LocalObstacles
+    p = MetricProjection(32651)
+    x, y = p.origin(ORIGIN)
+    obstacles = LocalObstacles(water=box(x-20, y-2000, x+20, y+2000))
+    provider = MockProvider(p, lambda x, y: math.hypot(x, y))
+    engine = HybridIsochroneProvider(p, provider, FastGate(), obstacles=obstacles)
+    result = await engine.compute(ORIGIN, HybridConfig(max_baidu_requests=110))
+    calculated, displayed = shape(result['geometry']), shape(result['displayGeometry'])
+    assert calculated.is_valid and displayed.is_valid
+    assert displayed.area > calculated.area
+    assert result['diagnostics']['hard_obstacle_overlap_m2'] < 1e-6
+    assert result['displayGeometry']['coordinateSystem'] == 'bd09ll'
+    assert result['requests_used'] == len(provider.calls) <= 110
+
+
+@pytest.mark.anyio
 async def test_all_request_sources_and_normalized_coordinates_must_be_inside_square():
     p = MetricProjection(32651)
     provider = MockProvider(p, lambda x, y: 500)

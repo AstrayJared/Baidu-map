@@ -7,6 +7,14 @@ const task = { schema_version: '1.0', responseType: 'task', taskId: 'one', statu
   stage: 'preparing', requests: 0, networkRequests: 0, budget: 40, elapsedSeconds: 0, dataSource: 'baidu_walking', error: null };
 
 describe('dedicated Hybrid contract', () => {
+  it('accepts legacy results without display geometry and validates new coordinates', () => {
+    const r = fixture();
+    delete r.isochrone.displayGeometry; delete r.algorithm.displayGeometry;
+    expect(validHybridResult(r)).toBe(true);
+    const bad = { ...r.isochrone.geometry, coordinateSystem: 'wgs84' };
+    r.isochrone.displayGeometry = bad; r.algorithm.displayGeometry = bad;
+    expect(validHybridResult(r)).toBe(false);
+  });
   it('accepts the backend fixture and non-grid budgets', () => {
     expect(validHybridResult(fixture())).toBe(true);
     expect(validHybridTask(task)).toBe(true);

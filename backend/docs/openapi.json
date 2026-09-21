@@ -5,6 +5,266 @@
     "version": "2.0.0"
   },
   "paths": {
+    "/api/analyses/{task_id}/routes/{facility_id}": {
+      "post": {
+        "tags": [
+          "analyses"
+        ],
+        "summary": "Facility Route",
+        "operationId": "facility_route_api_analyses__task_id__routes__facility_id__post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "facility_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Facility Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteEvidence"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyses": {
+      "post": {
+        "tags": [
+          "analyses"
+        ],
+        "summary": "Create",
+        "operationId": "create_api_analyses_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyses/{task_id}": {
+      "get": {
+        "tags": [
+          "analyses"
+        ],
+        "summary": "Status",
+        "operationId": "status_api_analyses__task_id__get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyses/by-request/{client_request_id}/cancel": {
+      "post": {
+        "tags": [
+          "analyses"
+        ],
+        "summary": "Cancel By Request",
+        "operationId": "cancel_by_request_api_analyses_by_request__client_request_id__cancel_post",
+        "parameters": [
+          {
+            "name": "client_request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Client Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyses/{task_id}/result": {
+      "get": {
+        "tags": [
+          "analyses"
+        ],
+        "summary": "Result",
+        "operationId": "result_api_analyses__task_id__result_get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResultResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyses/{task_id}/cancel": {
+      "post": {
+        "tags": [
+          "analyses"
+        ],
+        "summary": "Cancel",
+        "operationId": "cancel_api_analyses__task_id__cancel_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/analysis/hybrid": {
       "post": {
         "tags": [
@@ -436,437 +696,6 @@
         }
       }
     },
-    "/api/analyses": {
-      "post": {
-        "tags": [
-          "Hybrid Isochrone"
-        ],
-        "summary": "Create",
-        "operationId": "create_api_analyses_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HybridRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "202": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskStatusResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/analyses/by-request/{client_request_id}": {
-      "get": {
-        "tags": [
-          "Hybrid Isochrone"
-        ],
-        "summary": "By Request",
-        "operationId": "by_request_api_analyses_by_request__client_request_id__get",
-        "parameters": [
-          {
-            "name": "client_request_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Client Request Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskStatusResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Conflict"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Unprocessable Entity"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Service Unavailable"
-          }
-        }
-      }
-    },
-    "/api/analyses/by-request/{client_request_id}/cancel": {
-      "post": {
-        "tags": [
-          "Hybrid Isochrone"
-        ],
-        "summary": "Cancel By Request",
-        "operationId": "cancel_by_request_api_analyses_by_request__client_request_id__cancel_post",
-        "parameters": [
-          {
-            "name": "client_request_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Client Request Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskStatusResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Conflict"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Unprocessable Entity"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Service Unavailable"
-          }
-        }
-      }
-    },
-    "/api/analyses/{task_id}": {
-      "get": {
-        "tags": [
-          "Hybrid Isochrone"
-        ],
-        "summary": "Status",
-        "operationId": "status_api_analyses__task_id__get",
-        "parameters": [
-          {
-            "name": "task_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskStatusResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Conflict"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Unprocessable Entity"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Service Unavailable"
-          }
-        }
-      }
-    },
-    "/api/analyses/{task_id}/result": {
-      "get": {
-        "tags": [
-          "Hybrid Isochrone"
-        ],
-        "summary": "Result",
-        "operationId": "result_api_analyses__task_id__result_get",
-        "parameters": [
-          {
-            "name": "task_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridResultResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Conflict"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Unprocessable Entity"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Service Unavailable"
-          }
-        }
-      }
-    },
-    "/api/analyses/{task_id}/cancel": {
-      "post": {
-        "tags": [
-          "Hybrid Isochrone"
-        ],
-        "summary": "Cancel",
-        "operationId": "cancel_api_analyses__task_id__cancel_post",
-        "parameters": [
-          {
-            "name": "task_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskStatusResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Conflict"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Unprocessable Entity"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HybridError"
-                }
-              }
-            },
-            "description": "Service Unavailable"
-          }
-        }
-      }
-    },
     "/api/v1/analysis/mock/{scenario}": {
       "get": {
         "tags": [
@@ -976,6 +805,57 @@
         }
       }
     },
+    "/api/v1/analysis/osm_offline": {
+      "post": {
+        "tags": [
+          "OSM Offline"
+        ],
+        "summary": "Offline Analysis",
+        "operationId": "offline_analysis_api_v1_analysis_osm_offline_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OsmOfflineRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -997,6 +877,38 @@
   },
   "components": {
     "schemas": {
+      "AnalysisInput": {
+        "properties": {
+          "center": {
+            "$ref": "#/components/schemas/Center"
+          },
+          "coordinateSystem": {
+            "type": "string",
+            "const": "bd09ll",
+            "title": "Coordinatesystem"
+          },
+          "budget": {
+            "type": "integer",
+            "title": "Budget",
+            "default": 400
+          },
+          "clientRequestId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Clientrequestid"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "center",
+          "coordinateSystem",
+          "clientRequestId"
+        ],
+        "title": "AnalysisInput"
+      },
       "AnalysisResponse": {
         "properties": {
           "schema_version": {
@@ -1289,6 +1201,29 @@
           "service_status"
         ],
         "title": "CategoryResult"
+      },
+      "Center": {
+        "properties": {
+          "lng": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lng"
+          },
+          "lat": {
+            "type": "number",
+            "exclusiveMaximum": 85.0,
+            "exclusiveMinimum": -85.0,
+            "title": "Lat"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "lng",
+          "lat"
+        ],
+        "title": "Center"
       },
       "CoverageEvidence": {
         "properties": {
@@ -1590,6 +1525,17 @@
               }
             ],
             "title": "In Circle"
+          },
+          "poiEvidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PoiEvidence"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
           }
         },
         "additionalProperties": false,
@@ -1728,6 +1674,19 @@
           "coordinates"
         ],
         "title": "Geometry"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
       },
       "HealthResponse": {
         "properties": {
@@ -1981,6 +1940,18 @@
                 "type": "null"
               }
             ]
+          },
+          "displayGeometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Geometry"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Display-only shell before water subtraction; never use for analysis or area.",
+            "x-legacy-optional": true
           },
           "evidence_geometry": {
             "anyOf": [
@@ -2452,6 +2423,212 @@
         ],
         "title": "Origin"
       },
+      "OsmOfflineRequest": {
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/Origin"
+          },
+          "coordinate_system": {
+            "type": "string",
+            "const": "bd09ll",
+            "title": "Coordinate System"
+          },
+          "algorithm": {
+            "type": "string",
+            "const": "osm_offline",
+            "title": "Algorithm",
+            "default": "osm_offline"
+          },
+          "threshold": {
+            "type": "integer",
+            "const": 900,
+            "title": "Threshold",
+            "default": 900
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "origin",
+          "coordinate_system"
+        ],
+        "title": "OsmOfflineRequest"
+      },
+      "PoiEvidence": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Version",
+            "default": "1.0"
+          },
+          "facilityId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Facilityid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "verified_reachable",
+              "verified_unreachable"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration"
+          },
+          "observedDuration": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observedduration"
+          },
+          "endpointVerified": {
+            "type": "boolean",
+            "title": "Endpointverified"
+          },
+          "requestOrigin": {
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Requestorigin"
+          },
+          "destination": {
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Destination"
+          },
+          "routeOrigin": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Routeorigin"
+          },
+          "routeDestination": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Routedestination"
+          },
+          "originOffsetM": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Originoffsetm"
+          },
+          "destinationOffsetM": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destinationoffsetm"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "facilityId",
+          "status",
+          "reason",
+          "duration",
+          "observedDuration",
+          "endpointVerified",
+          "requestOrigin",
+          "destination",
+          "routeOrigin",
+          "routeDestination",
+          "originOffsetM",
+          "destinationOffsetM"
+        ],
+        "title": "PoiEvidence",
+        "description": "Strict requested-OD evidence, not geometry membership or 1km service coverage."
+      },
       "QueryEvidence": {
         "properties": {
           "category": {
@@ -2581,6 +2758,17 @@
             },
             "type": "array",
             "title": "Path"
+          },
+          "poiEvidence": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PoiEvidence"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
           }
         },
         "additionalProperties": false,
@@ -2674,6 +2862,158 @@
           "coordinate_system"
         ],
         "title": "SyntheticRequest"
+      },
+      "TaskResultResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Schema Version",
+            "default": "1.0"
+          },
+          "responseType": {
+            "type": "string",
+            "const": "result",
+            "title": "Responsetype",
+            "default": "result"
+          },
+          "taskId": {
+            "type": "string",
+            "title": "Taskid"
+          },
+          "taskStatus": {
+            "type": "string",
+            "const": "completed",
+            "title": "Taskstatus"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial",
+              "failed",
+              "empty"
+            ],
+            "title": "Status"
+          },
+          "businessStatus": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial",
+              "failed",
+              "empty"
+            ],
+            "title": "Businessstatus"
+          },
+          "dataSource": {
+            "type": "string",
+            "enum": [
+              "synthetic",
+              "baidu_walking"
+            ],
+            "title": "Datasource"
+          },
+          "center": {
+            "$ref": "#/components/schemas/Origin"
+          },
+          "generatedAt": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Generatedat"
+          },
+          "facilitiesStatus": {
+            "type": "string",
+            "enum": [
+              "not_integrated",
+              "complete",
+              "partial",
+              "failed"
+            ],
+            "title": "Facilitiesstatus"
+          },
+          "facilityAnalysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FacilityAnalysis"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coordinateSystem": {
+            "type": "string",
+            "const": "bd09ll",
+            "title": "Coordinatesystem",
+            "default": "bd09ll"
+          },
+          "coordinateOrder": {
+            "type": "string",
+            "const": "longitude,latitude",
+            "title": "Coordinateorder",
+            "default": "longitude,latitude"
+          },
+          "units": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Units"
+          },
+          "rules": {
+            "$ref": "#/components/schemas/Rules"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Data"
+          },
+          "algorithm": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Algorithm"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/Issue"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/Issue"
+            },
+            "type": "array",
+            "title": "Errors"
+          },
+          "isochrone": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Isochrone"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "taskId",
+          "taskStatus",
+          "status",
+          "businessStatus",
+          "dataSource",
+          "center",
+          "generatedAt",
+          "facilitiesStatus",
+          "isochrone"
+        ],
+        "title": "TaskResultResponse",
+        "description": "异步结果与旧地理分析契约共享坐标、单位和数据语义。"
       },
       "TaskStatusResponse": {
         "properties": {
@@ -2780,6 +3120,46 @@
         ],
         "title": "TaskStatusResponse",
         "description": "统一异步任务响应；business_status 是业务结果，status 是传输任务状态。"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }

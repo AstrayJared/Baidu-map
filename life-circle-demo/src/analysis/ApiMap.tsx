@@ -3,12 +3,14 @@ import type { Center } from '../types';
 import { useBaiduMap } from '../map/useBaiduMap';
 import type { BMapIcon, BMapMap } from '../map/baiduMapTypes';
 import { createDotIcon } from '../map/mapIcons';
-import { drawGeometry, type DrawableGeometry } from './geometry';
+import { drawGeometry, drawOutline, type DrawableGeometry } from './geometry';
 import type { Facility, AssessmentPoint } from '../api-contract';
 
 export type Layers = { reachable: boolean; unreachable: boolean; unknown: boolean; uncertain: boolean; extent: boolean; serviceBlind: boolean };
 
 export type MapResult = {
+  outlineOnly?: boolean;
+  displayGeometry?: DrawableGeometry | null;
   geometry: DrawableGeometry | null;
   unknownRegion: DrawableGeometry | null;
   uncertainRegion: DrawableGeometry | null;
@@ -67,7 +69,11 @@ export function ApiMap({ center, result, resultCenter, layers, onPick, minutes =
         if (layers.extent) drawGeometry(instance, api, result.computationExtent, { strokeColor: '#64748b', fillOpacity: 0, strokeStyle: 'dashed', strokeWeight: 1 });
         const band = result.timeBands?.find(item => item.minutes === minutes);
         const reachable = band ? band.geometry : minutes === 15 ? result.geometry : null;
-        if (layers.reachable) drawGeometry(instance, api, reachable, { strokeColor: '#147d70', fillColor: '#2da990', fillOpacity: .28, strokeWeight: 2 });
+        if (layers.reachable) {
+          if (result.outlineOnly) drawOutline(instance, api,
+            result.displayGeometry === undefined ? reachable : result.displayGeometry);
+          else drawGeometry(instance, api, reachable, { strokeColor: '#147d70', fillColor: '#2da990', fillOpacity: .28, strokeWeight: 2 });
+        }
         if (layers.serviceBlind) Object.values(blindRegions).forEach(region => drawGeometry(instance, api, region as never, { strokeColor: '#4b5563', fillColor: '#6b7280', fillOpacity: .38, strokeWeight: 1 }));
         if (layers.unreachable) drawGeometry(instance, api, result.unreachableRegion ?? null, { strokeColor: '#374151', fillColor: '#6b7280', fillOpacity: .28, strokeStyle: 'dashed' });
         if (layers.unknown) drawGeometry(instance, api, result.unknownRegion, { strokeColor: '#64748b', fillColor: '#64748b', fillOpacity: .24, strokeStyle: 'dashed' });

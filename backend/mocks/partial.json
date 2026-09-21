@@ -158,7 +158,8 @@
           "lng": 116.4,
           "lat": 39.9
         },
-        "in_circle": true
+        "in_circle": true,
+        "poi_evidence": null
       }
     ],
     "categories": [

@@ -247,6 +247,7 @@ export type HybridIsochrone = {
   quality: "usable" | "partial" | "insufficient";
   coverage_policy: "continuous_land_interior";
   geometry: Geometry | null;
+  displayGeometry?: Geometry | null;
   evidence_geometry: Geometry | null;
   inferred_fill_geometry: Geometry | null;
   unknown_region: Geometry | null;

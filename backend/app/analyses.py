@@ -12,9 +12,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from life_circle.coordinates import normalize
-from life_circle.engine import compute_isochrone
+from .algorithms.baidu_e82 import compute_e82, EndpointAnalyticProvider
 from life_circle.models import CancelToken, IsochroneRequest, ProgressSnapshot, RouteObservation
-from life_circle.providers import AnalyticProvider, BaiduProvider
+from life_circle.providers import BaiduProvider
 
 from .baidu import silence_transport_logs
 from .contracts import Data, Issue, Rules, TaskResultResponse, TaskStatusResponse, RouteEvidence, map_business_status
@@ -204,8 +204,6 @@ class AnalysisManager:
         if self.settings.analysis_provider == "baidu" and not self.provider_factory:
             if not self.settings.ak_configured or self.settings.analysis_qps is None:
                 raise HTTPException(503, "请在后端配置步行服务 AK 和 ANALYSIS_QPS")
-            if (payload.budget - 1) / self.settings.analysis_qps >= 600:
-                raise HTTPException(503, "配置的 QPS 无法在截止时间内完成初始化")
         source = "synthetic" if self.settings.analysis_provider == "synthetic" else "baidu_walking"
         job = Job(str(uuid4()), payload, source)
         self.jobs[job.task_id] = job
@@ -226,7 +224,7 @@ class AnalysisManager:
                     if hasattr(provider, "__aenter__"):
                         provider = await stack.enter_async_context(provider)
                 elif self.settings.analysis_provider == "synthetic":
-                    provider = AnalyticProvider(origin, lambda x, y: math.hypot(x, y) / 1.2)
+                    provider = EndpointAnalyticProvider(origin, lambda x, y: math.hypot(x, y) / 1.2)
                 else:
                     silence_transport_logs()
                     client = await stack.enter_async_context(httpx.AsyncClient(trust_env=False, follow_redirects=False))
@@ -235,8 +233,9 @@ class AnalysisManager:
                         self.gate,
                     )
                 request = IsochroneRequest(origin, "bd09ll", budget=budget,
+                    max_extent=1600, expand=False, time_bands=(15,), config_version="local-multicross-e82",
                     qps=self.settings.analysis_qps if provider.network else None)
-                result = await compute_isochrone(request, provider, job.token, on_progress=lambda p: self.update(job, p))
+                result = await compute_e82(request, provider, job.token, on_progress=lambda p: self.update(job, p))
                 if not self.provider_factory and provider.network and result.quality != "insufficient" and not job.token.cancelled:
                     self.update(job, ProgressSnapshot("facilities", result.statistics.requests,
                         result.statistics.network_requests, budget, time.monotonic() - job.started))

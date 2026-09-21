@@ -1,5 +1,7 @@
 """E8 research: estimate an outer envelope; deliberately do not verify its interior."""
+import asyncio
 from collections import Counter
+from dataclasses import asdict
 import math
 
 from shapely.geometry import Point, Polygon, box
@@ -7,6 +9,7 @@ from shapely.ops import unary_union
 
 from tools.endpoint_geometry import business_geometry
 from life_circle.scheduler import Scheduler
+from life_circle.models import ProgressSnapshot
 from tools.endpoint_boundary import BoundarySession
 from tools.endpoint_boundary_surface import add_origin_condition
 
@@ -17,10 +20,20 @@ async def compute_radial_boundary(request, provider, token, *, directions=8,
                                   adaptive=False, max_directions=64,
                                   target=25, chord_target=100, boundary_bands=False,
                                   side_probe_limit=4, on_sampling_complete=None,
-                                  on_session_start=None, coverage_first=False):
+                                  on_session_start=None, coverage_first=False, on_progress=None):
     if directions < 4 or max_directions < directions or target <= 0 or chord_target <= 0:
         raise ValueError('Invalid direction configuration')
     scheduler = Scheduler(request, provider, token)
+    stage = 'initializing'
+    def report(next_stage=None):
+        nonlocal stage
+        if next_stage:
+            stage = next_stage
+        if on_progress:
+            on_progress(ProgressSnapshot(stage, scheduler.stats.requests, scheduler.stats.network_requests,
+                request.budget, max(0, scheduler.clock.time() - scheduler.started)))
+    scheduler.on_progress = report
+    report()
     domain = box(-request.extent, -request.extent, request.extent, request.extent)
     session = BoundarySession(scheduler, domain)
     rays = []
@@ -75,6 +88,7 @@ async def compute_radial_boundary(request, provider, token, *, directions=8,
         return row
 
     try:
+        report('exploring')
         if on_session_start is not None and not token.cancelled:
             await on_session_start(session)
         for i in range(directions):
@@ -135,7 +149,9 @@ async def compute_radial_boundary(request, provider, token, *, directions=8,
             rays.append(await search(angle, hint))
         rays.sort(key=lambda r:r['angle'])
         if on_sampling_complete is not None and not token.cancelled:
+            report('refining')
             await on_sampling_complete(session,rays)
+        report('reconstructing')
         anchor = add_origin_condition(session)
         origin = anchor['xy'] if anchor else (0, 0)
         faces, covered = [], 0
@@ -157,7 +173,7 @@ async def compute_radial_boundary(request, provider, token, *, directions=8,
         envelope = unary_union(faces) if faces else None
         cancelled = token.cancelled
         if boundary_bands:
-            connected=connect_estimate(rays,origin,domain,session._conflicts,target=target,
+            connected=await asyncio.to_thread(connect_estimate,rays,origin,domain,session._conflicts,target=target,
                                        chord_target=chord_target,witnesses=session.records)
             envelope=connected['envelope']
         result = dict(status='cancelled' if cancelled else 'completed',
@@ -206,6 +222,9 @@ async def compute_radial_boundary(request, provider, token, *, directions=8,
                 uncoveredAngleFraction=None)
             if connected['reason']=='known_negative_inside_estimate' and not cancelled:
                 result['quality']='experimental_evidence_conflict'
+        scheduler.stats.total_seconds = max(0, scheduler.clock.time() - scheduler.started)
+        result['_statistics'] = asdict(scheduler.stats)
+        report()
         return result
     finally:
         scheduler.close()

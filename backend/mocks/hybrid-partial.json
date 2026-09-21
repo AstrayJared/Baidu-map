@@ -218,6 +218,7 @@
       ],
       "coordinateSystem": "bd09ll"
     },
+    "displayGeometry": null,
     "evidence_geometry": {
       "type": "MultiPolygon",
       "coordinates": [
@@ -493,6 +494,7 @@
       ],
       "coordinateSystem": "bd09ll"
     },
+    "displayGeometry": null,
     "evidence_geometry": {
       "type": "MultiPolygon",
       "coordinates": [
@@ -724,5 +726,5 @@
     }
   },
   "config_hash": "d5cc8f81f7adfa828d14082ecdd15c839bbca26f3b89c19c4b5bd757eb677e00",
-  "result_hash": "066c54b7444bcaa971c49ccbcd8d73b48aca4835c86caf610b69977f2cc394ba"
+  "result_hash": "538da5fc0844b91b7541a781645b9288ec1d1527c3766a36fe9febcceed0389c"
 }

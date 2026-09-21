@@ -3,7 +3,7 @@ import asyncio
 import math
 from pathlib import Path
 
-from life_circle.providers import AnalyticProvider
+from app.algorithms.baidu_e82 import EndpointAnalyticProvider as AnalyticProvider
 from life_circle.scenarios import scenarios
 from app.config import Settings
 from app.algorithms.hybrid_isochrone.models import Evidence, Validity

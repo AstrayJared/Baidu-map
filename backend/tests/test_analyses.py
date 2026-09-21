@@ -41,7 +41,7 @@ def test_real_algorithm_result_and_idempotency():
         assert client.post("/api/analyses", json=body()).json()["taskId"] == task
         state = finished(client, task)
         assert state["status"] == "completed"
-        assert 144 <= state["requests"] <= 200
+        assert 0 < state["requests"] <= 200
         result = client.get(f"/api/analyses/{task}/result").json()
         TaskResultResponse.model_validate(result)
         assert result["responseType"] == "result"
@@ -50,6 +50,8 @@ def test_real_algorithm_result_and_idempotency():
         assert result["facilitiesStatus"] == "not_integrated"
         assert result["isochrone"]["geometry"]["type"] == "MultiPolygon"
         assert result["isochrone"]["coordinateSystem"] == "bd09ll"
+        assert result["isochrone"]["algorithm"] == "local-multicross-e82"
+        assert [band['minutes'] for band in result['isochrone']['timeBands']] == [15]
         assert result["isochrone"]["statistics"]["network_requests"] == 0
         assert client.post(f"/api/analyses/{task}/cancel").json()["status"] == "completed"
         assert client.post("/api/analyses", json=body(budget=400)).status_code == 409
@@ -185,16 +187,16 @@ def test_terminal_capacity_is_twenty():
 
 def test_geometry_reconstruction_keeps_health_and_cancel_responsive(monkeypatch):
     import threading
-    import life_circle.engine as engine
     entered, release = threading.Event(), threading.Event()
-    original = engine.reconstruct
 
-    def blocked(*args):
+    from tools import endpoint_boundary_band
+    original = endpoint_boundary_band.connect_estimate
+    def blocked(*args, **kwargs):
         entered.set()
         assert release.wait(5)
-        return original(*args)
+        return original(*args, **kwargs)
 
-    monkeypatch.setattr(engine, "reconstruct", blocked)
+    monkeypatch.setattr(endpoint_boundary_band, "connect_estimate", blocked)
     with TestClient(create_app(config())) as client:
         task = client.post("/api/analyses", json=body()).json()["taskId"]
         try:

@@ -42,6 +42,9 @@ class HybridIsochrone(WireModel):
     quality: Literal["usable", "partial", "insufficient"]
     coverage_policy: Literal["continuous_land_interior"]
     geometry: Geometry | None
+    display_geometry: Geometry | None = Field(default=None, alias="displayGeometry",
+        json_schema_extra={"x-legacy-optional": True},
+        description="Display-only shell before water subtraction; never use for analysis or area.")
     evidence_geometry: Geometry | None
     inferred_fill_geometry: Geometry | None
     unknown_region: Geometry | None

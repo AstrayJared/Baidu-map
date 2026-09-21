@@ -39,6 +39,7 @@ export function validHybridResult(v: unknown): v is HybridResultResponse {
     || !object(v.isochrone) || !object(v.algorithm)
     || ![v.config_hash, v.result_hash].every(s => typeof s === 'string' && /^[a-f0-9]{64}$/.test(s))) return false;
   const r = v.isochrone;
+  if (r.displayGeometry !== undefined && !geometry(r.displayGeometry)) return false;
   if (r.algorithm !== 'hybrid' || r.algorithm_version !== 'hybrid-v1.5.0' || r.coordinate_system !== 'bd09ll'
     || !['usable', 'partial', 'insufficient'].includes(r.quality as string)
     || r.coverage_policy !== 'continuous_land_interior' || typeof r.extent_truncated !== 'boolean'

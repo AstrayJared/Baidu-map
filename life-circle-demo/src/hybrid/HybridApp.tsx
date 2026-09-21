@@ -117,13 +117,14 @@ export default function HybridApp() {
           <Space><Button type="primary" aria-label="开始分析" disabled={!valid || busy || !!active.current} loading={busy} onClick={() => void start()}>开始分析</Button>
             {(busy || active.current) && <Button onClick={() => void cancel()}>取消任务</Button>}</Space>
         </Card>
-        <Card title="地图图层">{([['reachable', '生活圈估计范围'], ['unknown', '未知区域'], ['extent', '计算范围']] as const).map(([key, label]) => <Checkbox key={key} checked={layers[key]} onChange={e => setLayers({ ...layers, [key]: e.target.checked })}>{label}</Checkbox>)}</Card>
+        <Card title="地图图层"><Checkbox checked={layers.reachable} onChange={e => setLayers({ ...layers, reachable: e.target.checked })}>15 分钟圈外轮廓</Checkbox><p className="api-muted">仅展示外轮廓，圈内不代表每处均可步行到达。</p></Card>
         <Alert type="info" title="设施统计尚未接入" description="当前仅展示生活圈及步行验证证据，不将空设施列表解释为缺少服务。" />
       </section>
       <section className="api-map-section">
         {dirty && result && <Alert type="warning" title="条件已修改，地图仍显示上次分析结果" />}
         <ApiMap center={center} onPick={pick} layers={layers} resultCenter={result?.center}
-          result={core ? { geometry: core.geometry, unknownRegion: core.unknown_region,
+          result={core ? { geometry: core.geometry, outlineOnly: true,
+            displayGeometry: core.displayGeometry ?? core.geometry, unknownRegion: core.unknown_region,
             uncertainRegion: null, computationExtent: core.computation_extent } : undefined} />
       </section>
       <section className="api-results" aria-label="分析结果"><Card title="分析结果">

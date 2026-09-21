@@ -27,6 +27,15 @@ export function polygonPaths(geometry: DrawableGeometry | null): string[][] {
 export function drawGeometry(map: BMapMap, api: BaiduMapApi, geometry: DrawableGeometry | null, style: BMapPolygonOptions) {
   for (const rings of polygonPaths(geometry)) map.addOverlay(new api.Polygon(rings, style));
 }
+
+/** Display-only exterior paths. Preserve components; never connect across gaps. */
+export function drawOutline(map: BMapMap, api: BaiduMapApi, geometry: DrawableGeometry | null) {
+  for (const rings of polygonPaths(geometry)) {
+    map.addOverlay(new api.Polygon([rings[0]], {
+      strokeColor: '#147d70', strokeWeight: 2, fillOpacity: 0,
+    }));
+  }
+}
 export function geometryMessage(geometry: BusinessGeometry | null) {
   if (geometry === null) return '证据不足，无法确定可达区域';
   if (!geometry.coordinates.length) return '有效证据范围内，可达区域为空';

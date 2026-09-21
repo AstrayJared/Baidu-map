@@ -4,6 +4,7 @@ import time
 
 from shapely.geometry import Point, shape
 from life_circle.coordinates import LocalProjection
+from life_circle.models import RouteObservation
 from life_circle.providers import BaiduProvider
 from life_circle.field import business_geometry
 
@@ -81,7 +82,7 @@ async def analyze_facilities(result, client, ak, gate, token, *, max_points=9, m
             item.poi_evidence = mapped.poi_evidence
         return value
 
-    for sample in selected:
+    async def assess(sample):
         evidence = []
         for major, minors in GROUPS.items():
             items = sorted((f for f in facilities if f.major_category == major),
@@ -103,6 +104,15 @@ async def analyze_facilities(result, client, ak, gate, token, *, max_points=9, m
                 if not chosen:
                     state, reason = "unknown", "cancelled_or_deadline"
             evidence.append(CoverageEvidence(category=major, status=state, facility_id=chosen, distance_m=distance, reason=reason))
+        return evidence
+
+    # Center-anchored route evidence is a real request for the analysis center; it
+    # must not depend on whether this sampler happened to measure the center itself.
+    center = next((o for o in result.sample_observations if o.destination == origin), None) or RouteObservation(origin, 0)
+    if geometry is not None:
+        await assess(center)
+    for sample in selected:
+        evidence = await assess(sample)
         assessments.append(AssessmentPoint(location={"lng": sample.destination[0], "lat": sample.destination[1]}, duration_s=sample.duration, categories=evidence))
     groups = []
     for major, minors in GROUPS.items():

@@ -1,13 +1,17 @@
 # 当前算法状态
 
-2026-09-17：项目同时保留两套可运行方案，供用户选择和开发对比：
+2026-09-20：项目同时保留两套可运行方案，供用户选择和开发对比：
 
-- **纯百度算法**：速度较快，任务接口为 `/api/analyses`，请求使用 `center`、`coordinateSystem`、`budget`、`clientRequestId`。
-- **OSM＋百度算法（Hybrid v1.5）**：耗时更长但目标是获得更准确的边界，任务接口为 `/api/v1/analysis/hybrid`，请求使用 `origin`、`coordinate_system`、`config`、`client_request_id`。
-- 两个接口拥有独立契约和任务管理器，不能互相复用请求体，也不会静默切换算法。
-- 前端保留两个独立页面，并通过顶部算法选择器切换；`VITE_ANALYSIS_MODE=baidu|api` 和 `hybrid` 可指定开发时的初始选择。
+- **百度边界搜索（E8.2，`local-multicross-e82`）**：任务接口为 `/api/analyses`，请求使用 `center`、`coordinateSystem`、`budget`、`clientRequestId`。保留实际端点证据、径向搜索、局部多边界重建、未知区域与预算停止逻辑；默认 16 个方向、50 米局部扫描步长、25 米细化目标，逐边细化。默认预算 400，保留 200/800 档。
+- **OSM＋百度算法（Hybrid v1.5）**：任务接口为 `/api/v1/analysis/hybrid`，请求使用 `origin`、`coordinate_system`、`config`、`client_request_id`。继续运行现有 Hybrid，其圈面扣除 OSM 水体。
+- 两个接口拥有独立契约和任务管理器，不能互相复用请求体，也不会静默切换算法；两者共享百度限流器。
+- 前端顶部算法选择器文案为「百度边界搜索（E8.2）」与「OSM＋百度」，不标注速度或精度优劣；`VITE_ANALYSIS_MODE=baidu|api` 和 `hybrid` 可指定开发时的初始选择。结果明确标记算法标识，两个入口的结果不混用。
+- E8.2 与 Hybrid 目前只提供真实计算的 15 分钟圈，不生成或伪造 5/10 分钟圈。未知或未收敛结果保持部分结果语义，不包装成精度达标。
+- E8.2 入口沿用 E8.2 默认策略（16 方向、50 米局部扫描步长、25 米细化目标、逐边细化），不启用实验性批量策略或 POI 引导。设施分析使用 E8.2 的计算圈面独立执行，不将设施结果回流改变边界。
+- Hybrid 地图只绘制 15 分钟圈外轮廓线（`displayGeometry`，取自扣除水体前的 `coverage.shell`）：不填色、不画水体内孔，逐分量绘制外环、不连接离散区域。该字段仅用于展示，计算几何、水体约束、面积统计与诊断仍以原字段为准；旧响应缺少该字段时退回原几何外环显示。
+- **E8.3（POI 引导联合构圈）仍为离线实验**：不接入浏览器或生产 HTTP 入口，代码完整保留在 `backend/tools/endpoint_e83_*`。
+- 旧自适应网格实现保留作历史基线，不再作为页面上的同伴算法；`/api/analyses` 通过薄适配层调用团队 E8.2 核心，不再导入旧网格引擎。
 - 启动与健康检查不加载城市图；首次 Hybrid 或 OSM Offline 分析才惰性加载。缺失数据保留 `degraded` 标记。
-- Hybrid 的设施分析尚未接入；纯百度流程继续保留设施检索、采样点评估和设施路线证据。
-- 自动测试使用合成数据，不代表真实社区精度验收。本次冲突整理未新增真实百度调用。
+- 自动测试使用合成数据与模拟传输，不代表真实社区精度验收。本轮未新增真实百度调用，也未做额外水体核验。
 
-[Hybrid 设计](HYBRID_ISOCHRONE_DESIGN.md) · [后端说明](backend/README.md)
+[Hybrid 设计](HYBRID_ISOCHRONE_DESIGN.md) · [后端说明](backend/README.md) · [本地启动与前后端联调](backend/docs/本地启动与前后端联调.md)
