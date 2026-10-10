@@ -695,6 +695,22 @@ def carve_conflicts(state, estimate):
     return polygon_difference(estimate, disk), disk, carved
 
 
+def _ring_assembly(version) -> dict:
+    """环面合没合起来，没合起来是为什么。
+
+    ``connect_estimate`` 早就把这句话算出来了 —— 拒绝时的 ``reason`` 与 ``max_gap_radians``
+    —— 但一次没有几何的运行只把 ``budget`` 留下来：读者要自己翻源码才知道真正挡住它的是
+    什么（已定的方向之间隔着多大一个角隙）。这里只搬运已经算出来的值，不改判定。
+    """
+    base = (version or {}).get('base') or {}
+    gap = base.get('max_gap_radians')
+    return dict(assembled=base.get('candidate') is not None,
+                reason=base.get('reason') or None,
+                maxGapRadians=float(gap) if isinstance(gap, (int, float))
+                and math.isfinite(float(gap)) else None,
+                localizedNodes=len(base.get('nodes') or []))
+
+
 def publish(state, token=None):
     """Assemble the published extension from the last evidence version."""
     session = state.session
@@ -713,16 +729,21 @@ def publish(state, token=None):
     if version is None or version['estimate'] is None:
         loop_meta.update(carvedAreaM2=0, carvedNegatives=[], unresolvedInsideM2=0,
                          unresolvedOutsideM2=domain.area)
+        # 没有环面时这两个数此前写死为 0：它们读起来像"网格里没有未决边"，而真实情况是
+        # "根本没量过" —— 这两个数只在补丁窗口内量，而这里连窗口都没有，量出来只会是 0。
+        # 所以它们是 null，不是 0；环到底为什么没合起来，写在 ringAssembly 里。
         return dict(geometry=None, candidateGeometry=None, unknownRegion=None,
                     quality='experimental_insufficient_support', uncertaintyBand=None,
                     uncertainty=dict(guaranteedCoverage=False, closedEstimate=False, segments=[],
                                      reason='insufficient_support',
                                      meaning='solver-unresolved region; not an error bound'),
                     completion=dict(scope='closed_loop_local_evidence', resolutionReached=False,
-                                    budgetExhausted=session.scheduler.remaining <= 0, unresolvedEdges=0,
-                                    pendingUnattemptedEdges=0, pendingScanRays=pending_rays,
+                                    budgetExhausted=session.scheduler.remaining <= 0,
+                                    unresolvedEdges=None, pendingUnattemptedEdges=None,
+                                    pendingScanRays=pending_rays,
                                     initialUnfinishedDirections=initial_unfinished,
                                     runComplete=not cancelled, reason=state.stop_reason),
+                    ringAssembly=_ring_assembly(version),
                     localRepair=dict(patches=len(state.spec_keys), calls=state.used, scanRays=[],
                                      edgeBrackets=[], physicalBarrierVerified=False),
                     refinementLoop=loop_meta)
@@ -768,6 +789,7 @@ def publish(state, token=None):
                         pendingScanRays=pending_rays, initialUnfinishedDirections=initial_unfinished,
                         runComplete=not cancelled and state.stop_reason not in ('deadline', 'upstream_failure'),
                         reason='resolution_reached' if resolution else state.stop_reason),
+        ringAssembly=_ring_assembly(version),
         localRepair=dict(patches=len(state.spec_keys), calls=state.used, scanRays=[], edgeBrackets=[],
                          radialStepM=state.radial_step, targetM=state.target, physicalBarrierVerified=False,
                          negativeConflicts=still, connectionAssumption='homogeneous observed vertices; '

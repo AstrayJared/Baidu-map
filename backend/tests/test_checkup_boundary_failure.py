@@ -7,9 +7,9 @@
 读者会去查一个没有出错的阶段。成圈内部的拒收原因当时也没有留下，修订里只剩一个 budget。
 
 这里用一条**从不返回端点**的路线替身重现那个形状：所有观测都被求解器拒收，圈面立不起来。
-路网与设施传输都是离线替身，运行不出机器。断言的是整条链上的六件事：可达性与核验的原因
-指向边界、设施与核验零派发、额度一次不动、评分与灰区都不给、成圈诊断写进修订、逐条观测
-证据落在任务明细目录里且不含密钥或原始报文。
+路网与设施传输都是离线替身，运行不出机器。断言的是整条链上的七件事：可达性与核验的原因
+指向边界、设施与核验零派发、额度一次不动、评分与灰区都不给、成圈诊断写进修订、环面装配的
+具名原因与"没量过"的计数也在这一版里、逐条观测证据落在任务明细目录里且不含密钥或原始报文。
 """
 import json
 from dataclasses import replace
@@ -91,6 +91,15 @@ def test_a_boundary_that_never_stood_up_is_not_reported_as_a_facility_failure(tm
         "missing_endpoints": diagnostics["observations"]["rejected"]}
     assert diagnostics["directions"]["byReason"] == {"missing_endpoints": 16}
     assert diagnostics["completion"]["resolutionReached"] is False
+    # 环面根本没合起来，原因是具名的：一条观测都用不上时连三个方向都凑不齐。
+    ring = diagnostics["ringAssembly"]
+    assert ring["assembled"] is False and ring["reason"] == "insufficient_brackets"
+    assert ring["localizedNodes"] == 0 and ring["maxGapRadians"] is None
+    # 没有环面就没有补丁窗口，那两个计数没有被量过：这里必须是 null，不能是 0 ——
+    # 0 会被读成"未决边一条都没有"，而这一趟连边都还没有。
+    assert diagnostics["completion"]["unresolvedEdges"] is None
+    assert diagnostics["completion"]["pendingUnattemptedEdges"] is None
+    assert frozen["isochrone"]["statistics"]["unfinished_boundary"] is None
 
     # 逐条观测证据落在任务明细目录里，与修订文件同时到期。
     assert frozen["isochrone"]["statistics"]["observationEvidence"] == EVIDENCE_NAME

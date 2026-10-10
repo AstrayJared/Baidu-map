@@ -1,10 +1,12 @@
 import asyncio
+import math
 from dataclasses import replace
 
 import pytest
 from shapely.geometry import shape
 
 from app.algorithms.baidu_e82 import compute_e82, EndpointAnalyticProvider
+from app.engines.baidu_e82 import e82_request
 from life_circle.models import CancelToken, IsochroneRequest, RouteObservation
 from tools.endpoint_multicross_boundary import compute_multicross_boundary
 from tools.endpoint_radial_experiment import ORIGIN, Synthetic
@@ -130,6 +132,8 @@ def test_boundary_diagnostics_name_why_the_observations_were_rejected():
                                             'byReason': {'none': 16}}
         assert diagnostics['completion']['reason'] == adapted.stop_reason
         assert diagnostics['completion']['unresolvedEdges'] == 0
+        # 旧 refinement 路径不算环面装配，所以这一项缺失（None），不是"合起来了"。
+        assert diagnostics['ringAssembly'] is None
 
         endpointless = await compute_e82(request, Endpointless(ORIGIN), CancelToken())
         assert endpointless.geometry is None and endpointless.quality == 'insufficient'
@@ -153,4 +157,77 @@ def test_boundary_diagnostics_name_why_the_observations_were_rejected():
         assert observations['rejectedReasons'] == {
             'different_actual_origin': observations['logged'] - 1}
         assert observations['actualOriginGroups'] == observations['logged'] > 1
+    asyncio.run(run())
+
+
+class SplitOrigin(EndpointAnalyticProvider):
+    """一个扇区的路线从另一处道路吸附点起步。
+
+    这是两次真实体检（2026-10-10 10:27 与 13:39，中心 31.299213,121.50847）的形状：请求
+    中心落在两处道路吸附点之间，百度按**目标点**分别吸附 —— 193 次回同一个点、南向约
+    115° 扇区里的 7 次回另一个点（两点相距 20.11 米），而求解器只采纳先到的那个起点，
+    于是那 6 个方向一条证据都没有。传输计数看不出任何问题：每一次都回来了时长。
+    """
+
+    def __init__(self, origin, wedge=(3.4, 5.6)):
+        super().__init__(origin, lambda x, y: (x * x + y * y) ** .5 / 1.2)
+        self.wedge = wedge
+
+    async def query_walking_time(self, origin, destination, deadline):
+        observation = await super().query_walking_time(origin, destination, deadline)
+        angle = math.atan2(*reversed(self.projection.to_local(destination))) % (2 * math.pi)
+        if self.wedge[0] <= angle <= self.wedge[1]:
+            return replace(observation, route_origin=self.projection.to_geographic((-20, 0)),
+                           origin_offset_m=20)
+        return observation
+
+
+def test_the_ring_assembly_says_the_boundary_closed_and_at_what_gap():
+    """环合起来了：具名说它合起来了，且最大角隙在那条"不能凭空连过去"的界线之内。
+
+    同一趟里"量过的 0"与"没量过的 null"必须分得开：这一趟量过未决边，所以它是 0。
+    """
+    async def run():
+        adapted = await compute_e82(e82_request(ORIGIN, 200), Synthetic('circle'), CancelToken())
+        diagnostics = adapted.to_dict()['boundaryDiagnostics']
+        ring = diagnostics['ringAssembly']
+        assert adapted.geometry is not None
+        assert ring['assembled'] is True and ring['reason'] is None
+        assert ring['maxGapRadians'] < math.pi / 2
+        # 参与合环的就是那些定住的方向，不多不少。
+        assert ring['localizedNodes'] == diagnostics['directions']['byStatus']['localized']
+        assert diagnostics['completion']['unresolvedEdges'] == 0
+        assert adapted.statistics.unfinished_boundary == 0
+    asyncio.run(run())
+
+
+def test_a_wedge_from_another_road_point_names_the_ring_that_could_not_close():
+    """真实失败形状：起点按目标点分裂，环因此合不拢 —— 而现在这句话写在修订里。
+
+    在此之前，这样一条修订只剩一个 ``budget``：200 次全部花光、``geometry: null``，而
+    "已定的方向之间隔着 2.7 弧度"这句求解器算过就扔了；未决边数还被写死成 0，读起来像
+    "边界都完成了"。这里把两件事一起钉住。
+    """
+    async def run():
+        adapted = await compute_e82(e82_request(ORIGIN, 200), SplitOrigin(ORIGIN), CancelToken())
+        assert adapted.geometry is None and adapted.quality == 'insufficient'
+        diagnostics = adapted.to_dict()['boundaryDiagnostics']
+        observations, directions = diagnostics['observations'], diagnostics['directions']
+        # 额度花光，而每一条观测都带回了时长：只看传输计数，这一趟没有任何异常。
+        assert observations['logged'] == adapted.statistics.requests == 200
+        # 两个实际起点；被拒的每一条都是因为起点对不上，而那批拒收正好落在扇区的方向上。
+        assert observations['actualOriginGroups'] == 2 and observations['rejected'] > 0
+        assert observations['rejectedReasons'] == {
+            'different_actual_origin': observations['rejected']}
+        assert directions['byReason']['different_actual_origin'] \
+            == directions['byStatus'].get('unknown', 0) > 0
+        # 环合不拢的具名原因，连同那个角隙本身。
+        ring = diagnostics['ringAssembly']
+        assert ring['assembled'] is False and ring['reason'] == 'angular_gap_too_large'
+        assert ring['maxGapRadians'] >= math.pi / 2
+        assert 3 <= ring['localizedNodes'] == directions['byStatus']['localized']
+        # 没有环面就没有补丁窗口，这两个数因此没有被量过：null，不是 0。
+        assert diagnostics['completion']['unresolvedEdges'] is None
+        assert diagnostics['completion']['pendingUnattemptedEdges'] is None
+        assert adapted.statistics.unfinished_boundary is None
     asyncio.run(run())
