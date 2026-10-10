@@ -946,6 +946,8 @@ class CheckupManager:
                                                      for zone in gaps],
                     heatmap=heatmap, entrances=assessment.entrances,
                     origin=normalize((payload.center.lng, payload.center.lat)),
+                    # 没有圈面时核验没有对象，而且原因在成圈不在这里。
+                    boundary_available=snapshot.geometry is not None,
                     session=attach_token(routes.session(self.quota.direction, budget=budget,
                                                         deadline=deadline), token),
                     progress=progress, token=token)

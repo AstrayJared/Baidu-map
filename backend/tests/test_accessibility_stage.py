@@ -247,6 +247,19 @@ def test_no_boundary_refuses():
     assert {item.unavailable_reason for item in outcome.accessibility.categories} \
         == {stage.NO_BOUNDARY}
 
+def test_a_missing_boundary_is_not_reported_as_a_facility_failure():
+    """没有圈面时原因写边界，不写设施阶段：设施检索根本没轮到开始。
+
+    ``facilities.py`` 先认几何再看预算，所以「设施阶段没有产出」是下游症状。两次真实
+    体检（2026-10-10 10:27 与 10:29）的成圈返回 ``geometry: null``、设施一次也没派发，
+    报告却把每个类别写成 ``facility_stage_unavailable`` —— 把一个没有出错的阶段指成了
+    原因，读者会去查设施检索而不是成圈。
+    """
+    outcome = run(geometry=None, facilities=None)
+    assert outcome.scores is None and outcome.service_gaps is None
+    assert {item.unavailable_reason for item in outcome.accessibility.categories} \
+        == {stage.NO_BOUNDARY}
+
 
 def test_domain_beyond_the_grid_limit_refuses_the_stage():
     """评估域装不下网格时，不假装评估过，也不静默粗化。"""

@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import replace
 
 import pytest
 from shapely.geometry import shape
@@ -74,4 +75,82 @@ def test_adapted_synthetic_origin_keeps_endpoint_evidence_exact():
         rejected = await compute_e82(request, MissingEndpoints(), CancelToken())
         assert rejected.quality == 'insufficient'
         assert all(o.route_destination is None for o in rejected.sample_observations)
+    asyncio.run(run())
+
+
+class Endpointless(EndpointAnalyticProvider):
+    """上游回了时长，却一次也没有回端点：求解器一条观测都用不上。"""
+
+    def __init__(self, origin):
+        super().__init__(origin, lambda x, y: (x * x + y * y) ** .5 / 1.2)
+
+    async def query_walking_time(self, origin, destination, deadline):
+        observation = await super().query_walking_time(origin, destination, deadline)
+        return replace(observation, route_origin=None, route_destination=None,
+                       endpoint_verified=False)
+
+
+class DriftingOrigin(EndpointAnalyticProvider):
+    """每次回的实际起点都差一点：只读传输计数，这一趟看起来完全正常。"""
+
+    def __init__(self, origin):
+        super().__init__(origin, lambda x, y: (x * x + y * y) ** .5 / 1.2)
+
+    async def query_walking_time(self, origin, destination, deadline):
+        observation = await super().query_walking_time(origin, destination, deadline)
+        drift = 0.04 * self.calls
+        return replace(observation, route_origin=self.projection.to_geographic((drift, 0)),
+                       origin_offset_m=drift)
+
+
+def test_boundary_diagnostics_name_why_the_observations_were_rejected():
+    """没有圈面时，修订里的诊断要说清哪些观测被拒、各自什么原因。
+
+    两次真实体检（2026-10-10）就是这个形状：成圈花掉全部 200 次、返回
+    ``geometry: null``、公开统计里只有 ``endpoint_offset`` 这一项。从那份修订看不出
+    "上游没回端点"、"每次回的实际起点不一样"和"边界没收敛"的区别，只能看到一句
+    ``budget``。这里把三种形态各自的诊断钉住：诊断只数求解器已经记下的东西，
+    它不改判定，但没有它就没有可查的现场。
+    """
+    async def run():
+        request = IsochroneRequest(ORIGIN, 'bd09ll', budget=200, extent=1200,
+                                   max_extent=1200, expand=False, time_bands=(15,))
+        adapted = await compute_e82(request, Synthetic('circle'), CancelToken())
+        diagnostics = adapted.to_dict()['boundaryDiagnostics']
+        observations = diagnostics['observations']
+        # 立住了的那一趟：每一条观测都被采纳，实际起点只有一个，十六个方向都定住了。
+        assert adapted.geometry is not None
+        assert observations['logged'] == observations['accepted'] > 0
+        assert observations['rejected'] == 0 and observations['rejectedReasons'] == {}
+        assert observations['actualOriginGroups'] == 1
+        assert observations['kinds'] == {'direction_search': 48, 'boundary_midpoint': 64}
+        assert sum(observations['kinds'].values()) == observations['logged']
+        assert diagnostics['directions'] == {'total': 16, 'byStatus': {'localized': 16},
+                                            # 定住的方向没有原因要报，所以这个桶是 none。
+                                            'byReason': {'none': 16}}
+        assert diagnostics['completion']['reason'] == adapted.stop_reason
+        assert diagnostics['completion']['unresolvedEdges'] == 0
+
+        endpointless = await compute_e82(request, Endpointless(ORIGIN), CancelToken())
+        assert endpointless.geometry is None and endpointless.quality == 'insufficient'
+        diagnostics = endpointless.to_dict()['boundaryDiagnostics']
+        observations = diagnostics['observations']
+        # 一条也没采纳：原因写在名字上，不留给读者去猜。
+        assert observations['accepted'] == 0
+        assert observations['logged'] == observations['rejected'] > 0
+        assert observations['rejectedReasons'] == {'missing_endpoints': observations['logged']}
+        assert observations['actualOriginGroups'] == 0
+        # 十六个方向全部止于同一个原因：这就是"额度没花完、圈面却是空的"现场缺的那句话。
+        assert diagnostics['directions']['total'] == 16
+        assert diagnostics['directions']['byReason'] == {'missing_endpoints': 16}
+
+        drifting = await compute_e82(request, DriftingOrigin(ORIGIN), CancelToken())
+        assert drifting.geometry is None and drifting.quality == 'insufficient'
+        observations = drifting.to_dict()['boundaryDiagnostics']['observations']
+        # 求解器只采纳第一个实际起点。其余每一次都带回了一个可用时长，所以传输计数
+        # 一个失败都没有 —— 那正是"每次都成功、圈面却立不起来"的现场。
+        assert observations['accepted'] == 1
+        assert observations['rejectedReasons'] == {
+            'different_actual_origin': observations['logged'] - 1}
+        assert observations['actualOriginGroups'] == observations['logged'] > 1
     asyncio.run(run())

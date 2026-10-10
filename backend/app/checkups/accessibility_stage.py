@@ -560,6 +560,12 @@ def assess_accessibility(*, geometry, facilities, query_status: str, majors, sto
     query_complete = query_status == "complete"
     if store is None:
         return _refusal(NO_GRAPH, requested, "OSM 步行路网不可用，服务覆盖与灰区无法评估。")
+    # 没有圈面时设施检索根本没有开始：它的第一个前置条件就是几何（facilities.py 先认
+    # 边界，再谈预算与缓存）。所以"设施阶段没有产出"是下游症状，不是原因。先认边界这
+    # 一条，报告才会说"成圈没有可用范围"，而不是把一次成圈失败读成一次设施检索失败 ——
+    # 两次真实体检正是这样被读成了 facility_stage_unavailable，原因指向了错误的阶段。
+    if geometry is None:
+        return _refusal(NO_BOUNDARY, requested, "成圈结果没有可用范围，服务覆盖未评估。")
     if facilities is None:
         return _refusal(NO_FACILITIES, requested, "设施检索没有建立结果，服务覆盖无从评估。")
     # A failed retrieval may still publish an empty group so its query evidence

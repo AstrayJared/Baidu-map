@@ -25,6 +25,49 @@ class EndpointAnalyticProvider(AnalyticProvider):
                        route_destination=destination, origin_offset_m=0, destination_offset_m=0)
 
 
+# 一次成圈里每条观测被接收还是被拒收。求解器运行时一直记着这些行，但修订此前只带走了
+# 调度器的传输计数 —— 于是一次没有圈面的运行只留下一个 ``budget``。两次真实体检因此
+# 无法分辨"上游没回端点"、"回来的端点对不上起点"和"边界本身没收敛"。这里只把已经记下
+# 的东西数出来，不新增任何判断：诊断不改变判定。
+def _tally(values) -> dict:
+    """把取值数成计数，键按字典序固定；``None`` 归到 ``none``（没有要报的原因）。"""
+    counts: dict[str, int] = {}
+    for value in values:
+        key = 'none' if value is None else str(value)
+        counts[key] = counts.get(key, 0) + 1
+    return dict(sorted(counts.items()))
+
+
+def boundary_diagnostics(raw) -> dict:
+    """成圈这一趟接收／拒收了什么，以及各方向的结果。只计数，不含坐标。"""
+    log = [row for row in (raw.get('observationEvidence') or []) if isinstance(row, dict)]
+    rejected = [row for row in log if not row.get('accepted')]
+    origins = {tuple(row['route_origin']) for row in log
+               if isinstance(row.get('route_origin'), (list, tuple))}
+    directions = [row for row in (raw.get('directions') or []) if isinstance(row, dict)]
+    completion = raw.get('completion') or {}
+    return {
+        'observations': {
+            'logged': len(log), 'accepted': len(log) - len(rejected), 'rejected': len(rejected),
+            'rejectedReasons': _tally(row.get('rejected') for row in rejected),
+            'kinds': _tally(row.get('kind') for row in log),
+            # 实际起点有几个：多过一个就说明上游把同一次体检的路线吸到了不同的路上，而
+            # 求解器只采纳第一个起点的一致性证据 —— 这正是"每次都回了结果、却没有圈面"
+            # 的一种成因，只靠传输计数看不出来。
+            'actualOriginGroups': len(origins),
+        },
+        'directions': {
+            'total': len(directions),
+            'byStatus': _tally(row.get('status') for row in directions),
+            'byReason': _tally(row.get('reason') for row in directions),
+        },
+        'completion': {key: completion.get(key) for key in
+                       ('reason', 'resolutionReached', 'budgetExhausted', 'unresolvedEdges',
+                        'pendingUnattemptedEdges', 'pendingScanRays',
+                        'initialUnfinishedDirections', 'runComplete')},
+    }
+
+
 async def compute_e82(request, provider, token, *, on_progress=None, refinement=None):
     if refinement is None:
         # The request names its refinement; an older version string means legacy.
@@ -75,6 +118,7 @@ async def compute_e82(request, provider, token, *, on_progress=None, refinement=
         sample_observations=raw['_observations'],
         metadata=dict(algorithm=ALGORITHM, validationStatus='not_independently_validated',
             completion=raw['completion'], assumption=raw['assumption'],
+            boundaryDiagnostics=boundary_diagnostics(raw),
             unknownRegionMeaning=('solver-unresolved region; may overlap geometry; not an error bound'
                                   if established else 'no boundary established'),
             unresolvedArea=dict(insideM2=local_unknown.intersection(local_geometry).area if established else 0,
