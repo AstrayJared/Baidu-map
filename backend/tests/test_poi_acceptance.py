@@ -62,6 +62,29 @@ def test_a_container_tag_alone_establishes_no_category():
     assert classify('合成教育科技', ['教育培训'])[1] == 'excluded'
 
 
+@pytest.mark.parametrize('name,category,status', [
+    ('合成大学', 'college', 'accepted'),
+    ('合成职业技术学院', 'college', 'accepted'),
+    ('合成培训学院', None, 'excluded'),
+    ('合成大学继续教育学院', None, 'needs_review'),
+])
+def test_the_college_tag_carries_the_category_but_not_a_business(name, category, status):
+    """``高等院校`` is the provider's word for what this dictionary calls ``高等教育``.
+
+    It is the tag a real v3 education query returns for a university: every college
+    at one surveyed coordinate came back as ``教育培训;高等院校``. Without the alias
+    the tag established no category, so eight colleges were reported
+    ``needs_review``/``insufficient_category_evidence`` instead of being counted —
+    the container tag alone establishes nothing, exactly as above.
+    """
+    verdict = classify(name, ['教育培训;高等院校'])
+    assert (verdict[0], verdict[1]) == (category, status)
+    if status == 'accepted':
+        # The category must be established by the tag as well as by the name, or an
+        # education row would still be accepted only when its name happens to say so.
+        assert 'tag:college' in verdict[2]
+
+
 def test_uid_name_address_and_parent_conflicts_are_preserved():
     request, _, plan, _ = setup_run()
     base = {'uid': 'synthetic-conflict', 'name': '合成药店甲', 'address': '合成地址甲',
