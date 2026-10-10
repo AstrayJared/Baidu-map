@@ -33,12 +33,33 @@ def test_misleading_tags_and_accessories_never_accepted(name, tags):
 
 @pytest.mark.parametrize('name,tags,status', [
     ('合成小学', ['教育培训;小学'], 'accepted'),
+    ('合成幼儿园', ['教育培训;幼儿园'], 'accepted'),
+    ('合成中学', ['教育培训;中学;初中'], 'accepted'),
+    ('合成大学', ['教育培训;大学'], 'accepted'),
     ('合成小学辅导班', ['教育培训;小学'], 'excluded'),
     ('合成农贸市场-1号门', ['购物;农贸市场'], 'excluded'),
     ('合成小学', ['教育培训;培训机构'], 'excluded'),
+    ('合成培训机构', ['教育培训;培训机构'], 'excluded'),
 ])
 def test_v3_parent_education_tag_is_not_a_training_business(name, tags, status):
+    """The provider's container tag says where a row sits, not what it is.
+
+    Every education POI a v3 query returns is tagged ``教育培训;<type>``. That
+    container word is also this dictionary's name for the training category, so
+    reading the raw tag parts as category evidence classified a whole real
+    retrieval — 11 primary schools, 11 middle schools and 15 kindergartens at one
+    coordinate — as training businesses and excluded every one of them.
+    """
     assert classify(name, tags)[1] == status
+
+
+def test_a_container_tag_alone_establishes_no_category():
+    """The group word is not evidence about a business, in either direction."""
+    # Nothing but the container tag: no category is established, so no verdict is
+    # invented — the record stays for review instead of being thrown away.
+    assert classify('合成机构', ['教育培训'])[1] == 'needs_review'
+    # …and a name that really does say training is still excluded by it.
+    assert classify('合成教育科技', ['教育培训'])[1] == 'excluded'
 
 
 def test_uid_name_address_and_parent_conflicts_are_preserved():

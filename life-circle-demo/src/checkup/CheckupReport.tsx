@@ -214,7 +214,11 @@ export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS }: {
         {snapshot.businessStatus !== 'complete' && <p className="rp-status"
           data-tone={snapshot.businessStatus === 'insufficient' ? 'warn' : 'info'}>
           {snapshot.businessStatus === 'insufficient' ? '证据不足：结论只覆盖已评估的部分'
-            : '部分结果：有阶段未能完成，缺失的部分按"未知"计，不计入覆盖率。'}</p>}
+            // 后端把"每个阶段都跑完"的修订也记成 partial：目录的完整性从来不靠关键词检索
+            // 建立。所以这里的"部分"说的是证据的性质，不是"某个阶段挂了"；而区间里的未知
+            // 面积是**进上界**的（最高覆盖率 = (C+U)/A），写成"不计入覆盖率"与图上的区间条
+            // 正好相反。
+            : '部分结果：设施目录完整性未经独立核验；覆盖率区间中的未知面积不计入已知覆盖，但计入上界。'}</p>}
       </header>
 
       <Section id="rp-overall">

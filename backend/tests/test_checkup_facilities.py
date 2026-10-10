@@ -25,7 +25,7 @@ from fastapi.testclient import TestClient
 
 from app.algorithms.baidu_e82 import EndpointAnalyticProvider
 from app.algorithms.hybrid_isochrone.models import Evidence, Validity
-from app.catalog import default_analysis_majors, poi_keys
+from app.catalog import default_analysis_majors, major_of, poi_keys
 from app.checkups.facilities import collect_facilities
 from app.checkups.facility_stage import query_domain
 from app.checkups.places import POI_POOL, declared_identity
@@ -51,8 +51,9 @@ SYNTHETIC_ROUTES = "synthetic:checkup-routes"
 # 断言写在这条关系上，词典增删小类时数字跟着走，而不是把某一次运行的快照钉死。
 CORE_MINORS = len(poi_keys(list(default_analysis_majors())))
 CORE_PAGES = 4 * CORE_MINORS
-# 每个小类各回一条落在中心的记录；十四个小类里 combined_school 与 training 的样本标签
-# 不判进本类，所以被接收的是十二处 —— 这三条数字来自词典，不是来自某次运行。
+# 每个小类各回一条落在中心的记录，标签按真实形态给（教育类是 ``教育培训;<type>``）；
+# 十四个小类里 combined_school 与 training 的样本不判进本类，所以被接收的是十二处 ——
+# 这三条数字来自词典，不是来自某次运行。
 CORE_ACCEPTED = {"shopping": 3, "medical": 5, "education": 4}
 CORE_ACCEPTED_TOTAL = sum(CORE_ACCEPTED.values())
 
@@ -106,6 +107,19 @@ def analytic(origin):
 def supported_tag(category):
     """One tag the dictionary classifies into this category, taken from it."""
     return sorted(RULES["supportedTags"][category])[0]
+
+
+def provider_tag(category, word):
+    """The way the provider really tags a row of this category.
+
+    A v3 education POI arrives as ``教育培训;<type>``. The container word is the
+    provider's own group — and it is also this dictionary's *name* for the training
+    category, which is why a fixture sending only ``<type>`` made every one of these
+    tests look right while a real run threw every school, college and kindergarten
+    away as ``negative:training``.
+    """
+    container = sorted(RULES["nonBusinessParentTags"])[0]
+    return f"{container};{word}" if major_of(category) == "education" and word != container else word
 
 
 def offset(meters, *, east=1.0, north=0.0):
@@ -247,7 +261,8 @@ def row(sequence, index, *, at, uid=None):
     word = supported_tag(sequence["category"])
     return {"uid": uid or f"{sequence['category']}-{index}", "name": f"{word}样本",
             "address": f"{word}路{index}号", "location": {"lng": at[0], "lat": at[1]},
-            "detail_info": {"classified_poi_tag": word, "parent_id": None}}
+            "detail_info": {"classified_poi_tag": provider_tag(sequence["category"], word),
+                            "parent_id": None}}
 
 
 def every_page(points):

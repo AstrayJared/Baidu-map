@@ -42,6 +42,8 @@ type Options = {
   unmetCoverage?: boolean;
   /** 明细已到期：任务视图说明细不可用，明细接口一律 410，保留汇总仍可读。 */
   detailsExpired?: boolean;
+  /** 业务状态：默认 partial。报告首行的措辞按它分岔，两个分支都要验到。 */
+  businessStatus?: 'partial' | 'insufficient';
 };
 
 async function setup(page: Page, options: Options = {}) {
@@ -143,7 +145,8 @@ async function setup(page: Page, options: Options = {}) {
         budget: 400, engine: submitted?.engine ?? 'baidu_e82' }) });
     }
     return route.fulfill({ json: task({ status: 'completed', stage: 'ready', revision: REVISION,
-      businessStatus: 'partial', budget: 400, engine: submitted?.engine ?? 'baidu_e82',
+      businessStatus: options.businessStatus ?? 'partial', budget: 400,
+      engine: submitted?.engine ?? 'baidu_e82',
       ...(options.detailsExpired ? { retention: retentionView({ detailsAvailable: false,
         reason: 'legacy', cleared: true }) } : {}) }) });
   });
@@ -229,6 +232,7 @@ function snapshotFor(options: Options, submitted: { center: { lng: number; lat: 
     : base.facilities!;
   return snapshot({
     center: { lng: submitted.center.lng, lat: submitted.center.lat },
+    businessStatus: options.businessStatus ?? 'partial',
     serviceGaps: { ...base.serviceGaps!, zones },
     report: report({ gaps: { ...report().gaps, zones } }),
     accessibility: { ...base.accessibility!, domain: polygon(0.03) },
@@ -442,6 +446,33 @@ test('a published revision draws its layers, opens the report and keeps the view
   expect(drawn.creations).toBe(1);
   expect(drawn.pans.map(pan => [pan.lng, pan.lat])).toEqual([[116.405, 39.916]]);
   expect(errors).toEqual([]);
+});
+
+/**
+ * 报告首行那句"部分结果"说的是**证据的性质**，不是"某个阶段挂了"。
+ *
+ * 后端把每个阶段都跑完的修订也记成 `partial`：目录的完整性从来不靠关键词检索建立。所以
+ * 这句话不能写成"有阶段未能完成"；而区间里的未知面积进的是**上界**（最高覆盖率 = (C+U)/A），
+ * 写成"不计入覆盖率"与图上的区间条正好矛盾 —— 一字之差，读者对同一个数字的理解就反了。
+ */
+test('the partial banner says what partial means instead of blaming a failed stage', async ({ page }) => {
+  await setup(page);
+  await page.goto('/');
+  await pickAndStart(page);
+  const status = page.locator('.rp-status');
+  await expect(status).toHaveAttribute('data-tone', 'info');
+  await expect(status).toHaveText(
+    '部分结果：设施目录完整性未经独立核验；覆盖率区间中的未知面积不计入已知覆盖，但计入上界。');
+});
+
+/** 证据不足是另一回事：那句话讲的是结论只覆盖已评估的部分，配色也必须跟着警告走。 */
+test('an insufficient revision keeps the warning tone and its own wording', async ({ page }) => {
+  await setup(page, { businessStatus: 'insufficient' });
+  await page.goto('/');
+  await pickAndStart(page);
+  const status = page.locator('.rp-status');
+  await expect(status).toHaveAttribute('data-tone', 'warn');
+  await expect(status).toHaveText('证据不足：结论只覆盖已评估的部分');
 });
 
 test('layers are independent: unchecking one leaves the others on the map', async ({ page }) => {

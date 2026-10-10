@@ -49,7 +49,14 @@ def classify(name, tags):
     # agree on the keywords actually sent but not on the words that identify a
     # category, and §4.3 wants one table per question.
     names = {c for c, words in RULES['nameHints'].items() if any(w in name for w in words)}
-    tagged = {c for c, words in RULES['supportedTags'].items() if tag_parts.intersection(words)}
+    # The tag evidence reads ``business_tags``, not the raw parts: the provider
+    # prefixes its own group tag to a row (``教育培训;小学``), and that group word
+    # is *also* this dictionary's name for the training category. Matching the raw
+    # parts therefore classified every school, college and kindergarten a real run
+    # returned as a training business and threw it away as ``negative:training`` —
+    # a container tag says where a facility sits in the provider's tree, not what
+    # business it does, which is what ``nonBusinessParentTags`` already declares.
+    tagged = {c for c, words in RULES['supportedTags'].items() if business_tags.intersection(words)}
     for category, words in RULES.get('excludeHints', {}).items():
         if category in names | tagged and any(word in name or word in business_tags for word in words):
             names.discard(category)

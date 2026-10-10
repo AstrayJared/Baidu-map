@@ -1,5 +1,5 @@
 {
-  "version": "poi-categories-v2.1",
+  "version": "poi-categories-v2.2",
   "displayGroups": [
     {"key":"healthcare","label":"健康照护","order":1,"majors":["medical","care"]},
     {"key":"education","label":"教育成长","order":2,"majors":["education"]},
