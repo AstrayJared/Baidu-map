@@ -1122,6 +1122,58 @@
         }
       }
     },
+    "/api/v2/checkups/{task_id}/continue": {
+      "post": {
+        "tags": [
+          "checkups"
+        ],
+        "summary": "Continue Checkup",
+        "operationId": "continue_checkup_api_v2_checkups__task_id__continue_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContinueCheckupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckupTaskView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/checkups/{task_id}/layers/{layer_id}": {
       "get": {
         "tags": [
@@ -2598,6 +2650,30 @@
         "title": "CategoryCoverage",
         "description": "一类在冻结评估域内的三态面积（§7.1）。\n\n面积只在这里出现一次：:class:`ScoreEvidence` 报的是由这些面积算出的百分比，\n不再复制一份面积。``C + G + U`` 与 ``domain_area_m2`` 必须相符，不符的类别按\n``supported=False`` 报出 ``unavailable_reason``，绝不归一化后照常给分。"
       },
+      "CategoryDirectoryEntry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "order"
+        ],
+        "title": "CategoryDirectoryEntry"
+      },
       "CategoryResult": {
         "properties": {
           "category": {
@@ -2837,6 +2913,18 @@
             },
             "type": "array",
             "title": "Waterreviews"
+          },
+          "categoryDirectoryVersion": {
+            "type": "string",
+            "title": "Categorydirectoryversion",
+            "default": "poi-categories-v2.2"
+          },
+          "categoryDirectory": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryDirectoryEntry"
+            },
+            "type": "array",
+            "title": "Categorydirectory"
           }
         },
         "additionalProperties": false,
@@ -2850,6 +2938,103 @@
           "quota"
         ],
         "title": "CheckupCapabilities"
+      },
+      "CheckupCompletion": {
+        "properties": {
+          "reportRevision": {
+            "type": "integer",
+            "title": "Reportrevision",
+            "default": 0
+          },
+          "roundNumber": {
+            "type": "integer",
+            "title": "Roundnumber",
+            "default": 1
+          },
+          "roundPoiLimit": {
+            "type": "integer",
+            "title": "Roundpoilimit",
+            "default": 60
+          },
+          "roundPoiRequests": {
+            "type": "integer",
+            "title": "Roundpoirequests",
+            "default": 0
+          },
+          "cumulativePoiRequests": {
+            "type": "integer",
+            "title": "Cumulativepoirequests",
+            "default": 0
+          },
+          "routeRequests": {
+            "type": "integer",
+            "title": "Routerequests",
+            "default": 0
+          },
+          "routeRemaining": {
+            "type": "integer",
+            "title": "Routeremaining",
+            "default": 120
+          },
+          "queryCompleteByMajor": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object",
+            "title": "Querycompletebymajor"
+          },
+          "evaluatedCategories": {
+            "type": "integer",
+            "title": "Evaluatedcategories",
+            "default": 0
+          },
+          "totalCategories": {
+            "type": "integer",
+            "title": "Totalcategories",
+            "default": 10
+          },
+          "evaluationStatus": {
+            "type": "string",
+            "enum": [
+              "partial",
+              "complete",
+              "limited"
+            ],
+            "title": "Evaluationstatus",
+            "default": "partial"
+          },
+          "canContinue": {
+            "type": "boolean",
+            "title": "Cancontinue",
+            "default": false
+          },
+          "restartRetrieval": {
+            "type": "boolean",
+            "title": "Restartretrieval",
+            "default": false
+          },
+          "stopReason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stopreason"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "CheckupCompletion"
       },
       "CheckupFacilities": {
         "properties": {
@@ -2879,10 +3064,10 @@
           },
           "maxPoiRequests": {
             "type": "integer",
-            "maximum": 1600.0,
+            "maximum": 1200.0,
             "minimum": 1.0,
             "title": "Maxpoirequests",
-            "default": 240
+            "default": 1200
           },
           "maxRouteRequests": {
             "type": "integer",
@@ -3135,6 +3320,17 @@
             },
             "type": "array",
             "title": "Warnings"
+          },
+          "completion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CheckupCompletion"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
           }
         },
         "additionalProperties": false,
@@ -3323,6 +3519,17 @@
               }
             ]
           },
+          "completion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CheckupCompletion"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
+          },
           "retention": {
             "anyOf": [
               {
@@ -3346,6 +3553,29 @@
           "serverTime"
         ],
         "title": "CheckupTaskView"
+      },
+      "ContinueCheckupRequest": {
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Clientrequestid"
+          },
+          "baseRevision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Baserevision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "clientRequestId",
+          "baseRevision"
+        ],
+        "title": "ContinueCheckupRequest"
       },
       "CoverageEvidence": {
         "properties": {
@@ -4319,7 +4549,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "maximum": 1600.0,
+                "maximum": 1200.0,
                 "minimum": 1.0
               },
               {
@@ -4719,7 +4949,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "maximum": 1600.0,
+                "maximum": 1200.0,
                 "minimum": 1.0
               },
               {
@@ -5023,6 +5253,18 @@
               }
             ],
             "title": "Poireason"
+          },
+          "entranceStatus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entrancestatus",
+            "x-legacy-optional": true
           },
           "evidenceGrade": {
             "type": "string",
@@ -6411,6 +6653,26 @@
             "type": "array",
             "title": "Categories"
           },
+          "categoryDirectoryVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categorydirectoryversion",
+            "x-legacy-optional": true
+          },
+          "categoryDirectory": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryDirectoryEntry"
+            },
+            "type": "array",
+            "title": "Categorydirectory",
+            "x-legacy-optional": true
+          },
           "overall": {
             "anyOf": [
               {
@@ -6448,6 +6710,17 @@
             },
             "type": "array",
             "title": "Limitations"
+          },
+          "completion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CheckupCompletion"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
           }
         },
         "additionalProperties": false,
@@ -6670,6 +6943,30 @@
             "type": "integer",
             "title": "Unresolved",
             "default": 0
+          },
+          "routeReturns": {
+            "type": "integer",
+            "title": "Routereturns",
+            "default": 0,
+            "x-legacy-optional": true
+          },
+          "strictConfirmed": {
+            "type": "integer",
+            "title": "Strictconfirmed",
+            "default": 0,
+            "x-legacy-optional": true
+          },
+          "toleranceEstimated": {
+            "type": "integer",
+            "title": "Toleranceestimated",
+            "default": 0,
+            "x-legacy-optional": true
+          },
+          "noUsableDecision": {
+            "type": "integer",
+            "title": "Nousabledecision",
+            "default": 0,
+            "x-legacy-optional": true
           },
           "facilities": {
             "items": {
@@ -7950,6 +8247,30 @@
             "type": "integer",
             "title": "Unresolved",
             "default": 0
+          },
+          "routeReturns": {
+            "type": "integer",
+            "title": "Routereturns",
+            "default": 0,
+            "x-legacy-optional": true
+          },
+          "strictConfirmed": {
+            "type": "integer",
+            "title": "Strictconfirmed",
+            "default": 0,
+            "x-legacy-optional": true
+          },
+          "toleranceEstimated": {
+            "type": "integer",
+            "title": "Toleranceestimated",
+            "default": 0,
+            "x-legacy-optional": true
+          },
+          "noUsableDecision": {
+            "type": "integer",
+            "title": "Nousabledecision",
+            "default": 0,
+            "x-legacy-optional": true
           },
           "facilities": {
             "items": {

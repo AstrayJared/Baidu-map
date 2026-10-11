@@ -17,11 +17,23 @@ export const CATEGORY_ORDER = ['shopping', 'medical', 'education'] as const;
 
 /** 三大类的名字与颜色在旧图层里也各有一份（`ApiMap.majorNames`、`FacilityPanel.groupNames`）。 */
 export const CATEGORY_LABELS: Record<string, string> = {
-  shopping: '购物', medical: '医疗', education: '教育',
+  medical: '医疗健康', shopping: '购物消费', education: '教育',
+  care: '疗养康养', dining: '餐饮', finance: '金融', public: '政务公共服务',
+  leisure: '文体休闲', transport: '交通出行', life: '生活服务',
 };
 export const CATEGORY_COLORS: Record<string, string> = {
   shopping: '#12b886', medical: '#7b5cff', education: '#ff9f1a',
+  care: '#d45d79', dining: '#ed7044', finance: '#3887c8', public: '#5368bf',
+  leisure: '#9a63b6', transport: '#0a9d9c', life: '#9b714b',
 };
+
+export function reportDirectory(snapshot: CheckupSnapshot) {
+  const frozen = snapshot.report?.categoryDirectory;
+  if (frozen?.length) return [...frozen].sort((a, b) => a.order - b.order);
+  // Old reports cannot tell us the complete request range. Only show recorded rows.
+  return rows(snapshot).map((row, order) => ({ id: row.category,
+    label: CATEGORY_LABELS[row.category] ?? row.category, order }));
+}
 
 /** 灰区理由码 → 中文。缺的码原样显示，宁可露出英文码也不猜它的意思。 */
 const REASON_LABELS: Record<string, string> = {
@@ -37,6 +49,14 @@ const REASON_LABELS: Record<string, string> = {
   verification_conflict: '实测路线与模型不一致（局部未决）',
   verified_route: '实测路线确认可达',
   no_legal_attachment: '无法接入路网',
+  endpoint_mapping_unconfirmed: '路线端点未能严格对应请求的设施位置',
+  endpoint_offset: '路线端点偏移超过容差，不能形成可靠判定',
+  entrance_unresolved: '设施入口尚未解决，路线不能确认可达',
+  task_budget_exhausted: '本任务路线预算已用尽',
+  layer_budget_exhausted: '本层路线预算已用尽',
+  daily_budget_exhausted: '当日请求额度已用尽',
+  timeout: '路线请求超时',
+  network_error: '路线请求失败',
 };
 
 /** 给不出分数的原因码 → 中文。 */
@@ -50,9 +70,13 @@ const UNAVAILABLE_LABELS: Record<string, string> = {
   empty_assessment_domain: '评估范围为空',
   categories_not_analysed: '只评估了部分大类，不能加权成总体分',
   category_without_spatial_support: '有大类缺少空间支持，不能加权成总体分',
+  query_incomplete: '设施检索未完成，暂无可用评估结果',
+  no_usable_evidence: '无可用覆盖证据',
 };
 
-export function categoryLabel(category: string): string {
+export function categoryLabel(category: string, snapshot?: CheckupSnapshot): string {
+  const frozen = snapshot?.report?.categoryDirectory?.find(item => item.id === category);
+  if (frozen) return frozen.label;
   return CATEGORY_LABELS[category]
     ?? majorMeta[category as keyof typeof majorMeta]?.label
     ?? subCategoryByKey[category]?.label
@@ -62,6 +86,27 @@ export function categoryLabel(category: string): string {
 export function reasonLabel(reason: string | null): string | null {
   if (reason === null || reason === '') return null;
   return REASON_LABELS[reason] ?? reason;
+}
+
+export function verificationLayerLabel(layer: string | null | undefined): string {
+  return layer === 'strict' ? '严格确认' : layer === 'endpoint_tolerance'
+    ? '含端点接入距离估计' : '未形成可用判定';
+}
+
+export function verificationFacilityRows(snapshot: CheckupSnapshot) {
+  const records = snapshot.report?.verification.facilities ?? snapshot.verification?.facilities ?? [];
+  return records.map(record => ({
+    id: String(record.facilityId ?? '未知设施'),
+    layer: verificationLayerLabel(record.verificationLayer as string | null),
+    routeDistance: typeof record.routeDistanceM === 'number' ? `${record.routeDistanceM.toFixed(0)} 米` : '无有效路线',
+    accessDistance: typeof record.accessDistanceM === 'number' ? `${record.accessDistanceM.toFixed(0)} 米` : '无法估计',
+    originOffset: typeof record.originOffsetM === 'number' ? `${record.originOffsetM.toFixed(1)} 米` : '未知',
+    destinationOffset: typeof record.destinationOffsetM === 'number' ? `${record.destinationOffsetM.toFixed(1)} 米` : '未知',
+    entrance: record.entranceStatus === 'unresolved' ? '入口未解决'
+      : typeof record.entranceStatus === 'string' ? record.entranceStatus : '入口状态未记录',
+    reason: reasonLabel(typeof record.poiReason === 'string' ? record.poiReason
+      : typeof record.reason === 'string' ? record.reason : null),
+  }));
 }
 
 export function unavailableLabel(reason: string | null): string {
@@ -101,6 +146,7 @@ export type CoverageItem = {
   unknownM2: number | null;
   evidenceGrade: string | null;
   unavailableReason: string | null;
+  queryComplete: boolean | null;
 };
 
 /** 报告里那一节优先（它带着面积），没有报告时退回分数那一节。 */
@@ -122,28 +168,34 @@ type ScoreRowView = {
 export function coverageItems(snapshot: CheckupSnapshot): CoverageItem[] {
   const byCategory = new Map<string, ScoreRowView>();
   for (const row of rows(snapshot)) byCategory.set(row.category, row as ScoreRowView);
-  const known: readonly string[] = CATEGORY_ORDER;
-  const order = [...known.filter(category => byCategory.has(category)),
-    ...[...byCategory.keys()].filter(category => !known.includes(category))];
+  const directory = reportDirectory(snapshot);
+  const order = [...directory.map(item => item.id),
+    ...[...byCategory.keys()].filter(category => !directory.some(item => item.id === category))];
   return order.map(category => {
-    const row = byCategory.get(category)!;
+    const row = byCategory.get(category);
     // `supported` 缺省当"不支持"读：没有明确说支持就不给百分比。
-    const supported = row.supported === true;
+    const supported = row?.supported === true;
     return {
-      category, label: categoryLabel(category),
+      category, label: categoryLabel(category, snapshot),
       color: CATEGORY_COLORS[category] ?? '#8a94a6',
       supported,
-      lowerPct: supported ? row.coverageLowerPct ?? null : null,
-      upperPct: supported ? row.coverageUpperPct ?? null : null,
-      widthPct: supported ? row.intervalWidthPct ?? null : null,
-      assessablePct: supported ? row.assessablePct ?? null : null,
-      unknownPct: supported ? row.unknownPct ?? null : null,
-      degenerate: supported && (row.intervalDegenerate ?? false),
-      coveredM2: row.coveredM2 ?? null,
-      gapM2: row.gapM2 ?? null,
-      unknownM2: row.unknownM2 ?? null,
-      evidenceGrade: row.evidenceGrade ?? null,
-      unavailableReason: supported ? null : row.unavailableReason ?? null,
+      lowerPct: supported ? row?.coverageLowerPct ?? null : null,
+      upperPct: supported ? row?.coverageUpperPct ?? null : null,
+      widthPct: supported ? row?.intervalWidthPct ?? null : null,
+      assessablePct: supported ? row?.assessablePct ?? null : null,
+      unknownPct: supported ? row?.unknownPct ?? null : null,
+      degenerate: supported && (row?.intervalDegenerate ?? false),
+      coveredM2: row?.coveredM2 ?? null,
+      gapM2: row?.gapM2 ?? null,
+      unknownM2: row?.unknownM2 ?? null,
+      evidenceGrade: row?.evidenceGrade ?? null,
+      unavailableReason: supported ? null : row?.unavailableReason ?? (
+        snapshot.facilities?.queryStatus !== 'completed'
+          ? 'query_incomplete' : 'no_usable_evidence'),
+      queryComplete: typeof snapshot.facilities?.statistics?.queryCompleteByMajor === 'object'
+        && snapshot.facilities.statistics.queryCompleteByMajor !== null
+        ? (snapshot.facilities.statistics.queryCompleteByMajor as Record<string, boolean>)[category] ?? null
+        : snapshot.facilities ? snapshot.facilities.queryStatus === 'completed' : null,
     };
   });
 }
@@ -162,6 +214,34 @@ export function coverageBars(items: CoverageItem[]): CoverageBar[] {
     span: item.lowerPct === null || item.upperPct === null ? 0 : item.upperPct - item.lowerPct,
     available: item.lowerPct !== null && item.upperPct !== null,
   }));
+}
+
+/** 仅为报告排序；缺面积的旧版记录排在已知面积之后，不补零。 */
+export function coverageGroups(items: CoverageItem[]) {
+  return {
+    assessed: items.filter(item => item.supported).sort((a, b) =>
+      a.gapM2 === null ? (b.gapM2 === null ? 0 : 1)
+        : b.gapM2 === null ? -1 : b.gapM2 - a.gapM2),
+    unavailable: items.filter(item => !item.supported),
+  };
+}
+
+export function reportSummary(snapshot: CheckupSnapshot) {
+  const overall = overallView(snapshot);
+  const gaps = gapSummary(snapshot);
+  const verification = verificationView(snapshot);
+  const { assessed } = coverageGroups(coverageItems(snapshot));
+  const largest = assessed.find(item => item.gapM2 !== null && item.gapM2 > 0);
+  return {
+    coverage: overall.available
+      ? `总体加权覆盖区间 ${percent(overall.lowerPct)} ～ ${percent(overall.upperPct)}。`
+      : '总体覆盖暂无法评估，请查看分类结果及其限制。',
+    gap: !gaps.assessed ? '服务盲区未评估，暂不能判断缺口。'
+      : `已评估部分的服务盲区合计 ${gaps.gapAreaText}。${largest
+        ? `分类缺口面积最大的是${largest.label}（${area(largest.gapM2)}）。` : ''}`,
+    verification: verification.summary,
+    limitations: evidenceNotes(snapshot).filter(note => note.level === 'warning'),
+  };
 }
 
 export type RadarView = {
@@ -203,10 +283,11 @@ export type OverallView = {
 };
 
 export function overallView(snapshot: CheckupSnapshot): OverallView {
-  const overall: OverallScore | null = snapshot.scores?.overall ?? snapshot.report?.overall ?? null;
+  const overall: OverallScore | null = snapshot.report?.overall ?? snapshot.scores?.overall ?? null;
   if (!overall || !overall.available) {
     return { available: false, reason: overall?.reason ?? 'scores_missing', missingCategories:
-      (overall?.missingCategories ?? []).map(categoryLabel), lowerPct: null, upperPct: null,
+      (overall?.missingCategories ?? []).map(category => categoryLabel(category, snapshot)),
+      lowerPct: null, upperPct: null,
       assessablePct: null, unknownPct: null, weights: {}, equalWeights: false };
   }
   const weights = Object.values(overall.weights ?? {});
@@ -214,6 +295,16 @@ export function overallView(snapshot: CheckupSnapshot): OverallView {
   return { available: true, reason: null, missingCategories: [], lowerPct: overall.coverageLowerPct,
     upperPct: overall.coverageUpperPct, assessablePct: overall.assessablePct,
     unknownPct: overall.unknownPct, weights: overall.weights ?? {}, equalWeights: equal };
+}
+
+export function overallUnavailableText(snapshot: CheckupSnapshot): string {
+  const view = overallView(snapshot);
+  const reason = view.reason === 'categories_not_analysed'
+    ? '部分请求类别尚无可用评估结果，不能代表全部类别的总体覆盖。'
+    : view.reason === 'category_without_spatial_support'
+      ? '部分类别缺少空间支持，不能计算全部类别的总体覆盖。'
+      : '评分阶段未产出全部类别的总体覆盖。';
+  return `${reason}${view.missingCategories.length ? `涉及：${view.missingCategories.join('、')}。` : ''}`;
 }
 
 export type ZoneItem = {
@@ -256,7 +347,7 @@ export function zoneItems(snapshot: CheckupSnapshot): ZoneItem[] {
     kind: zone.kind,
     kindLabel: ZONE_KIND_LABELS[zone.kind] ?? zone.kind,
     categories: zone.categories,
-    categoryLabels: zone.categories.map(categoryLabel),
+    categoryLabels: zone.categories.map(category => categoryLabel(category, snapshot)),
     areaM2: zone.areaM2, areaText: area(zone.areaM2), parts: zone.parts,
     evidenceGrade: zone.evidenceGrade, queryStatus: zone.queryStatus,
     reason: zone.reason, reasonLabel: reasonLabel(zone.reason),
@@ -302,7 +393,7 @@ export function gapSummary(snapshot: CheckupSnapshot): GapSummary {
     obstacleLayerAvailable: gaps?.obstacleLayerAvailable ?? null,
     notes: gaps?.notes ?? [],
   };
-  if (!gaps) return base;
+  if (!gaps || status === 'failed') return base;
   return { ...base, assessed: true, gapAreaText: area(gaps.gapAreaM2),
     compositeAreaText: area(gaps.compositeAreaM2) };
 }
@@ -315,6 +406,10 @@ export type VerificationView = {
   checked: number;
   failed: number;
   unresolved: number;
+  routeReturns: number;
+  strictConfirmed: number;
+  toleranceEstimated: number;
+  noUsableDecision: number;
   reason: string | null;
   notes: string[];
   summary: string;
@@ -329,16 +424,27 @@ export function verificationView(snapshot: CheckupSnapshot): VerificationView {
     failed: '核验未完成' }[status] ?? status;
   if (!verification || status === 'not_integrated') {
     return { available: false, status, statusLabel, provider: verification?.provider ?? null,
-      checked: 0, failed: 0, unresolved: 0, reason: verification?.reason ?? null, notes: [],
+      checked: 0, failed: 0, unresolved: 0, routeReturns: 0, strictConfirmed: 0,
+      toleranceEstimated: 0, noUsableDecision: 0,
+      reason: verification?.reason ?? null, notes: [],
       summary: '本次体检未接入现实核验，设施结论的证据等级为模型推定。' };
   }
+  const records = verification.facilities ?? [];
+  const routeReturns = verification.routeReturns ?? records.filter(item => item.routeDistanceM !== null
+    && item.routeDistanceM !== undefined).length;
+  const strictConfirmed = verification.strictConfirmed ?? records.filter(item => item.verificationLayer === 'strict').length;
+  const toleranceEstimated = verification.toleranceEstimated ?? records.filter(item => item.verificationLayer === 'endpoint_tolerance').length;
+  const noUsableDecision = verification.noUsableDecision ?? records.filter(item => item.verificationLayer !== 'strict'
+    && item.verificationLayer !== 'endpoint_tolerance').length;
   return {
     available: true, status, statusLabel, provider: verification.provider,
     checked: verification.checked, failed: verification.failed,
+    routeReturns, strictConfirmed, toleranceEstimated, noUsableDecision,
     unresolved: verification.unresolved, reason: verification.reason,
     notes: verification.notes ?? [],
-    summary: `已尝试核验 ${verification.checked} 处设施，其中 ${verification.failed} 处未取得严格路线结论，`
-      + `模型入口未确认 ${verification.unresolved} 处。`,
+    summary: `已尝试核验 ${verification.checked} 处设施：${routeReturns} 条有效路线返回；`
+      + `严格确认 ${strictConfirmed} 条、含端点接入距离估计 ${toleranceEstimated} 条、`
+      + `未形成可用判定 ${noUsableDecision} 条。路线返回数与后三项有交叉，不能相加。`,
   };
 }
 
@@ -374,7 +480,9 @@ export function evidenceNotes(snapshot: CheckupSnapshot): Note[] {
     ? '未叠加障碍物图层：围墙、河道等阻断只通过路网连通性体现。' : '');
   push('catalog', 'info', report?.evidence.catalogCompleteness === 'unverified'
     ? '设施目录的完整性未经独立核实：目录里没有，不等于现实中不存在。' : '');
-  push('query', 'warning', report?.evidence.queryStatus && report.evidence.queryStatus !== 'complete'
+  push('legacy-directory', 'warning', report && !report.categoryDirectory?.length
+    ? '旧报告未记录请求类别目录，无法确认当时完整的请求范围；这里只显示已记录类别。' : '');
+  push('query', 'warning', report?.evidence.queryStatus && !['complete', 'completed'].includes(report.evidence.queryStatus)
     ? '本次设施检索未完全覆盖，相关灰区的结论可能是目录缺失造成的。' : '');
   const excluded = snapshot.accessibility?.excludedAreaM2 ?? 0;
   push('domain', 'warning', excluded > 0

@@ -77,7 +77,7 @@ describe('nearest facilities', () => {
       facility(0, 100, { majorCategory: 'finance' }),
       facility(1, 120, { majorCategory: 'public' }),
     ]), center);
-    expect(groups.map(group => group.label)).toEqual(['金融', '政务与公共服务']);
+    expect(groups.map(group => group.label)).toEqual(['金融', '政务公共服务']);
   });
 
   it('says nothing at all without a centre or without points', () => {

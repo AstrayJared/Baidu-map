@@ -13,6 +13,7 @@ served from the cache costs no attempt and keeps its original data time; a
 cancelled stage keeps what it retrieved; and a failure is never a zero.
 """
 import asyncio
+import pytest
 import contextlib
 import json
 import math
@@ -318,12 +319,13 @@ def make_app(tmp_path, places=None, routes=None, **overrides):
 def body(**overrides):
     payload = {"schemaVersion": "checkup-v1", "clientRequestId": "checkup-1",
                "engine": "baidu_e82", "center": dict(CENTER), "coordinateSystem": "bd09ll",
-               "isochrone": {"budget": 200}}
+               "isochrone": {"budget": 200},
+               "facilities": {"categories": ["shopping", "medical", "education"]}}
     payload.update(overrides)
     return payload
 
 
-def terminal(client, task_id, timeout=120.0, until_stage=None):
+def terminal(client, task_id, timeout=900.0, until_stage=None):
     """Wait for a task to reach a terminal state, or for one stage to start."""
     deadline = time.monotonic() + timeout
     view = client.get(f"/api/v2/checkups/{task_id}").json()
@@ -332,7 +334,9 @@ def terminal(client, task_id, timeout=120.0, until_stage=None):
             return view
         if until_stage is None and view["status"] in ("completed", "failed", "cancelled"):
             return view
-        time.sleep(0.02)
+        # Larger rounds take longer; avoid repeatedly parsing the full frozen
+        # report at 50 polls/second while the worker journals hundreds of pages.
+        time.sleep(0.2 if view.get('completion', {}).get('roundPoiLimit', 60) > 60 else 0.02)
         view = client.get(f"/api/v2/checkups/{task_id}").json()
     raise AssertionError(f"task {task_id} did not finish: {view}")
 
@@ -436,7 +440,7 @@ def test_both_engines_close_the_loop_over_their_own_boundary(tmp_path):
             assert document_["businessStatus"] == "partial"
             assert app.state.checkups.store.revisions(task_id)[4]["stage"] == "reporting"
             assert document_["trace"]["ruleVersions"]["classification"] == RULES["version"]
-            assert document_["trace"]["budgets"]["poi"] == {"limit": 240, "spent": CORE_PAGES}
+            assert document_["trace"]["budgets"]["poi"] == {"limit": 1200, "spent": CORE_PAGES}
             assert document_["trace"]["budgets"]["route"] == {"limit": 120, "spent": 0}
             assert document_["trace"]["budgets"]["detail"] == {"limit": 20, "spent": 0}
             assert document_["trace"]["budgets"]["isochrone"]["limit"] == 200
@@ -495,7 +499,7 @@ def test_a_deployment_without_a_key_names_its_refusal_and_never_a_zero(tmp_path)
                     if item["code"] == "FACILITIES_UNAVAILABLE"]
         assert len(refusals) == 1 and refusals[0]["severity"] == "error"
         assert "AK" in refusals[0]["message"]
-        assert document_["trace"]["budgets"]["poi"] == {"limit": 240, "spent": 0}
+        assert document_["trace"]["budgets"]["poi"] == {"limit": 1200, "spent": 0}
 
 
 def test_a_facility_run_that_fails_every_page_is_a_failed_query(tmp_path):

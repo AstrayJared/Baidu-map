@@ -36,7 +36,7 @@ class Clock:
 
 def new_task(store, task_id="task-1"):
     store.create(task_id=task_id, client_request_id=f"request-{task_id}", engine="baidu_e82",
-                 fingerprint="fingerprint", payload={}, budget=200)
+                 fingerprint="fingerprint", payload=body(clientRequestId=f"request-{task_id}"), budget=200)
     return task_id
 
 
@@ -161,7 +161,7 @@ def test_a_step_keeps_its_start_across_counter_ticks_and_only_cell_ticks_are_thr
     assert not report("category", count=40, throttle=True, **medical)
     clock.now = 1011.0
     assert report("category", count=90, throttle=True, **medical)
-    assert written[-1]["progress"]["label"] == "评估服务覆盖 · 医疗（第 1/2 类）"
+    assert written[-1]["progress"]["label"] == "评估服务覆盖 · 医疗健康（第 1/2 类）"
     assert written[-1]["progress"]["since"] == 1010.0
 
     # The next category is a new step even though the step code is the same.
@@ -177,7 +177,7 @@ def test_a_step_keeps_its_start_across_counter_ticks_and_only_cell_ticks_are_thr
 
 def test_the_elapsed_time_of_a_running_task_is_measured_on_the_wall_clock(tmp_path):
     app = make_app(tmp_path)
-    store = CheckupStore(tmp_path / "view-store")
+    store = app.state.checkups.store
     store.create_schema()
     task_id = new_task(store)
     store.claim(task_id)
@@ -241,10 +241,10 @@ def test_a_task_held_inside_a_stage_keeps_answering_and_reports_only_what_happen
         assert first["status"] == "running" and first["stage"] == "poi"
         # One page came back before the hold; the second is reserved but not answered.
         progress = first["progress"]
-        assert progress["step"] == "places" and progress["label"] == "检索设施"
+        assert progress["step"] == "places" and progress["label"] == "检索设施 · 购物消费"
         assert progress["count"] == 1 and progress["unit"] == "次请求"
         assert progress["limit"] >= 2
-        assert first["networkRequests"] == first["requests"] == 1
+        assert first["networkRequests"] == first["requests"] == 2
         assert first["stageStartedAt"] <= progress["since"] <= first["lastActivityAt"]
 
         polls = []
@@ -264,7 +264,7 @@ def test_a_task_held_inside_a_stage_keeps_answering_and_reports_only_what_happen
             assert view["lastActivityAt"] == first["lastActivityAt"]
             assert view["stageStartedAt"] == first["stageStartedAt"]
             assert view["revision"] == first["revision"]
-            assert view["networkRequests"] == 1
+            assert view["networkRequests"] == 2
         silence = views[-1]["serverTime"] - views[-1]["lastActivityAt"]
         assert silence >= 1.0
 
@@ -302,7 +302,7 @@ def test_the_assessment_thread_reports_its_steps_while_the_endpoint_answers(tmp_
         progress = view["progress"]
         assert progress["step"] == "category" and progress["count"] == 7
         assert progress["unit"] == "格" and progress["limit"] is None
-        assert progress["label"] == "评估服务覆盖 · 医疗（第 1/2 类）"
+        assert progress["label"] == "评估服务覆盖 · 医疗健康（第 1/2 类）"
         time.sleep(0.5)
         later, seconds = status(client, task_id)
         assert seconds < 1.0 and later["progress"] == progress

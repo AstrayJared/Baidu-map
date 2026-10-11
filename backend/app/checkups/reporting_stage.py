@@ -19,6 +19,8 @@ from .. import catalog
 from ..scoring import DEFAULT_SCORING_CATEGORIES
 from .models import (RULE_VERSION, SCHEMA_VERSION, CoverageRow, ReportEvidence, ReportGaps,
                      ReportQuality, ReportVerification)
+from .. import catalog
+from .verification_stage import evidence_counts
 
 #: 这份报告不能回答的问题。逐条都是"读者最容易从这里读出来的过度结论"。
 LIMITATIONS = (
@@ -36,7 +38,8 @@ LIMITATIONS = (
 )
 
 
-def _merge_categories(accessibility: dict | None, scores: dict | None) -> list[CoverageRow]:
+def _merge_categories(accessibility: dict | None, scores: dict | None,
+                      requested_categories=None, query_status=None) -> list[CoverageRow]:
     """把面积证据与分数行按类别合并：一份报告里同类别的数字只出现一次。"""
     areas = {item["category"]: item for item in (accessibility or {}).get("categories", [])}
     rows = []
@@ -60,6 +63,13 @@ def _merge_categories(accessibility: dict | None, scores: dict | None) -> list[C
                      "coveredM2": evidence.get("coveredM2"), "gapM2": evidence.get("gapM2"),
                      "unknownM2": evidence.get("unknownM2"), "cells": evidence.get("cells", {}),
                      "entrances": evidence.get("entrances", {}), "evidenceGrade": "model"})
+    known = {row['category'] for row in rows}
+    for category in requested_categories or ():
+        if category not in known:
+            rows.append({"category": category, "supported": False,
+                         "unavailableReason": "query_incomplete" if query_status not in
+                         ("complete", "completed") else "no_usable_evidence",
+                         "evidenceGrade": "model"})
     return rows
 
 
@@ -75,7 +85,13 @@ def _verification_section(verification: dict | None) -> ReportVerification:
                                   reason="本次体检未进行现实核验，证据等级为模型推定。")
     if verification.get("status") == "not_integrated":
         return ReportVerification(**{**verification, "available": False})
-    return ReportVerification(**{**verification, "available": True})
+    counts = evidence_counts(verification.get('facilities', []))
+    return ReportVerification(**{**verification, **{
+        'routeReturns': counts['route_returns'],
+        'strictConfirmed': counts['strict_confirmed'],
+        'toleranceEstimated': counts['tolerance_estimated'],
+        'noUsableDecision': counts['no_usable_decision'],
+    }, "available": True})
 
 
 def _quality_notes(accessibility: dict | None, gaps: dict | None, heatmap: dict | None,
@@ -129,7 +145,7 @@ def _scope_limitations(scores: dict | None) -> tuple[str, ...]:
 
 def build_report(*, task_id: str, revision: int, source_result_hash: str, generated_at: float,
                  domain, domain_area_m2, accessibility, service_gaps, heatmap, scores,
-                 facilities, verification=None, water=None) -> ReportEvidence:
+                 facilities, verification=None, water=None, requested_categories=None) -> ReportEvidence:
     """组装报告。``revision`` 是**将要发布**的那一版：报告描述的是它自己所在的那一版。
 
     ``source_result_hash`` 是报告所汇总的那一版（可达性/核验阶段的那一版）的结果摘要，
@@ -139,7 +155,10 @@ def build_report(*, task_id: str, revision: int, source_result_hash: str, genera
     return ReportEvidence(
         report_id=f"{task_id}:{revision}", generated_at=generated_at,
         domain=domain, domain_area_m2=domain_area_m2,
-        categories=_merge_categories(accessibility, scores),
+        categories=_merge_categories(accessibility, scores, requested_categories,
+                                     (facilities or {}).get('queryStatus')),
+        category_directory_version=catalog.VERSION,
+        category_directory=catalog.major_directory(requested_categories),
         overall=(scores or {}).get("overall"),
         gaps=ReportGaps(**service_gaps) if service_gaps else ReportGaps(
             status="failed", reason="服务覆盖阶段未完成，本报告不含灰区清单。"),

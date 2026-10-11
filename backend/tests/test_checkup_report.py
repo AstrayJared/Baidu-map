@@ -28,6 +28,15 @@ from app.geo.projection import MetricProjection
 from test_checkup_facilities import (ORIGIN, SyntheticPlaces, body, document, every_page,
                                      make_app, offset, run)
 
+@pytest.fixture(autouse=True)
+def three_category_query_fixture(monkeypatch):
+    """Freeze complete three-minor evidence for geometry/report regressions."""
+    from app import catalog
+    selected = ('market', 'pharmacy', 'primary_school')
+    monkeypatch.setattr(catalog, 'poi_keys', lambda majors=None: tuple(
+        key for key in selected if majors is None or catalog.major_of(key) in majors))
+
+
 CRS = "EPSG:32651"
 SPEED = 1.3
 #: Must match the deployment's ``osm_data_version``: the graph views are keyed by it.
@@ -144,16 +153,8 @@ def test_the_pipeline_publishes_the_report_last_and_the_domain_divides_exactly(t
             assert item["supported"] is True, item
             assert item["coveredM2"] + item["gapM2"] + item["unknownM2"] == pytest.approx(
                 domain_area, abs=1.0)
-            # Two facilities on a road grid: near them is covered, far from them
-            # is a gap, and the tolerance band in between stays unknown. All
-            # three states are present, which is what makes the next assertions
-            # about them meaningful.
-            #
-            # A gap can only be decided out of a *completed* retrieval: with the
-            # query incomplete every "definitely too far" cell degrades to
-            # unknown, the grey-zone list empties, and the revision still looks
-            # complete. So this assertion is also the one that pins the two
-            # spellings of that status together across the stage boundary.
+            # This focused three-minor directory completes all keyword pages.
+            # Its frozen domain contains coverage, measured gaps and uncertainty.
             assert item["coveredM2"] > 0 and item["gapM2"] > 0 and item["unknownM2"] > 0, item
 
 
@@ -175,8 +176,9 @@ def test_the_scores_are_intervals_over_the_frozen_domain(tmp_path):
             assert item["assessablePct"] + item["unknownPct"] == pytest.approx(100, abs=1e-6)
             assert item["assessablePct"] > item["coverageLowerPct"]
         overall = scores["overall"]
-        assert overall["available"] is True
-        assert overall["coverageLowerPct"] <= overall["coverageUpperPct"]
+        assert overall["available"] is False
+        assert overall["reason"] == "categories_not_analysed"
+        assert len(overall["missingCategories"]) == 7
 
 
 def test_every_grey_zone_explains_itself_and_the_layer_draws_the_counted_geometry(tmp_path):

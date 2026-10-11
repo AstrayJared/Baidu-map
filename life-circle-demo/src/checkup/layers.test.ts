@@ -56,7 +56,7 @@ describe('feature collection layers', () => {
         feature(point(116.41, 39.91), { id: 'f-2', name: '街道服务中心', category: 'government', majorCategory: 'public' }),
       ]) }));
     expect(drawable.points.map(item => item.title)).toEqual([
-      '社区银行 · 金融 · 银行', '街道服务中心 · 政务与公共服务 · 政务/社区服务',
+      '社区银行 · 金融 · 银行', '街道服务中心 · 政务公共服务 · 政务/社区服务',
     ]);
     expect(drawable.points.map(item => item.title)).not.toContain(expect.stringContaining('finance'));
     expect(drawable.points.map(item => item.title)).not.toContain(expect.stringContaining('public'));

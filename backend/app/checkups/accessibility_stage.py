@@ -569,6 +569,12 @@ def assess_accessibility(*, geometry, facilities, query_status: str, majors, sto
     if query_status == "failed":
         return _refusal(NO_FACILITIES, requested, "设施检索阶段未产出可用结果，服务覆盖无从评估。")
     majors_used = evaluated_majors(requested, facilities, query_complete=query_complete)
+    # A completed major with zero findings is evaluable even while another
+    # major still has queued keywords. Absence is never inferred for unfinished majors.
+    if incomplete is not None:
+        completed_majors = {major for major in requested if not any(
+            regions for minor, regions in incomplete.items() if catalog.major_of(minor) == major)}
+        majors_used = tuple(major for major in requested if major in majors_used or major in completed_majors)
     if not majors_used:
         return _refusal(QUERY_INCOMPLETE, requested,
                         "设施检索未完成且没有取到任何可用设施，服务覆盖未评估。",

@@ -58,4 +58,4 @@ def test_config_rejects_naive_or_partial_approval_window():
     with pytest.raises(ValueError):
         RuntimeConfig(runId='x', windowStart='2026-09-13T00:00:00')
     with pytest.raises(ValueError):
-        RuntimeConfig(runId='x', categoryBudgets={'market': 1})
+        RuntimeConfig(runId='x', categoryBudgets={'unknown': 1})

@@ -1,3 +1,4 @@
+from app import catalog
 import json
 from pathlib import Path
 
@@ -73,14 +74,17 @@ def test_four_mocks_consistent(client):
         assert body["source"] == "mock"
         assert "ak=" not in json.dumps(body).lower()
         for category in body["data"]["categories"]:
-            assert category["major_category"] in ("shopping", "medical", "education")
+            assert category["major_category"] in catalog.majors()
             assert category["minor_category"] == category["category"]
         for facility in body["data"]["facilities"] or []:
-            assert facility["major_category"] in ("shopping", "medical", "education")
+            assert facility["major_category"] in catalog.majors()
             assert facility["minor_category"] == facility["category"]
     assert bodies[2]["data"]["facilities"] is None
     assert bodies[3]["data"]["facilities"] == []
-    assert bodies[1]["data"]["categories"][0]["count_in_circle"] is None
+    partial_categories = {row['category']: row for row in bodies[1]['data']['categories']}
+    assert partial_categories['market']['count_in_circle'] is None
+    assert partial_categories['school']['count_in_circle'] is None
+    assert partial_categories['pharmacy']['count_in_circle'] == 1
 
 
 @pytest.mark.parametrize("scenario,expected", [("plane", "partial"), ("local_failure", "partial"), ("global_failure", "failed")])

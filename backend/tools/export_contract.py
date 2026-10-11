@@ -33,12 +33,24 @@ from app.checkups.models import (CheckupCapabilities, CheckupFacilities, Checkup
                                  FacilityExtensionDocument, FacilityExtensionRequest,
                                  FacilityExtensionView, FacilityRetryRequest, FacilityRetryView,
                                  FacilityRoute, RetainedCheckupView, RetentionView,
-                                 SessionOpenRequest, SessionView)
+                                 SessionOpenRequest, SessionView, ContinueCheckupRequest)
 from app.contracts import (AnalysisResponse, CategoryResult, Data, Facility, FacilityCatalog, Geometry,
                            Issue, Origin, Rules, TaskResultResponse, TaskStatusResponse, OsmOfflineRequest)
 from app.hybrid_contracts import HybridRequest, HybridResultResponse, HybridError
 from app.rules import DistanceRule
 from app.catalog import display_group_keys, keys as catalog_keys, majors as catalog_majors
+
+ANALYSIS_MODELS = (AnalysisResponse, TaskStatusResponse, TaskResultResponse, OsmOfflineRequest,
+                   FacilityCatalog, HybridRequest, HybridResultResponse, HybridError)
+ANALYSIS_REQUEST_MODELS = (OsmOfflineRequest, HybridRequest)
+CHECKUP_MODELS = (CheckupRequest, CheckupTaskView, CheckupSnapshot, CheckupLayer,
+                 FacilityRoute, CheckupCapabilities, CheckupFacilities, CheckupIsochrone,
+                 FacilityExtensionRequest, FacilityExtensionView, FacilityExtensionDocument,
+                 FacilityRetryRequest, FacilityRetryView, SessionOpenRequest, SessionView,
+                 RetentionView, RetainedCheckupView, ContinueCheckupRequest)
+CHECKUP_REQUEST_MODELS = (CheckupRequest, CheckupFacilities, CheckupIsochrone,
+                          FacilityExtensionRequest, FacilityRetryRequest, SessionOpenRequest,
+                          ContinueCheckupRequest)
 
 BACKEND = Path(__file__).resolve().parents[1]
 REPO = BACKEND.parent
@@ -160,7 +172,10 @@ def openapi_spec() -> dict:
     from app.main import create_app
     with tempfile.TemporaryDirectory(prefix="export-contract-") as directory:
         app = create_app(_isolated_settings(Path(directory)))
-        return freeze_status_phrases(app.openapi())
+        try:
+            return freeze_status_phrases(app.openapi())
+        finally:
+            app.state.checkups.store.close()
 
 
 def _mock_documents() -> dict[str, str]:
@@ -233,31 +248,8 @@ def build(where: Path = REPO) -> dict[str, str]:
         "openapi": json.dumps(openapi_spec(), ensure_ascii=False, indent=2) + "\n",
         "analysis-schema": json.dumps(AnalysisResponse.model_json_schema(),
                                       ensure_ascii=False, indent=2) + "\n",
-        "legacy-contract": typescript(
-            [AnalysisResponse, TaskStatusResponse, TaskResultResponse, OsmOfflineRequest,
-             FacilityCatalog, HybridRequest, HybridResultResponse, HybridError],
-            request_models=[OsmOfflineRequest, HybridRequest]),
-        # v2 体检契约单独一份文件：它和上面那份不共用类型名，也不共用文件，所以旧的严格
-        # POI 证据类型保持逐字节不变 —— 新字段加进旧契约就会改掉旧响应的序列化语义（§10）。
-        "v2-contract": typescript(
-            [CheckupRequest, CheckupTaskView, CheckupSnapshot, CheckupLayer,
-             FacilityRoute, CheckupCapabilities,
-             # 请求里带默认值的两个嵌套模型也要按请求方向生成：否则客户端会被要求
-             # 传 `maxPoiRequests`/`maxRouteRequests`，而它们在服务端本来是可省的 ——
-             # 前端于是只好把默认值抄一份，后端改档位就静默分叉。
-             CheckupFacilities, CheckupIsochrone,
-             # 按需补查也是 v2 契约的一部分：它有自己的请求、状态和结果文档，
-             # 手写这三份类型就等于给同一份字段留第二处定义。
-             FacilityExtensionRequest, FacilityExtensionView,
-             FacilityExtensionDocument,
-             # §5 B2 决策 1 的重试同理：它是另一个资源，有自己的请求与状态。
-             FacilityRetryRequest, FacilityRetryView,
-             # §5 B2 决策 2 的会话与保留期：会话视图是客户端的轮询对象（它是本地存的两个
-             # 标识换回来的状态），保留期在任务视图上，三个类型都是 v2 契约的一部分。
-             SessionOpenRequest, SessionView, RetentionView, RetainedCheckupView],
-            request_models=[CheckupRequest, CheckupFacilities, CheckupIsochrone,
-                            FacilityExtensionRequest, FacilityRetryRequest,
-                            SessionOpenRequest]),
+        "legacy-contract": typescript(ANALYSIS_MODELS, request_models=ANALYSIS_REQUEST_MODELS),
+        "v2-contract": typescript(CHECKUP_MODELS, request_models=CHECKUP_REQUEST_MODELS),
     }
     for name, text in _mock_documents().items():
         documents[f"mock-{name}"] = text

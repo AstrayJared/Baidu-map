@@ -27,6 +27,7 @@ import { isRetryTerminal } from './retry';
 import type { Contact } from './live';
 
 type Run = {
+  continuation?: { clientRequestId: string; baseRevision: number };
   input: CheckupInput;
   id?: string;
   abort: AbortController;
@@ -90,6 +91,7 @@ export class CheckupController {
       input: run.input, savedAt: Date.now(),
       ...(run.id ? { taskId: run.id } : {}),
       ...(run.cancelRequested ? { cancelRequested: true } : {}),
+      ...(run.continuation ? { continuation: run.continuation } : {}),
     });
   }
 
@@ -135,6 +137,7 @@ export class CheckupController {
     if (this.run) return;
     const run: Run = {
       input: handle.input, id: handle.taskId, cancelRequested: handle.cancelRequested,
+      continuation: handle.continuation,
       abort: new AbortController(), revision: ++this.revision,
     };
     this.run = run;
@@ -142,10 +145,45 @@ export class CheckupController {
     await this.follow(run);
   }
 
+  async continueReport() {
+    const old = this.run;
+    const task = this.state.task;
+    if (!old?.id || !task || !this.api.continueReport || this.pendingStart || isCheckupBusy(this.state)) return;
+    if (!old.continuation && !task.completion?.canContinue) return;
+    this.pendingStart = true;
+    old.abort.abort();
+    const run: Run = { ...old, abort: new AbortController(), revision: ++this.revision,
+      cancelRequested: false, creating: true,
+      continuation: old.continuation ?? { clientRequestId: crypto.randomUUID(), baseRevision: task.revision } };
+    this.run = run;
+    this.save(run);
+    this.patch({ phase: 'submitting', error: undefined, recovery: undefined });
+    try {
+      const next = await this.api.continueReport(run.id!, run.continuation!);
+      if (!this.current(run)) return;
+      run.continuation = undefined;
+      run.creating = false;
+      this.save(run);
+      this.patch({ task: next, phase: 'queued' });
+    } catch (error) {
+      run.creating = false;
+      if (!this.current(run)) return;
+      if (error instanceof CheckupError && error.status >= 400 && error.status < 500) {
+        run.continuation = undefined;
+        this.save(run);
+        this.patch({ phase: 'error', error: error.message });
+        return;
+      }
+      // An unclear POST is reconciled by its id, never repeated automatically.
+    } finally { this.pendingStart = false; }
+    await this.follow(run);
+  }
+
   async retry() {
     if (this.pendingStart || isCheckupBusy(this.state)) return;
     const run = this.run;
     if (!run) { this.set({ phase: 'idle' }); return; }
+    if (run.continuation) { await this.continueReport(); return; }
     const status = this.state.task?.status;
     if (run.expired || run.refused || status === 'failed' || status === 'cancelled') {
       // 过期、被拒、失败、已取消的任务不能再用同一个请求标识：后端会把它认成同一次请求。
@@ -233,6 +271,29 @@ export class CheckupController {
     let cancelSent = false;
     while (this.current(run)) {
       try {
+        if (run.continuation) {
+          try {
+            const confirmed = await this.api.byRequest(run.continuation.clientRequestId);
+            if (!this.current(run)) return;
+            if (confirmed.taskId !== run.id) throw new CheckupError('续查任务不匹配', 0, 'mismatched_task');
+            run.continuation = undefined;
+            this.save(run);
+            this.patch({ task: confirmed });
+          } catch (error) {
+            if (!isNotFound(error)) throw error;
+            const task = await this.api.status(run.id!, run.abort.signal);
+            if (!this.current(run)) return;
+            const revision = task.completion?.reportRevision;
+            if (!this.state.snapshot && revision) {
+              const snapshot = await this.api.result(run.id!, revision, run.abort.signal);
+              if (!this.current(run)) return;
+              this.patch({ snapshot });
+            }
+            this.patch({ phase: 'error', task, recovery: 'unconfirmed',
+              error: '续查请求尚未送达，点击重新提交会沿用同一请求标识，避免重复扣费。' });
+            return;
+          }
+        }
         if (!run.id) {
           let found: CheckupTaskView;
           try { found = await this.api.byRequest(run.input.clientRequestId); }
@@ -286,6 +347,13 @@ export class CheckupController {
 
   private async accept(run: Run, task: CheckupTaskView): Promise<boolean> {
     if (!this.current(run)) return true;
+    // Restoring a running or interrupted round still shows the last frozen report.
+    const previousRevision = task.completion?.reportRevision;
+    if (!this.state.snapshot && previousRevision && task.status !== 'completed') {
+      const previous = await this.api.result(run.id!, previousRevision, run.abort.signal);
+      if (!this.current(run)) return true;
+      this.patch({ snapshot: previous });
+    }
     if (task.status === 'completed') {
       this.patch({ phase: 'fetching', task });
       // 任务视图每次都带着保留期：**先问它**。明细已经到期时一个明细字段都不去要 ——
@@ -307,8 +375,15 @@ export class CheckupController {
       if (snapshot.revision !== task.revision) {
         throw new CheckupError('体检修订与任务状态不符，请检查服务版本', 0, 'mismatched_revision');
       }
-      this.set({ phase: 'completed', input: run.input, task, snapshot, retained: undefined,
-        layers: this.state.layers });
+      const layers: CheckupState['layers'] = {};
+      // Switch all already-visible layers with the new report in one publication.
+      const ids = Object.keys(this.state.layers ?? {}) as LayerId[];
+      await Promise.all(ids.map(async id => {
+        try { layers[id] = await this.api.layer(task.taskId, id, task.revision); }
+        catch { /* The ordinary layer loader exposes a named failure after the switch. */ }
+      }));
+      if (!this.current(run)) return true;
+      this.set({ phase: 'completed', input: run.input, task, snapshot, retained: undefined, layers });
       return true;
     }
     if (task.status === 'cancelled') { this.patch({ phase: 'cancelled', task }); return true; }
@@ -353,11 +428,12 @@ export class CheckupController {
     // 明细已经到期：图层整组不可用。这里直接返回 undefined，让调用方知道"这一层没画"，
     // 而不是让它去撞一次必然的 410 再把它显示成一个图层错误。
     if (detailsGone(task) || this.state.retained !== undefined) return undefined;
+    const revision = this.state.snapshot?.revision ?? task.revision;
     const cached = this.state.layers?.[layerId];
-    if (cached && cached.revision === task.revision) return cached;
+    if (cached && cached.revision === revision) return cached;
     let layer: CheckupLayer;
     try {
-      layer = await this.api.layer(task.taskId, layerId, task.revision);
+      layer = await this.api.layer(task.taskId, layerId, revision);
     } catch (error) {
       if (!isDetailsExpired(error)) throw error;
       await this.switchToRetained(task);
@@ -366,7 +442,7 @@ export class CheckupController {
     // 取的过程里任务换了（清除后重开、或者修订又前进了一版）：这一张属于上一版，
     // 丢掉而不是画上去 —— 图上画着旧灰区、面板写着新面积是最难发现的一类错。
     const now = this.state.task;
-    if (!now || now.taskId !== task.taskId || now.revision !== task.revision) return undefined;
+    if (!now || now.taskId !== task.taskId || (this.state.snapshot?.revision ?? now.revision) !== revision) return undefined;
     this.patch({ layers: { ...this.state.layers, [layerId]: layer } });
     return layer;
   }
@@ -403,7 +479,7 @@ export class CheckupController {
   async cancel() {
     const old = this.run;
     if (!old || old.cancelRequested && this.state.phase === 'cancelling') return;
-    if (old.id && isTerminal(this.state.task)) return;
+    if (old.id && isTerminal(this.state.task) && !old.creating) return;
     if (old.refused || old.expired) { this.clear(); return; }
     old.cancelRequested = true;
     this.save(old);

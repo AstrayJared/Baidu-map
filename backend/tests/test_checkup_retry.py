@@ -75,6 +75,11 @@ def test_a_retry_publishes_a_new_revision_of_the_same_checkup(tmp_path):
         after = document(client, task_id)
         assert after["revision"] > original_revision
         assert after["stage"] == "reporting"
+        assert after["completion"]["roundPoiLimit"] == 120
+        assert after["completion"]["roundNumber"] == 2
+        assert after["completion"]["roundPoiRequests"] == done["networkRequests"]
+        assert after["completion"]["cumulativePoiRequests"] == 60 + done["networkRequests"]
+        assert after["completion"]["routeRequests"] == first["completion"]["routeRequests"]
         # 这一版是"重试发布的"，不是"离线重算发布的"：后者不花钱，前者花了。
         assert after["trace"]["retried"]["fromRevision"] == original_revision
         assert after["trace"]["retried"]["networkRequests"] == done["networkRequests"]

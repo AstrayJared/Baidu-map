@@ -10,11 +10,70 @@
  */
 import { test, expect, type Page } from '@playwright/test';
 import { installMapSdk } from './mapSdk';
-import { capabilities, collection, feature, layer, point, polygon, report, retainedView,
-  retentionView, retryView, snapshot, task, zone } from '../src/checkup/fixtures';
+import type { CheckupCompletion } from '../src/checkup/contract';
+import { capabilities, collection, feature, layer, point, polygon, report, retainedView, retentionView, retryView, snapshot, task, zone }
+  from '../src/checkup/fixtures';
 
 const REVISION = 5;
 const HASH = 'hash-5';
+
+for (const width of [1440, 390]) {
+  test(`manual continuation preserves report and restores the same round at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await setup(page, { tenCategories: true });
+    await page.route('**/api/v2/capabilities', route => {
+      const value = capabilities(); value.budgets.poiRequests = 1200;
+      return route.fulfill({ json: value });
+    });
+    let running = false, finished = false, posts = 0;
+    const completion = (): CheckupCompletion => ({ reportRevision: finished ? 9 : 5,
+      roundNumber: posts ? 2 : 1, roundPoiLimit: posts ? 1200 : 60, roundPoiRequests: running ? 12 : (posts ? 90 : 60),
+      cumulativePoiRequests: posts ? (running ? 72 : 150) : 60, routeRequests: 120, routeRemaining: 0,
+      queryCompleteByMajor: { medical: false, shopping: true }, evaluatedCategories: 6, totalCategories: 10,
+      evaluationStatus: 'partial', canContinue: !running, restartRetrieval: false,
+      stopReason: running ? null : 'budget_exhausted', limitations: ['设施检索尚未完成'] });
+    await page.route('**/api/v2/checkups/**', async route => {
+      const url = new URL(route.request().url());
+      if (url.pathname.endsWith('/continue')) {
+        expect(route.request().postDataJSON().baseRevision).toBe(5);
+        posts++; running = true;
+        return route.fulfill({ status: 202, json: task({ status: 'queued', revision: 5,
+          completion: completion() }) });
+      }
+      if (url.pathname.endsWith('/result')) {
+        const revision = Number(url.searchParams.get('revision') || (finished ? 9 : 5));
+        return route.fulfill({ json: { ...snapshotFor({ tenCategories: true },
+          { center: { lng: 116.405, lat: 39.916 } }), revision, completion: completion(),
+          trace: { ...snapshot().trace, resultHash: `hash-${revision}` } } });
+      }
+      const id = url.pathname.match(/\/layers\/([a-z_]+)$/)?.[1];
+      if (id) {
+        const revision = Number(url.searchParams.get('revision') || (finished ? 9 : 5));
+        return route.fulfill({ json: { ...layerFor(id, {}) as object, revision, resultHash: `hash-${revision}` } });
+      }
+      return route.fulfill({ json: task({ status: running ? 'running' : 'completed',
+        stage: running ? 'poi' : 'ready', revision: finished ? 9 : 5, completion: completion() }) });
+    });
+    await page.goto('/');
+    await page.getByTestId('checkup-map').click();
+    await page.getByRole('button', { name: '开始体检', exact: true }).click();
+    const reportPanel = page.getByTestId('checkup-report');
+    await expect(reportPanel).toBeVisible();
+    await expect(page.getByTestId('report-continue')).toContainText('1200');
+    await page.getByTestId('report-continue').click();
+    await expect(reportPanel).toContainText('正文保留第 5 版报告');
+    expect(posts).toBe(1);
+    await page.reload();
+    await expect(page.getByTestId('checkup-completion').first()).toContainText('第 2 轮');
+    expect(posts).toBe(1);
+    finished = true; running = false;
+    await expect(page.getByTestId('checkup-report')).toBeVisible();
+    await expect(page.getByTestId('checkup-report')).not.toContainText('正文保留');
+    await expect(page.getByTestId('checkup-report').getByTestId('checkup-completion')).toContainText('累计 150 次');
+    expect(posts).toBe(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
 
 /** 带空洞的灰区：面积与报告一致，画的时候少一圈就是两回事。 */
 function holed(offset = 0): Record<string, unknown> {
@@ -27,6 +86,7 @@ function holed(offset = 0): Record<string, unknown> {
 }
 
 type Options = {
+  tenCategories?: boolean;
   densityBoundary?: boolean;
   /** 模型网格：西半边三类都覆盖，东半边购物是缺口（其余两类覆盖）。 */
   serviceCells?: boolean;
@@ -221,6 +281,19 @@ function snapshotFor(options: Options, submitted: { center: { lng: number; lat: 
     : [zone({ id: 'zone-1', index: 1, queryStatus: 'partial', geometry: polygon(0.05),
       displayGeometry: polygon(0.05), suggestion: '设施检索未完成，先补采再判定。' })];
   const base = snapshot();
+  const categories = ['medical', 'shopping', 'education', 'care', 'dining', 'finance',
+    'public', 'leisure', 'transport', 'life'];
+  const baseReport = report();
+  const frozen = options.tenCategories ? report({
+    categoryDirectoryVersion: 'test-v1',
+    categoryDirectory: categories.map((id, order) => ({ id, label: `测试类别${order + 1}`, order })),
+    categories: categories.slice(0, 6).map((id, index) => ({
+      ...baseReport.categories[index % baseReport.categories.length], category: id })),
+    overall: { ...baseReport.overall!, available: false, reason: 'categories_not_analysed',
+      missingCategories: categories.slice(6), coverageLowerPct: null, coverageUpperPct: null,
+      assessablePct: null, unknownPct: null },
+    gaps: { ...baseReport.gaps, zones },
+  }) : report({ gaps: { ...baseReport.gaps, zones } });
   const facilities = options.unmetCoverage
     ? { ...base.facilities!, queryStatus: 'partial' as const, stopReason: 'network_budget_exhausted',
       queryAreaCoverage: { target: 0.8, status: 'unmet', boundaryAreaM2: 1000,
@@ -230,7 +303,7 @@ function snapshotFor(options: Options, submitted: { center: { lng: number; lat: 
   return snapshot({
     center: { lng: submitted.center.lng, lat: submitted.center.lat },
     serviceGaps: { ...base.serviceGaps!, zones },
-    report: report({ gaps: { ...report().gaps, zones } }),
+    report: frozen,
     accessibility: { ...base.accessibility!, domain: polygon(0.03) },
     facilities,
   });
@@ -344,7 +417,7 @@ test('设施密度按类别筛选、疑似重复只算一处，空类别明说�
   await expect(legend).toHaveAttribute('data-points', '0');
   await expect.poll(async () => (await rgbaAt(canvas, 116.405, 39.916))[3]).toBe(0);
   // 只看购物：只剩 f-2 这一处；单个设施中心的颜色在浅底上也看得出（不透明度 ≥ 0.4）。
-  await choose('购物');
+  await choose('购物消费');
   await expect(legend).toContainText('1 处设施参与');
   await expect(legend).not.toContainText('疑似重复');
   await expect.poll(async () => (await rgbaAt(canvas, 116.40504, 39.916))[3]).toBeGreaterThanOrEqual(100);
@@ -352,7 +425,7 @@ test('设施密度按类别筛选、疑似重复只算一处，空类别明说�
   await page.reload();
   await expect(page.getByRole('combobox', { name: '密度类别' })).toBeVisible();
   await expect(page.locator('.ant-select').filter({ has: page.getByRole('combobox', { name: '密度类别' }) }))
-    .toContainText('购物');
+    .toContainText('购物消费');
   await expect(legend).toContainText('1 处设施参与');
   await expect.poll(async () => (await rgbaAt(canvas, 116.40504, 39.916))[3]).toBeGreaterThanOrEqual(100);
   await page.locator('.api-map-shell').screenshot({ path: 'output/checkup-ui/density-category.png' });
@@ -379,7 +452,7 @@ test('服务覆盖热力默认打开：评估格连成渐变面，圈外与孔�
   // 计算圈的孔洞与圈外一律透明：热力不越过圈面。
   expect((await rgbaAt(canvas, 116.4055, 39.916))[3]).toBe(0);
   expect((await rgbaAt(canvas, 116.4075, 39.916))[3]).toBe(0);
-  await expect(page.getByTestId('service-legend')).toContainText('三类均已知');
+  await expect(page.getByTestId('service-legend')).toContainText('全部类别均已知');
   await expect(page.getByTestId('service-legend')).toContainText('模型估计');
   // 开着热力时等时圈只描边：面填色会透过半透明热力把整圈染成一片。
   const fills = async () => (await page.evaluate(() => (window as unknown as { __mapAudit: {
@@ -417,6 +490,46 @@ const markersAre = (page: Page, count: number) =>
 const pointsAre = (page: Page, count: number) =>
   expect.poll(async () => counted((await audit(page)).markers)).toBe(count);
 
+for (const width of [1280, 390]) {
+  test(`report conclusions and navigation remain readable at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await setup(page);
+    await page.goto('/');
+    await page.getByTestId('checkup-map').click();
+    await page.getByRole('button', { name: '开始体检', exact: true }).click();
+    const summary = page.getByTestId('report-summary');
+    await expect(summary).toBeVisible();
+    await expect(summary).toContainText('40.0% ～ 70.0%');
+    await expect(summary).toContainText('已尝试核验 4 处设施');
+    const hash = new URL(page.url()).hash;
+    await page.getByRole('navigation', { name: '报告目录' }).getByRole('button', { name: '服务盲区' }).click();
+    expect(new URL(page.url()).hash).toBe(hash);
+    await expect(page.getByTestId('zone-zone-1')).toContainText('建议下一步：');
+    expect(await summary.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+  });
+}
+
+for (const width of [1280, 390]) {
+  test(`ten-category frozen report names missing categories at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await setup(page, { tenCategories: true });
+    await page.goto('/');
+    await page.getByTestId('checkup-map').click();
+    await page.getByRole('button', { name: '开始体检', exact: true }).click();
+    const reportView = page.getByTestId('checkup-report');
+    await expect(reportView).toBeVisible();
+    await expect(reportView.locator('li[data-testid^="coverage-"]')).toHaveCount(10);
+    await expect(reportView.getByTestId('coverage-life')).toContainText('无法给出覆盖率');
+    await expect(reportView.getByTestId('coverage-life')).toContainText('设施检索未完成');
+    await expect(reportView.getByText('暂无法评估', { exact: true })).toBeVisible();
+    await page.screenshot({ path: `output/checkup-ui/ten-categories-${width}.png` });
+    await page.getByRole('navigation', { name: '报告目录' })
+      .getByRole('button', { name: '分类覆盖' }).click();
+    await reportView.getByTestId('coverage-life').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `output/checkup-ui/ten-categories-detail-${width}.png` });
+  });
+}
+
 test('a published revision draws its layers, opens the report and keeps the view still', async ({ page }) => {
   const errors: string[] = [];
   await setup(page);
@@ -424,7 +537,7 @@ test('a published revision draws its layers, opens the report and keeps the view
   await page.goto('/');
   await openTab(page, '采样与引擎');
   await expect(page.getByTestId('quota-label'))
-    .toHaveText('本应用预算余额（不含浏览器 SDK、其他应用及旧接口流量）');
+    .toHaveText('本应用请求限制（不含浏览器 SDK、其他应用及旧接口流量）');
   // 选点：只会平移这一次；后面取图层、画标记都不再动视角。
   await pickAndStart(page, { serviceGaps: true });
   const report = page.getByTestId('checkup-report');
@@ -677,6 +790,78 @@ test('stages advance as the backend reports them, and the engines come from the 
   await expect(page.getByTestId('checkup-engine')).toContainText('引擎：OSM＋百度');
   await expect(page.getByTestId('checkup-time-estimate')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '开始体检', exact: true })).toBeEnabled();
+});
+
+
+async function expectLegendDock(page: Page) {
+  await expect.poll(async () => {
+    const [side, legend, workspace, report] = await Promise.all([
+      page.locator('.wb-side').boundingBox(), page.getByTestId('checkup-legend').boundingBox(),
+      page.locator('.wb-body').boundingBox(), page.locator('.wb-results').boundingBox(),
+    ]);
+    return !!(side && legend && workspace && report
+      && Math.abs(side.x - legend.x) < 1 && Math.abs(side.width - legend.width) < 1
+      && Math.abs(legend.y - side.y - side.height - 12) < 1
+      && legend.y + legend.height <= workspace.y + workspace.height - 27
+      && legend.x + legend.width <= report.x);
+  }).toBe(true);
+}
+
+for (const [width, height] of [[1280, 720], [1440, 900], [2048, 1066]]) {
+  test(`legend docks below the left panel without report overlap at ${width}x${height}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await setup(page, { tenCategories: true, serviceCells: true, facilityCount: 12 });
+    await page.goto('/');
+    await pickAndStart(page);
+    await expect(page.getByTestId('checkup-report')).not.toBeVisible();
+    await expect(page.getByTestId('checkup-legend')).toBeVisible();
+    await expectLegendDock(page);
+    await page.screenshot({ path: `output/checkup-ui/legend-dock-${width}x${height}.png` });
+    const before = await page.locator('.wb-side').boundingBox();
+    await page.getByTestId('checkup-legend').getByRole('button', { name: '图例', exact: true }).click();
+    await expect(page.getByTestId('checkup-legend')).toHaveAttribute('data-open', 'no');
+    await expectLegendDock(page);
+    const collapsed = await page.locator('.wb-side').boundingBox();
+    expect(collapsed!.height).toBeGreaterThanOrEqual(before!.height);
+    await page.getByTestId('checkup-legend').getByRole('button', { name: '图例', exact: true }).click();
+    await expectLegendDock(page);
+  });
+}
+
+test('legend follows drag, resize and keyboard controls through viewport changes', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await setup(page, { tenCategories: true, serviceCells: true, facilityCount: 12 });
+  await page.goto('/'); await pickAndStart(page);
+  await expect(page.getByTestId('checkup-report')).not.toBeVisible();
+  await expectLegendDock(page);
+  const drag = async (id: string, dx: number, dy: number) => {
+    const box = await page.getByTestId(id).boundingBox();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width / 2 + dx, box!.y + box!.height / 2 + dy, { steps: 5 });
+    await page.mouse.up();
+  };
+  await drag('panel-move-side', 40, 35); await expectLegendDock(page);
+  await drag('panel-resize-side', 72, 2000); await expectLegendDock(page);
+  await page.getByTestId('panel-move-side').press('ArrowDown'); await expectLegendDock(page);
+  await page.getByTestId('panel-resize-side').press('ArrowLeft'); await expectLegendDock(page);
+  await page.setViewportSize({ width: 1280, height: 720 }); await expectLegendDock(page);
+  await page.setViewportSize({ width: 1440, height: 560 }); await expectLegendDock(page);
+  await page.setViewportSize({ width: 1440, height: 500 });
+  await expect(page.getByTestId('panel-move-side')).toHaveCount(0);
+  await expect(page.locator('.wb-side')).toHaveCSS('position', 'static');
+  const legend = await page.getByTestId('checkup-legend').boundingBox();
+  const map = await page.getByTestId('checkup-map-section').boundingBox();
+  const side = await page.locator('.wb-side').boundingBox();
+  expect(legend!.y + legend!.height).toBeLessThan(map!.y + map!.height);
+  expect(side!.y).toBeGreaterThanOrEqual(map!.y + map!.height);
+  await page.screenshot({ path: 'output/checkup-ui/legend-dock-low-height.png', fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByTestId('panel-move-results')).toHaveCount(0);
+  await expect(page.getByTestId('checkup-legend')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: 'output/checkup-ui/legend-dock-mobile.png', fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 900 }); await expectLegendDock(page);
 });
 
 test('hybrid shows its historical runtime guide only when the graph is ready', async ({ page }) => {
