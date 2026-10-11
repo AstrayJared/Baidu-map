@@ -5,6 +5,7 @@ import time
 from .. import catalog
 from ..engines import EngineContext, IsochroneSnapshot, canonical_hash
 from ..poi.online import RETRY_ERRORS, FATAL
+from ..request_control import wait_with_cancel
 from .facilities import collect_facilities
 from .facilities import FacilityOutcome
 from .models import CheckupCompletion, CheckupRequest, DEFAULT_POI_REQUESTS, DISTANCE_RULE, RULE_VERSION, TERMINAL
@@ -252,7 +253,11 @@ class ContinuationMixin:
             return
         self.store.update(task_id, stage='reporting')
         report('report')
-        business = await asyncio.to_thread(self._publish_reporting, task_id, payload, frozen,
-                                           budget, outcome, assessment, verification)
+        business = await wait_with_cancel(asyncio.to_thread(
+            self._publish_reporting, task_id, payload, frozen, budget, outcome, assessment,
+            verification, token=token), token, keep_running=True)
+        if token.cancelled:
+            self._finish(task_id, status='cancelled')
+            return
         self._finish(task_id, status='completed', business_status=business)
         self.store.update(task_id, stage='ready')

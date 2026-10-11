@@ -40,6 +40,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .analyses import RateGate
+from .request_control import RequestStopped, wait_with_cancel
 
 # The deployment's quota day. Fixed rather than read from the host zone, so a
 # container in UTC and a workstation in CST agree on when the day turns.
@@ -338,7 +339,11 @@ class ServicePool:
         if remaining <= 0:
             raise DeadlineReached()
         try:
-            await asyncio.wait_for(self.gate.attempt_lock.acquire(), timeout=remaining)
+            await wait_with_cancel(
+                asyncio.wait_for(self.gate.attempt_lock.acquire(), timeout=remaining), token,
+                on_abandon=lambda acquired: self.gate.attempt_lock.release() if acquired else None)
+        except RequestStopped:
+            raise AttemptCancelled() from None
         except asyncio.TimeoutError:
             raise DeadlineReached() from None
         try:
@@ -348,7 +353,7 @@ class ServicePool:
             self.gate.interval = 1 / self.gate.qps
             # Waiting before acquiring this lock lets queued callers bypass the
             # previous response's cooldown and can dispatch after their deadline.
-            if not await self.gate.wait(deadline, cost=cost):
+            if not await wait_with_cancel(self.gate.wait(deadline, cost=cost), token):
                 raise DeadlineReached()
             check_allowances()
             daily = self._daily_budget()
@@ -362,6 +367,8 @@ class ServicePool:
                 yield handle
             finally:
                 self.gate.completed(handle.reason if handle.reported else "interrupted", cost=cost)
+        except RequestStopped:
+            raise AttemptCancelled() from None
         finally:
             self.gate.attempt_lock.release()
 

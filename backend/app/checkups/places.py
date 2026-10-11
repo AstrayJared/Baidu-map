@@ -25,6 +25,7 @@ import httpx
 from ..baidu import API_URL, silence_transport_logs
 from ..poi.planner import parameters
 from ..poi.provider import read_page
+from ..request_control import RequestStopped, wait_with_cancel
 
 # The task's own pool name, as ``quota.TaskBudget`` spells it.
 POI_POOL = 'poi'
@@ -118,7 +119,13 @@ class PlaceSession:
         extra = {} if self.token is None else {'token': self.token}
         async with self.pool.attempt(self.deadline, budget=self.budget, pool=POI_POOL,
                                      **extra) as attempt:
-            payload, reason = await self.transport.page(
-                parameters(sequence, page), self.deadline - time.monotonic())
+            try:
+                payload, reason = await wait_with_cancel(self.transport.page(
+                    parameters(sequence, page), self.deadline - time.monotonic()), self.token)
+            except RequestStopped:
+                # Already dispatched: retain the reservation and record the stop.
+                payload, reason = None, 'cancelled'
+            if self.token is not None and self.token.cancelled:
+                payload, reason = None, 'cancelled'
             attempt.outcome(reason)
         return payload, reason

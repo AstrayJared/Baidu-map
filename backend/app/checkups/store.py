@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Callable
 from pathlib import Path
+from uuid import uuid4
 
 from ..persistence import atomic_dump
 from .rounds import ROUND_SCHEMA, RoundStore
@@ -734,14 +735,23 @@ class CheckupStore(RoundStore):
         return self._get(task_id)
 
     def publish(self, task_id: str, *, stage: str, snapshot: dict, result_hash: str,
-                summary: dict | None = None) -> int:
+                summary: dict | None = None, cancelled=None) -> int:
         """Freeze one revision. The payload is durable before its index row exists."""
         record = self._get(task_id)
         revision = record.revision + 1
-        relative = Path("tasks") / task_id / f"revision-{revision:04d}-{stage}.json"
+        # A cancelled report can finish serializing after a continuation starts.
+        # Its unindexed file must never overwrite that continuation's revision.
+        suffix = '' if cancelled is None else f'-{uuid4().hex}'
+        relative = Path("tasks") / task_id / f"revision-{revision:04d}-{stage}{suffix}.json"
+        if cancelled is not None and cancelled():
+            from ..accessibility.grid import AssessmentCancelled
+            raise AssessmentCancelled()
         atomic_dump(self.root / relative, snapshot)
         with self._connection() as connection:
             connection.execute("BEGIN IMMEDIATE")
+            if cancelled is not None and cancelled():
+                from ..accessibility.grid import AssessmentCancelled
+                raise AssessmentCancelled()
             connection.execute(
                 "INSERT INTO revisions (task_id, revision, stage, created_at, result_hash, payload,"
                 " summary) VALUES (?,?,?,?,?,?,?)",

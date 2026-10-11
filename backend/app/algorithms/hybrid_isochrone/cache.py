@@ -8,7 +8,7 @@ from life_circle.models import CancelToken
 
 from ...geo.coordinates import wgs84_to_bd09
 from ...persistence import atomic_dump
-from ...request_control import request_slot, RequestStopped
+from ...request_control import request_slot, RequestStopped, wait_with_cancel
 from .models import Evidence, Sample, Validity
 from .extent import LEDGER_VERSION, contains
 
@@ -140,11 +140,11 @@ class EvidenceSession:
             if not self.available:
                 return None
             point_id = f"p{len(self.samples) + 1:04d}"
-            if self.last_sent is not None:
-                pause = self.last_sent + self.min_interval - time.monotonic()
-                if pause > 0:
-                    await asyncio.sleep(pause)
             try:
+                if self.last_sent is not None:
+                    pause = self.last_sent + self.min_interval - time.monotonic()
+                    if pause > 0:
+                        await wait_with_cancel(asyncio.sleep(pause), self.token)
                 async with request_slot(self.gate, self.token, self.deadline) as outcome:
                     self.last_sent = time.monotonic()
                     self.requests_used += 1
@@ -156,7 +156,13 @@ class EvidenceSession:
                     await self.persist()
                     event["sent_at"] = time.time()
                     try:
-                        evidence = await self.provider.query_walking_time(self.origin, coordinate, self.deadline)
+                        evidence = await wait_with_cancel(
+                            self.provider.query_walking_time(self.origin, coordinate, self.deadline), self.token)
+                        if self.token.cancelled:
+                            raise RequestStopped('cancelled')
+                    except RequestStopped:
+                        event.update(state='interrupted', completed_at=time.time())
+                        raise
                     except asyncio.CancelledError:
                         self.stop_reason = "cancelled"
                         raise

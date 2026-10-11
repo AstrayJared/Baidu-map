@@ -22,6 +22,7 @@ from life_circle.models import RouteObservation
 
 from ..baidu import silence_transport_logs
 from ..quota import AttemptCancelled, BudgetExhausted, DeadlineReached
+from ..request_control import RequestStopped, wait_with_cancel
 
 #: 任务自己的池名，与 ``quota.TaskBudget`` 的拼写一致。
 ROUTE_POOL = 'route'
@@ -131,9 +132,11 @@ class RouteSession:
                         attempt.outcome('deadline')
                         raise DeadlineReached()
                     self.attempts += 1
-                    value = await self.transport.route(
+                    value = await wait_with_cancel(self.transport.route(
                         facility_id, origin, destination,
-                        min(MAX_TIMEOUT_SECONDS, timeout))
+                        min(MAX_TIMEOUT_SECONDS, timeout)), self.token)
+                    if self.token is not None and self.token.cancelled:
+                        raise RequestStopped('cancelled')
                     attempt.outcome(value.reason)
                     if self.budget is not None and self.budget.on_result is not None:
                         self.budget.on_result(self.budget.reservations[pool], asdict(value), value.reason)
@@ -145,7 +148,7 @@ class RouteSession:
             except DeadlineReached:
                 self.stop_reason = 'deadline'
                 return None
-            except AttemptCancelled:
+            except (AttemptCancelled, RequestStopped):
                 # 取消之后不再发出新的请求；已发出的那一次收不回，但不会有下一次。
                 self.stop_reason = 'cancelled'
                 return None

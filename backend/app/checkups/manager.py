@@ -39,6 +39,7 @@ from ..poi import plan as poi_plan
 from ..poi.online import coarse_blocks
 from ..poi.planner import RULES as POI_RULES
 from ..quota import PLACE, attach_token
+from ..request_control import RequestStopped, wait_with_cancel
 from .accessibility_stage import AccessibilityOutcome, assess_accessibility
 from .facilities import FacilityOutcome, collect_facilities, stale_for
 from .facility_stage import query_domain
@@ -585,7 +586,7 @@ class CheckupManager(ContinuationMixin):
                 await self._continue_stages(task_id, payload, record, token)
             else:
                 await self._stages(task_id, payload, record, token)
-        except AssessmentCancelled:
+        except (AssessmentCancelled, RequestStopped):
             self._finish(task_id, status='cancelled')
         finally:
             self.tokens.pop(task_id, None)
@@ -612,15 +613,15 @@ class CheckupManager(ContinuationMixin):
             artifact_dir=self.store.artifact_dir(task_id),
             # The engine names its own sub-stage; the counts are its attempts
             # against the tier and what of them actually went to the network.
-            on_progress=lambda snapshot: report(
+            on_progress=lambda snapshot: None if token.cancelled else report(
                 snapshot.stage, count=snapshot.requests, limit=snapshot.budget,
                 requests=snapshot.requests, network_requests=snapshot.network_requests),
             # Its preparation counts edges or nothing: the task counters stay as they are.
-            on_step=report)
+            on_step=lambda *args, **kwargs: None if token.cancelled else report(*args, **kwargs))
         try:
-            snapshot = await self.registry.get(record.engine).compute(
-                IsochroneAsk(origin=origin, budget=record.budget), context)
-        except EngineCancelled:
+            snapshot = await wait_with_cancel(self.registry.get(record.engine).compute(
+                IsochroneAsk(origin=origin, budget=record.budget), context), token)
+        except (EngineCancelled, RequestStopped):
             # The user's cancel stopped the engine: the task ends, the worker serves on.
             self._finish(task_id, status="cancelled")
             return
@@ -680,8 +681,12 @@ class CheckupManager(ContinuationMixin):
         report("report")
         # Assembling and writing the report takes a second or more; off the event
         # loop, so status polls are answered meanwhile.
-        business = await asyncio.to_thread(self._publish_reporting, task_id, payload, snapshot, budget,
-                                           outcome, assessment, verification)
+        business = await wait_with_cancel(asyncio.to_thread(
+            self._publish_reporting, task_id, payload, snapshot, budget,
+            outcome, assessment, verification, token=token), token, keep_running=True)
+        if token.cancelled:
+            self._finish(task_id, status='cancelled', business_status=business)
+            return
         self._finish(task_id, status="completed", business_status=business)
         self.store.update(task_id, stage="ready")
 
@@ -880,7 +885,7 @@ class CheckupManager(ContinuationMixin):
                  else outcome.group.model_dump(mode="json", by_alias=True))
         if report is not None and self.offline is not None:
             report("graph")
-        resolved = await self._resolve_offline(report)
+        resolved = await self._resolve_offline(report, token=token)
         inner = None if report is None else _assessment_progress(report)
 
         def progress(step, **detail):
@@ -980,7 +985,7 @@ class CheckupManager(ContinuationMixin):
 
     async def _assess(self, snapshot, outcome, payload, *, verified=None, token=None):
         """Re-run the assessment off the event loop; None without a graph or on cancel."""
-        resolved = await self._resolve_offline()
+        resolved = await self._resolve_offline(token=token)
         if resolved is None:
             return None
 
@@ -1027,8 +1032,10 @@ class CheckupManager(ContinuationMixin):
                            outcome: FacilityOutcome, assessment: AccessibilityOutcome,
                            verification: VerificationOutcome | None = None, *,
                            recomputed: dict | None = None,
-                           retried: dict | None = None) -> str:
+                           retried: dict | None = None, token=None) -> str:
         """Freeze the report revision: the same assessment, assembled for readers."""
+        if token is not None and token.cancelled:
+            raise AssessmentCancelled()
         revision = self.store.get(task_id).revision + 1
         isochrone = snapshot.model_dump(mode="json", by_alias=True)
         group = (None if outcome.group is None
@@ -1066,7 +1073,7 @@ class CheckupManager(ContinuationMixin):
                          extra_rules={"classification": POI_RULES["version"],
                                       "accessibility": RULE_VERSION},
                          recomputed=recomputed, retried=retried)), revision,
-            result_hash)
+            result_hash, token=token)
         return business
 
     # -- recompute after a data correction ---------------------------------
@@ -1156,7 +1163,7 @@ class CheckupManager(ContinuationMixin):
         self.store.update(task_id, stage="ready", business_status=business)
         return published
 
-    async def _resolve_offline(self, report=None):
+    async def _resolve_offline(self, report=None, *, token=None):
         """Resolve the walking graph off the event loop; None when there is none.
 
         A load in progress is told to ``report`` step by step, its edges counted.
@@ -1165,7 +1172,9 @@ class CheckupManager(ContinuationMixin):
             return None
         try:
             return await resolve(self.offline, None if report is None else (
-                lambda step, done, total: report(step, count=done, limit=total)))
+                lambda step, done, total: report(step, count=done, limit=total)), token=token)
+        except RequestStopped:
+            raise AssessmentCancelled() from None
         except Exception:
             # A graph that fails to load is the same answer as a deployment that
             # has none: the assessment says why, and the rest of the revision
@@ -1173,13 +1182,16 @@ class CheckupManager(ContinuationMixin):
             return None
 
     def _publish(self, task_id: str, stage: str, document: CheckupSnapshot, revision: int,
-                 result_hash: str) -> None:
+                 result_hash: str, *, token=None) -> None:
         # Published files use wire naming, so a stored revision round-trips back
         # into the response model without a translation step.
         document.completion = self._completion(task_id, document.model_dump(mode='json', by_alias=True), frozen=True)
         wire = document.model_dump(mode="json", by_alias=True)
+        if token is not None and token.cancelled:
+            raise AssessmentCancelled()
         published = self.store.publish(task_id, stage=stage, snapshot=wire,
                                        result_hash=result_hash,
+                                       cancelled=None if token is None else lambda: token.cancelled,
                                        # §5 B2 决策 2：汇总与修订同一笔定稿 —— 明细删掉之后，
                                        # 它就是这份结论唯一还留下来的东西。
                                        summary=retention.summary_of(wire))

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from .algorithms.osm_offline.lazy import GraphLoadCancelled
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -66,6 +67,8 @@ def create_app(settings: Settings | None = None, *, provider_factory=None,
             try:
                 await asyncio.to_thread(offline.get)
                 logger.info("OSM walking graph preloaded before serving requests: %s", offline.state)
+            except GraphLoadCancelled:
+                logger.info('OSM preload stopped for application shutdown')
             except Exception:
                 # OSM is optional; a corrupt or incompatible package should not
                 # take the Baidu-only application offline.
@@ -81,13 +84,14 @@ def create_app(settings: Settings | None = None, *, provider_factory=None,
         try:
             yield
         finally:
-            # Do not tear down the application while the graph worker still owns
-            # the process-wide graph memory or its temporary load objects.
-            if preload_task is not None:
-                await preload_task
+            # Stop new work first; the optional city load must not keep a
+            # shutting-down server waiting for a complete graph rebuild.
+            offline.stop()
             await checkups.close()
             await hybrid.close()
             await manager.close()
+            if preload_task is not None:
+                await preload_task
 
     app = FastAPI(title="Life Circle Backend", version="2.0.0", debug=False, lifespan=lifespan)
     app.state.osm_offline = offline
