@@ -17,6 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 最后一步的 `git show --check HEAD` 要读到 HEAD 的**父提交**才算得出"这次提交改了什么"。
+          # `pull_request` 检出的是 GitHub 合成的合并提交，而 checkout 默认只取一个提交：浅克隆里
+          # 那个合并提交成了"根提交"，于是整棵仓库被当成新增，历史里的空白问题全部算到这一次提交
+          # 头上（本地按 depth=1 / depth=2 复现过：前者退出码 2，后者干净）。检查器本身不读历史，
+          # 两个提交足够。
+          fetch-depth: 2
 
       - name: 检查器自检（证明它会失败，而不是永远通过）
         run: python3 scripts/test_check_repo_layout.py
