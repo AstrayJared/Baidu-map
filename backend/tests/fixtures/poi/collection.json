@@ -28,7 +28,7 @@
           },
           "address": "合成测试地址，不用于真实业务",
           "detail_info": {
-            "classified_poi_tag": "购物;超市"
+            "classified_poi_tag": "购物;菜市场"
           }
         }
       ]
@@ -59,7 +59,7 @@
           },
           "address": "合成测试地址，不用于真实业务",
           "detail_info": {
-            "classified_poi_tag": "购物;超市"
+            "classified_poi_tag": "购物;菜市场"
           }
         }
       ]
@@ -90,7 +90,7 @@
           },
           "address": "合成测试地址，不用于真实业务",
           "detail_info": {
-            "classified_poi_tag": "购物;超市"
+            "classified_poi_tag": "购物;菜市场"
           }
         }
       ]
@@ -221,6 +221,12 @@
           }
         }
       ]
+    },
+    "农副产品市场:0": {
+      "status": 0,
+      "result_type": "poi_type",
+      "total": 0,
+      "results": []
     }
   }
 }

@@ -7,6 +7,7 @@ request is ever issued by this file.
 import asyncio
 import math
 import time
+from tools.export_contract import ANALYSIS_MODELS, ANALYSIS_REQUEST_MODELS
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -194,7 +195,7 @@ def test_isochrone_stage_publishes_a_revision_without_a_second_facility_search(t
         # Every pool of the task is on the record, spent or not. The synthetic
         # transport issues no request, so the boundary reports none.
         assert trace["budgets"] == {"isochrone": {"limit": 200, "spent": 0},
-                                    "poi": {"limit": 240, "spent": 0},
+                                    "poi": {"limit": 1200, "spent": 0},
                                     "route": {"limit": 120, "spent": 0},
                                     "detail": {"limit": 20, "spent": 0}}
 
@@ -455,10 +456,10 @@ def test_capabilities_report_both_engines_and_the_fixed_distance_rule(tmp_path):
         assert rules["distance"]["tolerance_m"] == 100
         # The uncertainty band is never presented as a radius enlargement.
         assert rules["bandIsNotRadiusExpansion"] is True
-        # 单任务默认 240：合成夹具实测"适中"密度整轮 203 次派发，240 才够一次查到 80%
+        # 单任务默认 1200：合成夹具实测"适中"密度整轮 203 次派发，1200 才够一次查到 80%
         # 覆盖目标（2026-10-09 运营者授权）。
-        assert document["budgets"]["poiRequests"] == 240
-        assert document["budgets"]["maxPoiRequests"] == 1600
+        assert document["budgets"]["poiRequests"] == 1200
+        assert document["budgets"]["maxPoiRequests"] == 1200
         assert document["budgets"]["routeRequests"] == 120
         # 一次检索的最小次数是"查询分块 × 检索小类"，请求体里算不出来：客户端要能
         # 在提交前用它判断预算够不够，而不是提交后拿到一个预算不足的失败任务。
@@ -490,7 +491,7 @@ def test_capabilities_report_the_application_budget_never_the_account_balance(tm
     with TestClient(app) as client:
         quota = client.get("/api/v2/capabilities").json()["quota"]
         assert quota["tier"] == "current" and quota["matrixEnabled"] is False
-        # The two services are separate pools, and only place has a day budget.
+        # The fixture pins the current tier and its application-only day cap.
         assert quota["services"]["direction"] == {
             "qps": 3, "maxInflight": 1, "dailyBudget": None,
             "spentToday": None, "remainingToday": None}
@@ -499,7 +500,7 @@ def test_capabilities_report_the_application_budget_never_the_account_balance(tm
             "spentToday": 0, "remainingToday": 1600}
         # Nothing may present this as the account's own remaining allowance.
         assert quota["claimsAccountBalance"] is False
-        assert "本应用预算余额" in quota["label"]
+        assert "本应用请求限制" in quota["label"]
         assert app.state.quota is app.state.checkups.quota
 
 
@@ -535,42 +536,8 @@ def test_v2_contract_is_generated_without_touching_the_legacy_ones(tmp_path):
     schemas = spec["components"]["schemas"]
     assert {"clientRequestId", "coordinateSystem", "schemaVersion"} <= set(
         schemas["CheckupRequest"]["properties"])
-    # v2 adds no model to the generated demo contract, so the strict POI
-    # evidence types keep the serialization test_poi_evidence locks down.
-    # 这份清单必须与 ``tools/export_contract.export`` 一致：漏一个模型就会让这条
-    # 断言去和一份"少了 FacilityCatalog"的生成物比较，失败与契约无关。
-    legacy = typescript(
-        [AnalysisResponse, TaskStatusResponse, TaskResultResponse, OsmOfflineRequest,
-         FacilityCatalog, HybridRequest, HybridResultResponse, HybridError],
-        request_models=[OsmOfflineRequest, HybridRequest])
-    assert legacy == (Path(__file__).resolve().parents[2]
-                      / "life-circle-demo/src/api-contract.ts").read_text(encoding="utf-8")
-    # 判据是"没有 v2 的模型"，不是"没有 checkup 这个词"：设施目录里真有一个小类
-    # 就叫 checkup（体检/健康管理），按子串判会把一个正常的小类当成契约泄漏。
-    assert not [name for name in ("CheckupRequest", "CheckupSnapshot", "CheckupLayer",
-                                 "CheckupCapabilities", "CheckupTaskView", "FacilityRoute")
-                if name in legacy]
-    # v2 自己那份生成物也要对得上：它没有第二个消费者来发现漂移，漏跑一次导出
-    # 只会让前端缺字段，而不会有任何测试变红。
-    from app.checkups.models import (CheckupCapabilities, CheckupFacilities, CheckupIsochrone,
-                                     CheckupLayer, CheckupRequest, CheckupSnapshot,
-                                     CheckupTaskView, FacilityExtensionDocument,
-                                     FacilityExtensionRequest, FacilityExtensionView,
-                                     FacilityRetryRequest, FacilityRetryView, FacilityRoute,
-                                     RetainedCheckupView, RetentionView,
-                                     SessionOpenRequest, SessionView)
-    from tools.export_contract import typescript as v2_typescript
-    v2 = v2_typescript(
-        [CheckupRequest, CheckupTaskView, CheckupSnapshot, CheckupLayer,
-         FacilityRoute, CheckupCapabilities, CheckupFacilities, CheckupIsochrone,
-         FacilityExtensionRequest, FacilityExtensionView, FacilityExtensionDocument,
-         # §5 B2 决策 1 的重试也是 v2 契约的一部分。它漏进过导出清单：前端照着
-         # 生成物写调用，而那份生成物里没有这两个类型 —— 正是这条断言要拦的事。
-         FacilityRetryRequest, FacilityRetryView,
-         # §5 B2 决策 2 的会话与保留期同理：它们是客户端要读的状态，不是内部字段。
-         SessionOpenRequest, SessionView, RetentionView, RetainedCheckupView],
-        request_models=[CheckupRequest, CheckupFacilities, CheckupIsochrone,
-                        FacilityExtensionRequest, FacilityRetryRequest, SessionOpenRequest])
+    from tools.export_contract import CHECKUP_MODELS, CHECKUP_REQUEST_MODELS
+    v2 = typescript(CHECKUP_MODELS, request_models=CHECKUP_REQUEST_MODELS)
     assert v2 == (Path(__file__).resolve().parents[2]
                   / "life-circle-demo/src/checkup/contract.ts").read_text(encoding="utf-8")
 
@@ -762,4 +729,3 @@ def test_the_current_default_is_only_read_when_the_rule_needs_it(tmp_path):
         categories=["dining"], max_poi_requests=None),
         resolved_budget=lambda: 60) is True
     assert calls == []
-

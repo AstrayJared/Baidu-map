@@ -16,6 +16,7 @@ life-circle-demo/.env.*.local
 .DS_Store
 Thumbs.db
 .npm-cache/
+**/.netlify/
 .tmp/
 .pip-cache/
 

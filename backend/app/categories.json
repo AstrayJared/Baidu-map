@@ -1,5 +1,5 @@
 {
-  "version": "poi-categories-v2.1",
+  "version": "poi-categories-v2.2",
   "displayGroups": [
     {"key":"healthcare","label":"健康照护","order":1,"majors":["medical","care"]},
     {"key":"education","label":"教育成长","order":2,"majors":["education"]},
@@ -43,6 +43,7 @@
   "excluded": ["出入口","门口","北门","南门","东门","西门","正门","后门","管理办公室"],
   "nonBusinessParentTags": ["教育培训"],
   "conflictingTags": ["公司","仓库"],
-  "review": ["生鲜超市","九年一贯","九年制"],
-  "possibleDuplicateMeters": 20
+  "review": ["九年制"],
+  "possibleDuplicateMeters": 20,
+  "nameShadows": [["hospital_pharmacy","pharmacy"],["hospital_pharmacy","hospital"],["clinic","hospital"],["rehab","hospital"],["market","fresh_store"],["fresh_store","supermarket"],["combined_school","school"],["combined_school","middle_school"],["library","training"]]
 }

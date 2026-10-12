@@ -42,6 +42,7 @@ export type CheckupService = {
   /** 能力表：能选哪个引擎、哪一档预算，以及本应用预算余额的说法，都从这里来。 */
   capabilities: (signal?: AbortSignal) => Promise<Capabilities>;
   create: (body: CheckupRequest) => Promise<CheckupTaskView>;
+  continueReport?: (taskId: string, body: { clientRequestId: string; baseRevision: number }) => Promise<CheckupTaskView>;
   status: (taskId: string, signal?: AbortSignal) => Promise<CheckupTaskView>;
   byRequest: (clientRequestId: string) => Promise<CheckupTaskView>;
   result: (taskId: string, revision?: number, signal?: AbortSignal) => Promise<CheckupSnapshot>;
@@ -160,6 +161,12 @@ export function createCheckupService(
       if (task.taskId !== taskId) {
         throw new CheckupError('体检服务返回了另一个任务的状态，请检查服务版本', 0, 'mismatched_task');
       }
+      return task;
+    },
+    async continueReport(taskId, body) {
+      const { body: value } = await request(`/${encodeURIComponent(taskId)}/continue`, 'POST', body);
+      const task = checked<CheckupTaskView>(value, validTaskView, '续查任务');
+      if (task.taskId !== taskId) throw new CheckupError('续查任务不匹配', 0, 'mismatched_task');
       return task;
     },
     async byRequest(clientRequestId) {

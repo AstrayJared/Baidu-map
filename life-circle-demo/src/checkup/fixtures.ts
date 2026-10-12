@@ -183,7 +183,7 @@ export function capabilities(overrides: Partial<Capabilities> = {}): Capabilitie
     engines: [engine(), engine({ engineId: 'osm_hybrid', label: 'OSM＋百度',
       engineVersion: '1.5.0', budgets: [200, 400], requiresOsmGraph: true,
       notes: ['以本地 OSM 路网计算步行距离'] })],
-    quota: { label: '本应用预算余额（不含浏览器 SDK、其他应用及旧接口流量）',
+    quota: { label: '本应用请求限制（不含浏览器 SDK、其他应用及旧接口流量）',
       tier: 'first-release', day: '2026-09-27',
       services: { direction: { qps: 16, maxInflight: 16, dailyBudget: null, spentToday: null,
         remainingToday: null },

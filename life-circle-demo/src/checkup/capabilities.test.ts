@@ -84,7 +84,7 @@ describe('engine list', () => {
 describe('quota line', () => {
   it('shows the backend wording verbatim, and invents none when it is missing', () => {
     const view = quotaSummary(capabilities());
-    expect(view.label).toBe('本应用预算余额（不含浏览器 SDK、其他应用及旧接口流量）');
+    expect(view.label).toBe('本应用请求限制（不含浏览器 SDK、其他应用及旧接口流量）');
     // 余额的说法只能是后端给的：界面自己起个名字，读者就会以为它是账号总余额。
     expect(quotaSummary(capabilities({ quota: {} })).label).toBeNull();
   });
@@ -95,10 +95,11 @@ describe('quota line', () => {
 
   it('says "no daily budget" instead of reporting zero left', () => {
     // 日额度为 null 是"不适用"，写成 0 就是"今天已经用光了" —— 两种说法做的事完全不同。
-    const summary = quotaSummary(capabilities({ quota: { label: '本应用预算余额',
+    const summary = quotaSummary(capabilities({ quota: { label: '本应用请求限制', day: '2026-10-04',
       services: { place: { qps: 8, dailyBudget: null, remainingToday: null } } } }));
-    expect(summary.lines).toContain('设施检索不设每日额度，仅按速率限制');
+    expect(summary.lines).toContain('设施检索不设本地每日额度；单次体检最多 60 次，仍受速率限制');
     expect(summary.lines.some(line => line.includes('0 /'))).toBe(false);
+    expect(summary.lines.some(line => line.startsWith('记账日'))).toBe(false);
   });
 });
 

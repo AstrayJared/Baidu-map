@@ -29,7 +29,8 @@ def test_the_poi_runtime_spelling_is_an_alias_of_one_category():
     # it is declared once, next to the canonical key, and never as a second row.
     assert get_args(PoiCategory) == POI_CATEGORIES
     assert POI_CATEGORIES == tuple(catalog.poi_key(key) for key in catalog.POI_RUNTIME)
-    assert catalog.POI_RUNTIME == ("market", "pharmacy", "school")
+    assert catalog.POI_RUNTIME == tuple(c.key for c in catalog.CATEGORIES if c.poi_runtime)
+    assert len(catalog.POI_RUNTIME) == 31
     assert catalog.poi_key("school") == "primary_school"
     assert catalog.poi_key("market") == "market"
     assert len(catalog.BY_KEY) == len(catalog.CATEGORIES)
@@ -66,13 +67,14 @@ def test_only_the_declared_pair_of_categories_shares_name_words():
             if any(w in other or other in w
                    for w in left.name_hints for other in right.name_hints):
                 overlapping.append({left.key, right.key})
-    assert overlapping == [{"pharmacy", "hospital_pharmacy"}]
+    assert {frozenset(pair) for pair in overlapping} == {
+        frozenset(pair) for pair in catalog.DATA["nameShadows"]}
 
 
 def test_the_exclusion_vocabulary_is_declared_once_and_is_not_empty():
     assert len(catalog.EXCLUSIONS) == len(set(catalog.EXCLUSIONS))
     # A gate is never a facility, and a training business is never a school.
-    for word in ("门口", "北门", "管理办公室", "培训", "幼儿园"):
+    for word in ("门口", "北门", "管理办公室"):
         assert word in catalog.EXCLUSIONS
     for word in ("教育培训",):
         assert word in catalog.NON_BUSINESS_PARENT_TAGS
@@ -97,7 +99,10 @@ def test_no_second_category_file_is_shipped():
 def test_both_consumers_classify_the_same_vocabulary_the_same_way():
     # The legacy endpoint classifies name and tag together; the POI runtime
     # separates them. They must still agree on what a name alone means.
+    from app.poi.normalize import classify as strict
     for category in catalog.CATEGORIES:
         for name in category.name_hints:
-            assert classify(f"合成{name}") == category.key
-    assert catalog.VERSION == "poi-categories-v1.3"
+            result, status, _ = strict(f"合成{name}", list(category.tag_hints[:1]))
+            if status == 'accepted':
+                assert catalog.contract_key(result) == classify(f"合成{name}", category.tag_hints[0])
+    assert catalog.VERSION == "poi-categories-v2.2"

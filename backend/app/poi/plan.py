@@ -107,7 +107,8 @@ def initial_plan(domain, origin, categories, *, provider, api_version,
                     key=page_key(state.mapping, 0, provider=provider, api_version=api_version,
                                  coordinate_system=coordinate_system))
         for state in planner.first_round)
-    return InitialPlan(pages=pages, blocks=len(planner.coarse), categories=categories)
+    return InitialPlan(pages=pages, blocks=len(planner.coarse), categories=categories,
+                       primary_queries_only=planner.query_plan_limited)
 
 
 def reusable_pages(plan: InitialPlan, cache, *, task_id: str) -> int:

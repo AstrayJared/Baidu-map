@@ -24,7 +24,8 @@ deadlock on the shared in-flight lock.
 Every walking-route request of the application -- both boundary engines, the
 legacy ``/api/analyses`` and ``/api/v1/analysis/hybrid`` endpoints, verification
 and click-detail routes -- paces on the one direction gate, and every place
-search on the one place gate. Each gate reads the active tier when it waits, so a
+search on the one place gate. The application-side place daily budget is optional;
+it is unset by default. Each gate reads the active tier when it waits, so a
 tier switch lowers every caller at once and two limiters can never add up on one
 key. The engines and legacy endpoints pace on the gate directly (their own
 budgets bound them), so only the stages that reserve through a pool appear in
@@ -39,6 +40,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .analyses import RateGate
+from .request_control import RequestStopped, wait_with_cancel
 
 # The deployment's quota day. Fixed rather than read from the host zone, so a
 # container in UTC and a workstation in CST agree on when the day turns.
@@ -158,7 +160,7 @@ class ServiceTier:
     """The ceilings that apply at one instant."""
     direction_qps: float
     place_qps: float
-    place_daily_budget: int
+    place_daily_budget: int | None
     label: str
 
 
@@ -170,6 +172,12 @@ class TaskBudget:
     route: int = DEFAULT_ROUTE_ATTEMPTS
     detail: int = DEFAULT_DETAIL_ATTEMPTS
     spent: dict = field(default_factory=dict)
+    # Checkup rounds attach a durable reservation journal at the existing
+    # scheduling point. Other callers retain their original in-memory budgets.
+    on_reserve: object = None
+    on_result: object = None
+    request_context: dict = field(default_factory=dict)
+    reservations: dict = field(default_factory=dict)
 
     def pools(self) -> dict:
         return {"isochrone": self.isochrone, "poi": self.poi, "route": self.route,
@@ -190,6 +198,8 @@ class TaskBudget:
         used = self.spent.get(pool, 0)
         if used >= limit:
             raise BudgetExhausted(pool, limit)
+        if self.on_reserve is not None:
+            self.reservations[pool] = self.on_reserve(pool, self.request_context.get(pool, {}))
         self.spent[pool] = used + 1
         return limit - self.spent[pool]
 
@@ -286,7 +296,7 @@ class Attempt:
 
 
 class ServicePool:
-    """One service's scheduling point: task bucket, daily budget, slot, pacing."""
+    """One service's scheduling point: task bucket, optional day cap, slot, pacing."""
 
     def __init__(self, name: str, gate: RateGate, ledger: DailyLedger, tier: QuotaTier,
                  *, max_inflight: int = 1):
@@ -329,7 +339,11 @@ class ServicePool:
         if remaining <= 0:
             raise DeadlineReached()
         try:
-            await asyncio.wait_for(self.gate.attempt_lock.acquire(), timeout=remaining)
+            await wait_with_cancel(
+                asyncio.wait_for(self.gate.attempt_lock.acquire(), timeout=remaining), token,
+                on_abandon=lambda acquired: self.gate.attempt_lock.release() if acquired else None)
+        except RequestStopped:
+            raise AttemptCancelled() from None
         except asyncio.TimeoutError:
             raise DeadlineReached() from None
         try:
@@ -339,7 +353,7 @@ class ServicePool:
             self.gate.interval = 1 / self.gate.qps
             # Waiting before acquiring this lock lets queued callers bypass the
             # previous response's cooldown and can dispatch after their deadline.
-            if not await self.gate.wait(deadline, cost=cost):
+            if not await wait_with_cancel(self.gate.wait(deadline, cost=cost), token):
                 raise DeadlineReached()
             check_allowances()
             daily = self._daily_budget()
@@ -353,6 +367,8 @@ class ServicePool:
                 yield handle
             finally:
                 self.gate.completed(handle.reason if handle.reported else "interrupted", cost=cost)
+        except RequestStopped:
+            raise AttemptCancelled() from None
         finally:
             self.gate.attempt_lock.release()
 
@@ -411,7 +427,8 @@ class Quota:
                             "dailyBudget": None, "spentToday": None, "remainingToday": None},
                 PLACE: {"qps": active.place_qps, "maxInflight": self.place.max_inflight,
                         "dailyBudget": active.place_daily_budget,
-                        "spentToday": self.ledger.spent(PLACE, day=day),
+                        "spentToday": (self.ledger.spent(PLACE, day=day)
+                                       if active.place_daily_budget is not None else None),
                         "remainingToday": self.remaining(PLACE)},
             },
             "matrixEnabled": self.matrix_enabled,

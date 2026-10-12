@@ -36,6 +36,6 @@ export default defineConfig({
     // 单步操作必须有上限：默认是"一直等"，于是一个点不到的下拉会静默占满整个用例时限，
     // 而这一套的时限是 28 分钟 —— 看起来像"任务跑了很久"，实际上一笔额度都没花出去。
     actionTimeout: 30000, navigationTimeout: 60000 },
-  webServer: { command: 'npm run dev -- --port 5173', url: 'http://127.0.0.1:5173',
+  webServer: { command: `"${process.execPath}" ./node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5173`, url: 'http://127.0.0.1:5173',
     reuseExistingServer: false, timeout: 60000, env: { VITE_ANALYSIS_MODE: 'checkup' } },
 });

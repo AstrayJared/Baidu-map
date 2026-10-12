@@ -1,3 +1,4 @@
+import { continuationLabel } from './capabilities';
 /**
  * v2 体检报告：覆盖率区间、灰区清单与证据说明。
  *
@@ -15,13 +16,14 @@
  */
 import type { CSSProperties, ReactNode, RefObject } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Tag } from 'antd';
-import type { CheckupSnapshot } from './contract';
+import { Alert, Button, Tag } from 'antd';
+import type { CheckupCompletion, CheckupSnapshot } from './contract';
 import { Fold } from './Fold';
+import { CompletionSummary } from './CompletionSummary';
 import {
-  area, coverageItems, dataSourcesView, evidenceNotes, gapSummary, overallView, percent,
-  unavailableLabel,
-  verificationView, type CoverageItem, type DataSourcesView, type GapSummary,
+  area, coverageGroups, coverageItems, dataSourcesView, evidenceNotes, gapSummary, overallView,
+  percent, reportSummary, unavailableLabel, overallUnavailableText,
+  verificationView, verificationFacilityRows, type CoverageItem, type DataSourcesView, type GapSummary,
 } from './report';
 import { outdatedText, recomputedText, versionView, type WaterReviewRef } from './water';
 import './checkup.css';
@@ -99,20 +101,26 @@ function Toc({ root }: { root: RefObject<HTMLElement | null> }) {
 }
 
 /** 分类覆盖一行：区间与区间条在上，三类面积在下；不支持的类别只说"无法给出"，不写 0%。 */
-function CoverageRow({ item }: { item: CoverageItem }) {
+function CoverageRow({ item, count }: { item: CoverageItem; count?: number }) {
   const name = <span className="rp-cat"><i style={{ background: item.color }} />{item.label}
-    {item.evidenceGrade && <small>{item.evidenceGrade === 'verified' ? '已核验' : '模型推定'}</small>}</span>;
+    {item.supported && item.evidenceGrade
+      && <small>{item.evidenceGrade === 'verified' ? '已核验' : '模型推定'}</small>}</span>;
   if (!item.supported) return <li className="rp-cat-row" data-testid={`coverage-${item.category}`}>
     <div className="rp-cat-head">{name}</div>
+    <p>已检索设施 {count ?? '未记录'} 处 · 检索{item.queryComplete ? '已完成' : '未完成'}</p>
     <p className="rp-unsupported">无法给出覆盖率：{unavailableLabel(item.unavailableReason)}。未知不等于"没有设施"。</p>
   </li>;
   return <li className="rp-cat-row" data-testid={`coverage-${item.category}`}>
     <div className="rp-cat-head">{name}
       <span className="rp-num rp-cat-range">{percent(item.lowerPct)} ～ {percent(item.upperPct)}</span></div>
+    <p>已检索设施 {count ?? '未记录'} 处 · 检索{item.queryComplete ? '已完成' : '未完成'}
+      {item.assessablePct === 0 && <strong> · 全部未知，尚无有效覆盖判定</strong>}</p>
     <Meter lower={item.lowerPct} upper={item.upperPct} color={item.color} />
     <p className="rp-areas">
       <span><em>已覆盖</em>{area(item.coveredM2)}</span>
-      <span><em>缺口</em>{area(item.gapM2)}</span>
+      <span><em>缺口</em>{area(item.gapM2)}{item.gapM2 === 0
+        && <small>（未知 {percent(item.unknownPct)}；检索{item.queryComplete === true
+          ? '完整' : item.queryComplete === false ? '未完成' : '完整性未记录'}）</small>}</span>
       <span><em>未知</em>{area(item.unknownM2)}</span>
       <span><em>可评估</em>{percent(item.assessablePct)}</span>
     </p>
@@ -134,7 +142,10 @@ function ZoneList({ gaps }: { gaps: GapSummary }) {
         <header><b>{zone.title}</b><Tag>{zone.kindLabel}</Tag>
           {zone.queryStatus !== 'complete' && <Tag color="orange">设施检索未完成</Tag>}
           <span className="checkup-zone-area">{zone.areaText}</span></header>
-        <p>{zone.suggestion}</p>
+        <p><strong>发现的问题：</strong>{zone.reasonLabel ?? '模型识别出服务覆盖缺口'}
+          （{zone.evidenceGrade === 'verified' ? '已核验' : '模型推定'}）。</p>
+        <p><strong>涉及类别：</strong>{zone.categoryLabels.join('、')}</p>
+        <p><strong>建议下一步：</strong>{zone.suggestion || '结合设施目录与实际步行路线进一步核实。'}</p>
         <Fold title="详情" className="rp-fold-inline">
           <p className="checkup-muted">涉及类别：{zone.categoryLabels.join('、')}；几何分量
             {zone.parts} 片；证据等级 {zone.evidenceGrade === 'verified' ? '已核验' : '模型推定'}。
@@ -182,18 +193,27 @@ function DataSources({ view }: { view: DataSourcesView }) {
 
 const NO_REVIEWS: readonly WaterReviewRef[] = [];
 
-export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS }: {
+export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS, continuation,
+  busy = false, continuationPoiLimit = null, onContinue, onCancel }: {
   snapshot: CheckupSnapshot;
   stale?: boolean;
   /** 当前部署采用的水系复核（能力表）；用来认出早于复核的旧版本。 */
   waterReviews?: readonly WaterReviewRef[];
+  continuation?: CheckupCompletion | null;
+  busy?: boolean;
+  continuationPoiLimit?: number | null;
+  onContinue?: () => void;
+  onCancel?: () => void;
 }) {
   // 按修订记忆：`snapshot` 的身份只在取到新的一版时变化，所以这一组派生值在一次体检
   // 里是稳定的，图表也就不会因为父组件重渲染而重建。
   const items = useMemo(() => coverageItems(snapshot), [snapshot]);
+  const groups = useMemo(() => coverageGroups(items), [items]);
+  const summary = useMemo(() => reportSummary(snapshot), [snapshot]);
   const overall = useMemo(() => overallView(snapshot), [snapshot]);
   const gaps = useMemo(() => gapSummary(snapshot), [snapshot]);
   const verification = useMemo(() => verificationView(snapshot), [snapshot]);
+  const verificationRows = useMemo(() => verificationFacilityRows(snapshot), [snapshot]);
   const notes = useMemo(() => evidenceNotes(snapshot), [snapshot]);
   const sources = useMemo(() => dataSourcesView(snapshot), [snapshot]);
   const version = useMemo(() => versionView(snapshot, waterReviews), [snapshot, waterReviews]);
@@ -208,14 +228,35 @@ export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS }: {
       <header className="rp-head">
         <p className="rp-kicker">{snapshot.engine.label} · 第 {snapshot.revision} 版 · {generated}</p>
         <h1>15 分钟生活圈体检报告</h1>
+        <CompletionSummary value={snapshot.report?.completion ?? snapshot.completion ?? (!busy ? continuation : null)} />
+        {busy && <Alert type="info" title={`正在补全；正文保留第 ${snapshot.revision} 版报告`} />}
+        {onContinue && continuation?.canContinue && !busy && <Button type="primary" disabled={stale}
+          onClick={onContinue} data-testid="report-continue">
+          {continuationLabel(continuation.restartRetrieval, continuationPoiLimit)}
+        </Button>}
+        {busy && onCancel && <Button onClick={onCancel}>停止本轮补全</Button>}
         {stale && <Alert type="warning" showIcon title="条件已修改，本报告仍属于原中心点的那一次体检。" />}
         {version.outdatedBy.length > 0 && <Alert type="warning" showIcon data-testid="report-outdated"
           title="旧版本：水系数据已修订" description={outdatedText(version)} />}
         {snapshot.businessStatus !== 'complete' && <p className="rp-status"
           data-tone={snapshot.businessStatus === 'insufficient' ? 'warn' : 'info'}>
           {snapshot.businessStatus === 'insufficient' ? '证据不足：结论只覆盖已评估的部分'
-            : '部分结果：有阶段未能完成，缺失的部分按"未知"计，不计入覆盖率。'}</p>}
+            : '部分结果：有阶段未能完成，未知部分不计入已知覆盖，仍可能影响覆盖区间上界。'}</p>}
       </header>
+
+      <section className="rp-summary" aria-label="结论摘要" data-testid="report-summary">
+        <h2>先看结论</h2>
+        <dl>
+          <dt>覆盖情况</dt><dd>{summary.coverage}</dd>
+          <dt>主要缺口</dt><dd>{summary.gap}</dd>
+          <dt>现实核验</dt><dd>{summary.verification}</dd>
+        </dl>
+        <p className="checkup-muted">覆盖区间的下界表示已知覆盖，上界包含未知面积；未知区域仍需补充证据。</p>
+        {summary.limitations.length > 0 && <div className="rp-summary-limits">
+          <h3>阅读结论时请留意</h3>
+          <ul>{summary.limitations.map(note => <li key={note.key}>{note.text}</li>)}</ul>
+        </div>}
+      </section>
 
       <Section id="rp-overall">
         {overall.available ? <div className="rp-overall">
@@ -229,16 +270,21 @@ export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS }: {
               就是本次路面证据说不到的地方。</p>
           </Fold>
         </div> : <Alert type="info" showIcon title="本次不给总体覆盖率"
-          description={`${overall.reason === 'categories_not_analysed'
-            ? '只评估了部分大类：重新加权成"三类总分"会让人以为三类都评估过了。'
-            : overall.reason === 'category_without_spatial_support'
-              ? '有大类缺少空间支持：缺图的大类不是低覆盖率，是不能加权。'
-              : '评分阶段未产出总体分。'}${overall.missingCategories.length > 0
-            ? `涉及：${overall.missingCategories.join('、')}。` : ''}`} />}
+          description={overallUnavailableText(snapshot)} />}
       </Section>
 
       <Section id="rp-categories">
-        <ul className="rp-cats">{items.map(item => <CoverageRow key={item.category} item={item} />)}</ul>
+        {groups.assessed.length > 0 && <>
+          <p className="checkup-muted">按缺口面积从大到小排列；缺少面积记录的类别列在后面。</p>
+          <ul className="rp-cats">{groups.assessed.map(item => <CoverageRow key={item.category} item={item}
+            count={snapshot.facilities?.countsByCategory?.[item.category]} />)}</ul>
+        </>}
+        {groups.unavailable.length > 0 && <div data-testid="coverage-unavailable">
+          <h3>暂无法评估</h3>
+          <ul className="rp-cats">{groups.unavailable.map(item => <CoverageRow key={item.category} item={item}
+            count={snapshot.facilities?.countsByCategory?.[item.category]} />)}</ul>
+        </div>}
+        {items.length === 0 && <p className="checkup-muted">尚无分类覆盖结果，暂无法评估。</p>}
         <p className="checkup-muted">最低覆盖率 = C / A，最高覆盖率 = (C + U) / A；C 已覆盖、U 未知，
           A 为评估域面积 {area(domainAreaM2)}。</p>
         {items.some(item => item.degenerate) && <Fold title="区间退化说明">
@@ -255,6 +301,13 @@ export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS }: {
       <Section id="rp-verification">
         <p className="rp-lead" data-testid="verification-summary">{verification.summary}
           {verification.provider && `（${verification.provider}）`}</p>
+        {verificationRows.length > 0 && <Fold title="逐设施路线证据" count={`${verificationRows.length} 条`}>
+          <ul className="checkup-notes">{verificationRows.map((row, index) => <li key={`${row.id}:${index}`}>
+            <strong>{row.id}</strong>：{row.layer}；实际路线 {row.routeDistance}；
+            接入距离 {row.accessDistance}；起点偏移 {row.originOffset}，终点偏移 {row.destinationOffset}；
+            {row.entrance}{row.reason && `；未确认原因：${row.reason}`}
+          </li>)}</ul>
+        </Fold>}
         {(verification.reason || !verification.available) && <Fold title="详情">
           {verification.reason && <p className="checkup-muted">{verification.reason}</p>}
           {!verification.available && <p className="checkup-muted">没有核验不是"核验过、没问题"：
