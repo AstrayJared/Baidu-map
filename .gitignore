@@ -19,6 +19,14 @@ Thumbs.db
 .tmp/
 .pip-cache/
 
+# Standalone sites: each is its own Git repository with its own remote, CI and
+# Pages deployment. They are checked out here for local work only — adding them
+# to this repository would record two broken gitlinks instead of their content.
+intro-page/
+
+# Root-level virtualenv; backend/ and life-circle-algorithm/ have their own.
+/.venv/
+
 # Backend secrets, dependencies and local evidence
 **/.env
 **/.env.*

@@ -1,0 +1,39 @@
+name: Repository layout
+
+# 这个仓库此前没有任何 workflow，"工作区里多了一份没登记的嵌套仓库"和"文档搬了、
+# 引用没跟着改"这两类问题只能靠人眼发现。这里只做不需要网络、也不需要 Node/Python
+# 的检查，跑得很快，因此可以在每次 push 与 PR 上跑。
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 树里不能有 gitlink
+        run: |
+          # 嵌套仓库被提交进来就是模式 160000 的 gitlink：克隆的人不会拿到内容，
+          # 也不会有任何提示。本仓库用 .gitignore 忽略 intro-page/ 来避免这件事。
+          links=$(git ls-files -s | awk '$1 == "160000" { print $4 }')
+          if [ -n "$links" ]; then
+            echo "::error::以下路径被提交成 gitlink，克隆者拿不到它们的内容："
+            echo "$links"
+            exit 1
+          fi
+
+      - name: 独立站点要保持被忽略
+        run: |
+          # 这条规则一旦被删掉，本地检出就会重新暴露在"git add -A 提交成 gitlink"的风险里。
+          git check-ignore -q intro-page || {
+            echo "::error::intro-page/ 不再被 .gitignore 忽略"; exit 1; }
+
+      - name: 提交里不能带空白错误或冲突标记
+        run: git show --check --format= HEAD
