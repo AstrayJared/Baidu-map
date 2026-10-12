@@ -125,6 +125,15 @@ def load_baseline() -> dict[tuple[str, str], str]:
     return {(row["source"], row["target"]): row.get("reason", "") for row in data["known"]}
 
 
+def is_test_file(name: str) -> bool:
+    """测试与 fixture 文件：里面的链接常常是故意写坏的输入，不参与代码模板那一项。"""
+    parts = name.split("/")
+    if "tests" in parts or "test" in parts:
+        return True
+    base = parts[-1]
+    return base.startswith("test_") or ".test." in base or ".spec." in base
+
+
 def main() -> int:
     problems: list[str] = []
     notes: list[str] = []
@@ -152,11 +161,14 @@ def main() -> int:
             if not markdown:
                 # 代码文件里只跟一件事：它引用的是不是**搬走的文档**。理由是模板里的
                 # 链接按生成文档所在的目录写（例如 backend/tools/*.py 生成的报告落在
-                # backend/docs/），按脚本自己的目录解析会误报生成图片一类的相对路径；
-                # 而这个仓库真的踩过的坑，正是"文档搬了、代码里的链接没跟着改"。
+                # backend/docs/），按脚本自己的目录解析会误报生成图片一类的相对路径。
+                # 判据因此收窄成"还指着搬迁前的根目录位置"：目标以搬走的文件名结尾、
+                # 且路径里不含 docs/。测试文件跳过 —— 它们的 fixture 本来就是坏输入。
+                if is_test_file(name) or "docs/" in target:
+                    continue
                 if posixpath.basename(path) not in MOVED_DOCS or is_tracked(path):
                     continue
-                problems.append(f"{name}:{number}: 对已搬走文档的引用解析不到 -> {target}"
+                problems.append(f"{name}:{number}: 对已搬走文档的引用还指着旧位置 -> {target}"
                                 f"（按本文件所在目录解析为 {path}）")
                 continue
             checked += 1

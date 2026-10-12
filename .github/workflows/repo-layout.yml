@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 检查器自检（证明它会失败，而不是永远通过）
+        run: python3 scripts/test_check_repo_layout.py
+
       - name: 仓库布局检查（文档链接、gitlink、忽略规则、行尾）
         run: python3 scripts/check_repo_layout.py
 
