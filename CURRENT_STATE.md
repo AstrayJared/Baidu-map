@@ -21,4 +21,4 @@
 - 2026-10-08：修复设施检索的预算与缓存衔接。**同一个请求标识取回原来那次补查**（不重新排队、不发请求、不扣额度，日余额为 0 也一样），参数不同返回 409 且优先于余额判断；原请求的合法重试绑在它自己的 `baseRevision` 上，不受父任务后续修订影响。**补查与设施阶段的预检改为缓存感知**：按真实页键算出首轮页数、可复用页数与预计新增调用数，完全可复用的检索在日余额为 0 时也能跑（不进配额池），额度不足的冷启动仍带数字拒绝。**网络额度与本地处理上限分成两把尺子**：缓存重放不消耗新增调用额度，因此第二次同类别补查能越过已缓存的前缀真正取到缺页；额度用尽时仍继续读得到缓存、缺页逐页记名，并按 partial 报出。诊断随结果发布：`facilities.initialPlan`、补查的 `stopReason`/`initialPlan`、capabilities 的 `poiPlanning` 与 `cache.processLocal`；`budgets.poiRequestsIsLowerBound` 改为 false（该乘积是首轮估计，不是下界）。页面缓存仍是进程内存，重启即失效，本轮不支持持久化断点续查。
 - 本地数据：运行时路网包使用固定快照 `shanghai-latest.osm.pbf`（数据版本 `geofabrik-shanghai-260913`，PBF SHA256 `11e420b2fe24176856b31c26da308e3ec41a9a7f5a2b849d91c34f7069837c12`），已生成并校验 `shanghai.osm-cache`、`shanghai.poly` 及障碍/风险层；国定一水系复核仍绑定旧版 20260912 版本，因此在本机会以版本不符告警、不被采用。
 
-[Hybrid 设计](HYBRID_ISOCHRONE_DESIGN.md) · [后端说明](backend/README.md) · [本地启动与前后端联调](backend/docs/本地启动与前后端联调.md)
+[Hybrid 设计](docs/architecture/HYBRID_ISOCHRONE_DESIGN.md) · [后端说明](backend/README.md) · [本地启动与前后端联调](backend/docs/本地启动与前后端联调.md)
