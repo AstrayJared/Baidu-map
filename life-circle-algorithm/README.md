@@ -106,3 +106,15 @@ payload = result.to_dict()
 ## N04/N05 参数补充
 
 边界规则与合成接口说明见 [N04参数记录](../backend/docs/N04-算法参数与边界.md)，四组Mock与既有契约见 [N05接口契约](../backend/docs/N05-接口契约.md)。
+
+## 文档
+
+| 文档 | 内容 |
+| --- | --- |
+| [README.md](README.md)（本文件） | 安装、Python 接口、算法与调度口径、适配器边界 |
+| [TASK_COMPLETION.md](TASK_COMPLETION.md) | 阶段 1–5 的离线交付说明 |
+| [TEST_REPORT.md](TEST_REPORT.md) | 2026-09-12 的离线验证记录：单元、几何、契约与 225 组实验 |
+
+设计与需求在仓库级文档里：[自适应网格算法与测试方案](../docs/architecture/15分钟生活圈_自适应网格算法与测试方案.md)（本包的实现依据）、[总体技术实现方案](../docs/architecture/15分钟生活圈_技术实现方案.md)、[需求分析](../docs/architecture/15分钟生活圈_需求分析.md)、[文档总索引](../docs/README.md)。
+
+注意：**生产成圈不走本包的历史自适应网格**。线上百度边界搜索的适配层在 `backend/app/algorithms/baidu_e82.py`，核心在 `backend/tools/endpoint_multicross_boundary.py`；本包的 `engine.compute_isochrone` 与实验入口只用于离线实验与 CLI。

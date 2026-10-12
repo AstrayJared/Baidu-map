@@ -12,11 +12,12 @@
 ## 运行与实施
 
 - [地区设施检索与体检报告实施方案](operations/地区设施检索与体检报告实施方案.md)：历史实施规格，正文明确写着"不表示功能已经实现"。
-- [后端说明](../backend/README.md)
-- [前端说明](../life-circle-demo/README.md)
-- [算法包说明](../life-circle-algorithm/README.md)
+- [后端说明](../backend/README.md) · [后端文档索引](../backend/docs/README.md)
+- [前端说明](../life-circle-demo/README.md) · [前端文档索引](../life-circle-demo/docs/README.md)
+- [算法包说明](../life-circle-algorithm/README.md)（其三份文档的索引在文末）
 - [本地启动与前后端联调](../backend/docs/本地启动与前后端联调.md)
 - [OSM 地区数据](../data/osm/README.md)
+- [历史实验报告](../backend/reports/README.md)：百度路网 2.x 时代的原始报告，不作为当前输出
 
 ## 方案与决策记录
 
