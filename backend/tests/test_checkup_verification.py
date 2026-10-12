@@ -12,6 +12,8 @@ not the same answer as "nothing is there".
 """
 import asyncio
 import math
+from dataclasses import asdict
+from types import SimpleNamespace
 
 import pytest
 from life_circle.coordinates import LocalProjection, normalize
@@ -23,6 +25,8 @@ from app.checkups.verification_stage import (CANDIDATE_STRAIGHT_LINE_M, NO_FACIL
                                              NO_TRANSPORT, candidate_order, usable_route,
                                              verify_facilities, within_rule)
 from app.quota import BudgetExhausted
+from app.quota import TaskBudget
+from app.checkups.routes import ReplayRoutes
 
 # The sibling module's offline transport and its two responders: the pipeline
 # suites use them end to end, these cases drive the stage on its own.
@@ -30,6 +34,23 @@ from test_checkup_facilities import (ORIGIN, SyntheticRoutes, offset, offset_rou
                                      straight_routes)
 
 MAJORS = ("shopping", "medical", "education")
+
+
+def test_restart_replays_saved_evidence_even_when_lifetime_budget_is_empty():
+    known, unknown = facility(0, 100), facility(1, 950)
+    destination = tuple(known['location'][key] for key in ('lng', 'lat'))
+    observation = straight_routes()(ORIGIN, destination, known['id'])
+    store = SimpleNamespace(saved_routes=lambda _: [(
+        {'facilityId': known['id'], 'origin': ORIGIN, 'destination': destination}, asdict(observation))])
+    # A missing higher-priority candidate must not prevent replaying a later saved route.
+    session = SimpleNamespace(attempts=0, stop_reason=None, identity='saved-only')
+    budget = TaskBudget(isochrone=200, route=120, spent={'route': 120})
+    replay = ReplayRoutes(session, store=store, task_id='restored', budget=budget)
+    outcome = asyncio.run(verify_facilities(facilities=[unknown, known], majors=MAJORS,
+        zones=[], heatmap={}, entrances={}, session=replay, origin=ORIGIN))
+    assert [row['facilityId'] for row in outcome.evidence.facilities] == [known['id']]
+    assert budget.spent['route'] == 120
+    assert outcome.network_requests == 0
 
 
 class FastPool:

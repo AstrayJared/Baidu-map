@@ -17,6 +17,7 @@ from ..algorithms.hybrid_isochrone.extent import ALGORITHM_VERSION, computation_
 from ..algorithms.hybrid_isochrone.hard_obstacles import load_obstacles
 from ..algorithms.hybrid_isochrone.osm_guidance import OsmGuidance
 from ..algorithms.osm_offline.lazy import resolve
+from ..request_control import RequestStopped, wait_with_cancel
 from ..geo.projection import MetricProjection
 from life_circle.models import ProgressSnapshot
 
@@ -48,25 +49,25 @@ class OsmHybridEngine:
         qps = self.settings.analysis_qps or DEFAULT_QPS
         return HybridConfig(max_baidu_requests=budget, request_qps=max(1.0, min(20.0, qps)))
 
-    async def _prepare(self, origin, config, step=lambda name, count=None, limit=None: None):
+    async def _prepare(self, origin, config, step=lambda name, count=None, limit=None: None, *, token=None):
         """Resolve graph, guidance and obstacles; report what is missing.
 
         ``step`` is told as each of the three begins: none sends a request, and
         the first load of the city graph takes minutes, told as it goes.
         """
         step("graph")
-        resolved = await resolve(self.offline, step)
+        resolved = await resolve(self.offline, step, token=token)
         store, coverage = resolved.store, resolved.coverage
         projection = store.projection if store else MetricProjection(self.settings.osm_metric_crs)
         step("guidance")
-        guidance = await asyncio.to_thread(
+        guidance = await wait_with_cancel(asyncio.to_thread(
             OsmGuidance, store, projection.origin(origin), config,
-            risk_path=self.settings.hybrid_risk_path, speed=self.settings.walk_speed_mps)
+            risk_path=self.settings.hybrid_risk_path, speed=self.settings.walk_speed_mps), token, keep_running=True)
         extent = computation_extent(projection.origin(origin), config)
         step("obstacles")
-        obstacles = await asyncio.to_thread(
+        obstacles = await wait_with_cancel(asyncio.to_thread(
             load_obstacles, self.settings.hybrid_obstacle_path, projection,
-            self.settings.osm_data_version, extent, getattr(self.settings, "water_review_dir", None))
+            self.settings.osm_data_version, extent, getattr(self.settings, "water_review_dir", None)), token, keep_running=True)
         ready = dict(
             graph_available=store is not None,
             data_version_matches=bool(
@@ -101,8 +102,11 @@ class OsmHybridEngine:
         def report(stage, used=0):
             context.progress(ProgressSnapshot(stage, used, used if network else 0, budget,
                                               time.perf_counter() - started))
-        projection, guidance, obstacles, ready, readiness_warnings = await self._prepare(
-            ask.origin, config, context.step)
+        try:
+            projection, guidance, obstacles, ready, readiness_warnings = await self._prepare(
+                ask.origin, config, context.step, token=context.token)
+        except RequestStopped:
+            raise EngineCancelled() from None
         if context.token.cancelled:
             raise EngineCancelled()
         # A replay writes no ledger: the stored one stays the audit record of what was paid.

@@ -28,8 +28,10 @@ from shapely.ops import unary_union
 
 from .. import catalog
 from ..cache import KeyedCache
+from ..cache import Entry
 from ..contracts import Issue
 from ..poi import plan as poi_plan
+from ..poi.planner import RULES
 from ..poi.cache import CachedPages
 from ..poi.models import PoiCollectRequest, Point as WirePoint
 from ..poi.normalize import merge_entities, normalize
@@ -165,7 +167,7 @@ def budget_refusal(estimate: poi_plan.InitialEstimate, majors) -> FacilityOutcom
 
 async def collect_facilities(payload: CheckupRequest, snapshot, *, settings, context, quota,
                              budget, cache: KeyedCache, places_factory=None,
-                             progress=None) -> FacilityOutcome:
+                             progress=None, store=None) -> FacilityOutcome:
     """Run the one facility retrieval of a task and report it.
 
     ``places_factory`` substitutes the transport for an offline or fixture-backed
@@ -186,17 +188,22 @@ async def collect_facilities(payload: CheckupRequest, snapshot, *, settings, con
         boundary = local_region(snapshot.geometry, origin)
     except ValueError as exc:
         return _refusal(str(exc), majors)
+    # Full-catalog rounds retain the existing supplemental keyword strategy.
+    # The selected core scope keeps the upstream primary-keyword plan.
+    full_catalog = set(majors) == set(catalog.majors())
+    queries = ({key: tuple(RULES['queries'][key]) for key in categories} if full_catalog
+               else poi_plan.primary_queries(categories))
     # What this retrieval will ask for, and what of it the cache can answer, from
     # the planner's own first round and the cache's own keys — not from a second,
     # approximately equal count. No transport is opened and nothing is sent.
     provider, api_version = declared_identity(settings, places_factory)
     plan = poi_plan.initial_plan(domain, origin, categories, provider=provider,
-                                 api_version=api_version)
+                                 api_version=api_version, queries=queries)
     estimate = poi_plan.estimate(plan, cache, task_id=context.task_id,
                                  remaining_task_budget=budget.remaining(POI_POOL),
                                  remaining_daily_budget=quota.remaining(PLACE))
     refusal = budget_refusal(estimate, majors)
-    if refusal is not None:
+    if refusal is not None and not full_catalog:
         return refusal
     started = time.time()
     # What this stage sends is what it reserves: the pool counts the attempt
@@ -211,15 +218,43 @@ async def collect_facilities(payload: CheckupRequest, snapshot, *, settings, con
         source = 'baidu_place' if places.network else 'synthetic'
         # The cache wraps the metered session, so a hit never enters the pool's
         # scheduling point and §9.2's single reservation stays the only one.
-        fetch = CachedPages(cache, attach_token(places.session(quota.place, budget=budget,
-                                                               deadline=context.deadline),
-                                                context.token),
+        session = attach_token(places.session(quota.place, budget=budget,
+                                              deadline=context.deadline), context.token)
+        async def journaled(sequence, page):
+            key = fetch.key(sequence, page)
+            budget.request_context['poi'] = {'key': key, 'sequence': sequence, 'page': page}
+            before = budget.reservations.get('poi')
+            answer, reason = await session(sequence, page)
+            reservation = budget.reservations.get('poi')
+            if store is not None and reservation is not None and reservation != before:
+                store.complete_request(reservation, answer, reason)
+            return answer, reason
+        fetch = CachedPages(cache, journaled,
                             provider=places, task_id=context.task_id)
+        checkpoint = None if store is None else store.checkpoint(context.task_id)
+        if checkpoint is not None:
+            for saved in store.saved_pages(context.task_id):
+                cache.entries[saved['key']] = Entry(saved['payload'], context.task_id, saved['obtainedAt'])
         limit = budget.remaining(POI_POOL)
+        async def pages(sequence, page):
+            major = catalog.major_of(sequence['category'])
+            label = f"检索设施 · {catalog.MAJOR_LABELS.get(major, major)}"
+            if progress is not None:
+                progress(budget.spent.get(POI_POOL, 0) - reserved, limit, label)
+            try:
+                return await fetch(sequence, page)
+            finally:
+                if progress is not None:
+                    progress(budget.spent.get(POI_POOL, 0) - reserved, limit, label)
+        pages.metadata = lambda sequence, page: fetch.uses.get(
+            (sequence['tileId'], sequence['category'], sequence['query'], page), {})
         planner = OnlinePlanner(domain=domain, origin=origin, categories=list(categories),
-                                queries=poi_plan.primary_queries(categories), budget=limit,
+                                queries=queries, budget=limit,
                                 source=source, token=context.token,
-                                deadline=context.deadline,
+                                deadline=context.deadline, checkpoint=checkpoint,
+                                on_checkpoint=None if store is None else
+                                    lambda value: store.save_checkpoint(context.task_id, value),
+                                spent=lambda: budget.spent.get(POI_POOL, 0) - reserved,
                                 # Two ceilings: the task bucket and the day bound what
                                 # may be *sent*; this one bounds local scheduling, so a
                                 # cached page can never spend the allowance the missing
@@ -230,12 +265,6 @@ async def collect_facilities(payload: CheckupRequest, snapshot, *, settings, con
         pages = fetch
         if progress is not None:
             progress(0, limit)
-
-            async def pages(sequence, page):
-                try:
-                    return await fetch(sequence, page)
-                finally:
-                    progress(budget.spent.get(POI_POOL, 0) - reserved, limit)
         result = await planner.run(pages)
     return _report(payload, snapshot, result, fetch, domain, widened, boundary, origin,
                    places, source, majors, budget, started, estimate,
@@ -328,6 +357,19 @@ def _report(payload, snapshot, result, fetch, domain, widened, boundary, origin,
     accepted, review, excluded, outside_boundary, merged = merge_entities(
         inside, request, within=counted, nearby=nearby)
     coverage = result.coverage
+    major_queries = {major: sum(len(entry['pageRecords']) for entry in coverage
+                                if catalog.major_of(entry['category']) == major)
+                     for major in majors}
+    major_blocks = {major: sorted({entry['tileId'] for entry in coverage
+                                   if catalog.major_of(entry['category']) == major
+                                   and entry['pageRecords']}) for major in majors}
+    unfinished = {major: [{'tileId': entry['tileId'], 'category': entry['category'],
+                            'query': entry['query'], 'status': entry['status'],
+                            'stopReason': entry['stopReason']}
+                           for entry in coverage if catalog.major_of(entry['category']) == major
+                           and entry['status'] != 'completed'] for major in majors}
+    completeness = {major: not any(boxes for minor, boxes in result.incomplete.items()
+                                   if catalog.major_of(minor) == major) for major in majors}
     for entry in coverage:
         for record in entry['pageRecords']:
             use = fetch.uses.get((record['tileId'], record['category'], record['query'],
@@ -406,6 +448,9 @@ def _report(payload, snapshot, result, fetch, domain, widened, boundary, origin,
             'excludedRecords': len(excluded),
             'possibleDuplicateGroups': len(duplicates),
             'queryAttempts': result.attempts, 'budget': result.budget,
+            'requestsByMajor': major_queries, 'touchedBlocksByMajor': major_blocks,
+            'unfinishedByMajor': unfinished, 'stopReason': result.stop_reason,
+            'queryCompleteByMajor': completeness,
             'budgetSpent': budget.spent.get(POI_POOL, 0),
             # Pages, not fetches: a page asked for twice is one page.
             'sequences': len(coverage), 'blocks': len(result.blocks),

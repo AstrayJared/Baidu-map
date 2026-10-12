@@ -24,6 +24,7 @@ export type CheckupInput = {
  * 回后端按任务 ID 与修订号重取，本地存的旧结果可能已经不是服务端认的那一版。
  */
 export type CheckupHandle = {
+  continuation?: { clientRequestId: string; baseRevision: number };
   input: CheckupInput;
   taskId?: string;
   cancelRequested?: boolean;

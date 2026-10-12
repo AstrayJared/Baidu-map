@@ -4,7 +4,7 @@ import time
 
 import httpx
 
-from .catalog import CATEGORIES, EXCLUSIONS
+from .catalog import CATEGORIES
 from .contracts import Facility
 from .place_protocol import Pagination, RETRY_ERRORS, STOP_ERRORS, response_error
 from .request_control import RequestStopped, request_slot
@@ -12,30 +12,12 @@ from .request_control import RequestStopped, request_slot
 # Derived from the one dictionary rather than restated here. This endpoint sends
 # a single request type per category, which is the category's primary query.
 QUERIES = {category.key: category.query for category in CATEGORIES}
-# ``hospital_pharmacy`` shadows the general ``pharmacy``: a dispensary inside a
-# hospital is a different service, and a name may match both.
-SHADOWED = {"pharmacy": "hospital_pharmacy"}
 
 
 def classify(name, tag=""):
-    text = name + " " + tag
-    if any(word in text for word in EXCLUSIONS):
-        return None
-    matches = set()
-    for category in CATEGORIES:
-        if category.negative and any(word in text for word in (*category.name_hints, *category.tag_hints)):
-            return None
-        if any(word in text for word in (*category.name_hints, *category.tag_hints)) \
-                and not any(word in text for word in category.exclude_hints):
-            matches.add(category.key)
-    for shadowed, winner in SHADOWED.items():
-        if winner in matches:
-            matches.discard(shadowed)
-    if not matches:
-        return None
-    ranked = sorted(matches, key=lambda key: next(c.priority for c in CATEGORIES if c.key == key), reverse=True)
-    top = next(c.priority for c in CATEGORIES if c.key == ranked[0])
-    return ranked[0] if sum(next(c.priority for c in CATEGORIES if c.key == key) == top for key in matches) == 1 else None
+    from .classification import classify as shared_classify
+    category, status, _ = shared_classify(name, [tag])
+    return category if status == 'accepted' else None
 
 
 def parse_facility(row):

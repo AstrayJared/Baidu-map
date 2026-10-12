@@ -9,7 +9,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   area, coverageBars, coverageItems, dataSourcesView, evidenceNotes, gapSummary, overallView, percent,
-  radarView, reasonLabel, unavailableLabel, verificationView, zoneItems, categoryLabel,
+  radarView, reasonLabel, unavailableLabel, categoryLabel, verificationView, verificationFacilityRows, zoneItems,
+  coverageGroups, reportSummary,
 } from './report';
 import { AREA, CATEGORIES, report, snapshot, water, zone } from './fixtures';
 import type { CheckupSnapshot } from './contract';
@@ -35,7 +36,7 @@ describe('formatting', () => {
 
   it('translates extension major categories and minor category keys before rendering', () => {
     expect(categoryLabel('finance')).toBe('金融');
-    expect(categoryLabel('public')).toBe('政务与公共服务');
+    expect(categoryLabel('public')).toBe('政务公共服务');
     expect(categoryLabel('bank')).toBe('银行');
     expect(categoryLabel('new_category')).toBe('new_category');
   });
@@ -48,10 +49,32 @@ describe('formatting', () => {
 });
 
 describe('coverage rows', () => {
+  it('shows every frozen requested category while leaving four without invented scores', () => {
+    const base = snapshot();
+    const ids = ['medical', 'shopping', 'education', 'care', 'dining', 'finance', 'public',
+      'leisure', 'transport', 'life'];
+    const frozen = report({ categoryDirectoryVersion: 'test-v1',
+      categoryDirectory: ids.map((id, order) => ({ id, label: `类别${order}`, order })),
+      categories: ids.slice(0, 6).map((id, index) => ({
+        ...report().categories[index % report().categories.length], category: id })) });
+    const items = coverageItems({ ...base, report: frozen });
+    expect(items).toHaveLength(10);
+    expect(coverageGroups(items).unavailable).toHaveLength(4);
+    expect(items.find(item => item.category === 'life')).toMatchObject({
+      supported: false, lowerPct: null, gapM2: null, label: '类别9' });
+  });
+
+  it('treats complete and completed query states as finished', () => {
+    for (const queryStatus of ['complete', 'completed'] as const) {
+      const base = snapshot();
+      const old = report({ evidence: { ...report().evidence, queryStatus } });
+      expect(evidenceNotes({ ...base, report: old }).some(note => note.key === 'query')).toBe(false);
+    }
+  });
   it('reads the interval from the report and keeps the areas beside it', () => {
     const items = coverageItems(snapshot());
     expect(items.map(item => item.category)).toEqual([...CATEGORIES]);
-    expect(items[0]).toMatchObject({ label: '购物', lowerPct: 40, upperPct: 70, gapM2: AREA * 0.2,
+    expect(items[0]).toMatchObject({ label: '购物消费', lowerPct: 40, upperPct: 70, gapM2: AREA * 0.2,
       evidenceGrade: 'model' });
   });
 
@@ -102,7 +125,7 @@ describe('radar', () => {
       { ...report().categories[0], coverageLowerPct: null, coverageUpperPct: null }] }) };
     const view = radarView(coverageItems(broken));
     expect(view.available).toBe(false);
-    expect(view.missing).toContain('购物');
+    expect(view.missing).toContain('购物消费');
   });
 });
 
@@ -114,7 +137,7 @@ describe('overall', () => {
 
   it('gives no overall number when a category is missing', () => {
     const base = snapshot();
-    const partial = { ...base, scores: { ...base.scores!, overall: { available: false,
+    const partial = { ...base, report: null, scores: { ...base.scores!, overall: { available: false,
       reason: 'category_without_spatial_support', missingCategories: ['medical'],
       coverageLowerPct: null, coverageUpperPct: null, assessablePct: null, unknownPct: null,
       categories: [], weights: {} } } };
@@ -122,7 +145,47 @@ describe('overall', () => {
     expect(view.available).toBe(false);
     expect(view.lowerPct).toBeNull();
     // 缺的那一类要说名字：只写"数据不足"没人知道该去补哪一类。
-    expect(view.missingCategories).toEqual(['医疗']);
+    expect(view.missingCategories).toEqual(['医疗健康']);
+  });
+});
+
+describe('report conclusions', () => {
+  it('uses the frozen overall in both summary and body when snapshot scores differ', () => {
+    const base = snapshot();
+    const value = snapshot({ scores: { ...base.scores!, overall: {
+      ...base.scores!.overall!, coverageLowerPct: 99 } } });
+    expect(overallView(value).lowerPct).toBe(40);
+    expect(reportSummary(value).coverage).toContain('40.0% ～ 70.0%');
+  });
+
+  it('orders known gaps first without assigning zero to missing areas or unsupported categories', () => {
+    const items = coverageItems(snapshot());
+    const input = [{ ...items[0], gapM2: null }, { ...items[1], gapM2: 50 },
+      { ...items[2], supported: false, gapM2: 100 }];
+    const groups = coverageGroups(input);
+    expect(groups.assessed.map(item => item.category)).toEqual(['medical', 'shopping']);
+    expect(groups.unavailable.map(item => item.category)).toEqual(['education']);
+    expect(input[0].gapM2).toBeNull();
+  });
+
+  it('does not report zero gaps when assessment is missing or failed', () => {
+    expect(reportSummary(notAssessed()).gap).toContain('未评估');
+    const value = snapshot({ report: report({ gaps: { ...report().gaps, status: 'failed' } }) });
+    expect(gapSummary(value).assessed).toBe(false);
+    expect(reportSummary(value).gap).toContain('未评估');
+    expect(reportSummary(value).gap).not.toContain('0 m²');
+  });
+
+  it('keeps incomplete-query limitations beside partial conclusions', () => {
+    const value = snapshot({ report: report({ evidence: { ...report().evidence, queryStatus: 'partial' } }) });
+    expect(reportSummary(value).limitations.some(note => note.text.includes('设施检索未完全覆盖'))).toBe(true);
+    expect(reportSummary(value).gap).toContain('已评估部分');
+  });
+
+  it('does not turn unverified results into verified conclusions', () => {
+    const value = snapshot({ report: report({ verification: { ...report().verification,
+      status: 'not_integrated', available: false } }) });
+    expect(reportSummary(value).verification).toContain('模型推定');
   });
 });
 
@@ -134,7 +197,7 @@ describe('grey zones', () => {
     const items = zoneItems({ ...base, report: report({ gaps: { ...report().gaps, zones } }) });
     expect(items.map(item => item.id)).toEqual(['b', 'a']);
     expect(items[0]).toMatchObject({ title: '灰区 1', kindLabel: '单类灰区', areaText: '9.00 公顷',
-      suggestion: '大片', categoryLabels: ['医疗'] });
+      suggestion: '大片', categoryLabels: ['医疗健康'] });
   });
 
   it('uses the facility name from the frozen directory for the nearest facility', () => {
@@ -172,6 +235,19 @@ describe('grey zones', () => {
 });
 
 describe('verification', () => {
+  it('keeps a returned route with pending strict status as a tolerance estimate', () => {
+    const base = snapshot();
+    const evidence = { ...base.verification!, facilities: [{ facilityId: 'facility-1',
+      routeDistanceM: 438.2, accessDistanceM: 460.1, originOffsetM: 10,
+      destinationOffsetM: 11.9, verificationLayer: 'endpoint_tolerance', poiStatus: 'pending',
+      poiReason: 'endpoint_mapping_unconfirmed', entranceStatus: 'resolved' }] };
+    const current = { ...base, report: null, verification: evidence };
+    expect(verificationView(current)).toMatchObject({ routeReturns: 1, strictConfirmed: 0,
+      toleranceEstimated: 1, noUsableDecision: 0 });
+    expect(verificationFacilityRows(current)[0]).toMatchObject({
+      layer: '含端点接入距离估计', routeDistance: '438 米', entrance: 'resolved',
+      reason: '路线端点未能严格对应请求的设施位置' });
+  });
   it('says so plainly when no verification ran', () => {
     const base = snapshot();
     const view = verificationView({ ...base, verification: null,
@@ -185,7 +261,8 @@ describe('verification', () => {
   it('counts what was actually checked', () => {
     const view = verificationView(snapshot());
     expect(view.available).toBe(true);
-    expect(view.summary).toBe('已尝试核验 4 处设施，其中 0 处未取得严格路线结论，模型入口未确认 0 处。');
+    expect(view.summary).toContain('已尝试核验 4 处设施');
+    expect(view.summary).toContain('严格确认 0 条');
   });
 });
 

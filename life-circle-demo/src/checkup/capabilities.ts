@@ -48,6 +48,10 @@ export type CapabilityView = {
   defaultEngine: string | null;
   defaultBudget: number | null;
   quota: QuotaSummary;
+  poiRoundLimit: number | null;
+  /** 当前部署采用的水系复核（用来认出早于复核的旧版本）；旧后端不给时为空。 */
+  waterReviews: WaterReviewRef[];
+  categoryDirectory: Array<{ id: string; label: string; order: number }>;
   /**
    * 检索计划与缓存的口径：本地处理上限、它与网络额度分不分家、缓存活在哪、首轮计划是不是
    * 额度预留。每条只在后端明确报了它时才出现；旧后端缺的项直接省略，不写 0 也不写
@@ -57,7 +61,7 @@ export type CapabilityView = {
   /** 当前 OSM 图状态；缺失表示旧版后端没有提供运行时状态。 */
   graphState: 'unloaded' | 'loading' | 'ready' | 'unavailable' | null;
   /** 当前部署采用的水系复核（用来认出早于复核的旧版本）；旧后端不给时为空。 */
-  waterReviews: WaterReviewRef[];
+
   /**
    * 设施类别目录：类别选择器与预算算术的来源。旧后端不给这一项时为 null，界面据此
    * 说"这一版不提供类别选择"，而不是显示一份空的类别清单。
@@ -81,15 +85,17 @@ export function quotaSummary(value: Capabilities): QuotaSummary {
   const lines: string[] = [];
   const tier = nested(quota, 'tier');
   const day = nested(quota, 'day');
-  if (text(tier)) lines.push(`本轮服务档位：${tier}`);
-  if (text(day)) lines.push(`记账日：${day}`);
-  const remaining = nested(quota, 'services', 'place', 'remainingToday');
   const daily = nested(quota, 'services', 'place', 'dailyBudget');
+  if (text(tier)) lines.push(`本轮服务档位：${tier}`);
+  if (text(day) && number(daily)) lines.push(`记账日：${day}`);
+  const remaining = nested(quota, 'services', 'place', 'remainingToday');
   if (number(remaining) && number(daily)) {
     lines.push(`设施检索今日剩余：${remaining} / ${daily}`);
   } else if (daily === null && number(nested(quota, 'services', 'place', 'qps'))) {
     // 没有日额度只有速率：说明"今天花到多少"这件事不适用于这个服务，不能写成 0。
-    lines.push('设施检索不设每日额度，仅按速率限制');
+    const taskLimit = nested(value.budgets, 'poiRequests');
+    lines.push(`设施检索不设本地每日额度；${number(taskLimit)
+      ? `单次体检最多 ${taskLimit} 次，` : ''}仍受速率限制`);
   }
   return { label, lines };
 }
@@ -144,9 +150,13 @@ export function capabilityView(value: Capabilities): CapabilityView {
     // 默认预算由后端指定，且必须在这一档里：校验层已经查过，这里不再兜底。
     defaultBudget: first?.defaultBudget ?? null,
     quota: quotaSummary(value),
+    poiRoundLimit: number(value.budgets.poiRequests) && value.budgets.poiRequests > 0
+      ? value.budgets.poiRequests : null,
+    waterReviews: waterReviewRefs(value.waterReviews),
+    categoryDirectory: value.categoryDirectory ?? [],
     planningLines: planningLines(value),
     graphState,
-    waterReviews: waterReviewRefs(value.waterReviews),
+
     facilityCatalog: facilityCatalogView(value),
   };
 }
@@ -164,4 +174,10 @@ export function hybridTimeEstimate(budget: number | null, graphState: Capability
 export function budgetFor(view: CapabilityView, engineId: string): number | null {
   const engine = view.engines.find(item => item.engineId === engineId);
   return engine?.defaultBudget ?? null;
+}
+
+/** The next round's allowance comes from capabilities, not the frozen prior report. */
+export function continuationLabel(restart: boolean, limit: number | null = null): string {
+  return restart ? `复用边界，重新检索${limit === null ? '' : `（最多 ${limit} 次）`}`
+    : `继续补全${limit === null ? '' : `，最多追加 ${limit} 次检索`}`;
 }

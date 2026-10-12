@@ -1,5 +1,5 @@
 /*
- * 体检工作台：地图铺满，左上操作卡、右上结果卡浮在地图上，图例在右下角。
+ * 体检工作台：地图铺满，左上操作卡、右上结果卡浮在地图上，图例跟随左侧卡片在下方。
  * 百度开放平台的做法：白卡片、大圆角、淡蓝阴影、主蓝只给主操作与关键数字；
  * 说明文字一律收进可展开的目录项（原生 details），卡面上只留控件与结论。
  */
@@ -200,14 +200,14 @@
 .api-map-notice strong{display:block;margin-bottom:4px;font-size:15px;color:var(--ink)}
 .api-muted{font-size:12px;line-height:1.7;color:var(--ink-3)}
 
-/* 图例：右下角白卡，头部可以收起；限定语用小一号的灰字。 */
-.api-map-legend{position:absolute;right:16px;bottom:28px;z-index:6;width:max-content;max-width:min(360px,calc(100% - 32px));
+/* 图例：左侧面板下方白卡，头部可以收起；限定语用小一号的灰字。 */
+.api-map-legend{position:absolute;left:16px;bottom:28px;z-index:6;width:max-content;max-width:min(360px,calc(100% - 32px));
   border-radius:12px;background:#fff;box-shadow:var(--shadow-card);font-size:12px;line-height:1.6;color:var(--ink-2)}
 .lg-head{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border:0;background:none;font-size:12px;font-weight:600;color:var(--ink);text-align:left}
 .lg-head::after{content:"";width:6px;height:6px;margin:0 0 3px auto;border-right:1.5px solid var(--ink-3);border-bottom:1.5px solid var(--ink-3);transform:rotate(45deg)}
 .api-map-legend[data-open="no"] .lg-head::after{margin-bottom:0;transform:rotate(-135deg)}
 .api-map-legend[data-open="no"] .lg-body{display:none}
-.lg-body{display:grid;gap:8px;max-height:40vh;overflow:auto;padding:0 14px 12px}
+.lg-body{display:grid;gap:8px;max-height:var(--legend-body-max-height,40vh);overflow:auto;padding:0 14px 12px}
 .api-legend-item{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .api-legend-item.api-legend-block{display:grid;gap:3px;white-space:normal}
 .api-legend-line{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
@@ -221,8 +221,8 @@
 .api-legend-cats{color:var(--ink-3)}
 .api-legend-cats .api-legend-item{gap:4px;color:var(--ink-2)}
 
-/* 平板：地图在上、两张卡片在下，整页滚动。 */
-@media(max-width:1080px){
+/* 平板与低高度窗口：地图在上、两张卡片在下，整页滚动。 */
+@media(max-width:1080px), (max-height:559px){
   .wb{height:auto;min-height:100dvh}
   .wb-body{flex:none;display:grid;overflow:visible;align-items:start;gap:12px;padding-bottom:12px;
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"map map" "side results"}
@@ -271,6 +271,14 @@
 .rp-toc button:hover{color:var(--accent)}
 .rp-toc button[aria-current="true"]{border-left-color:var(--accent);background:linear-gradient(90deg,var(--accent-wash),transparent);color:var(--accent);font-weight:500}
 .rp-main{min-width:0;max-width:760px;padding:28px 40px 56px 16px}
+.rp-summary{margin:20px 0;padding:18px;border:1px solid var(--rule);border-radius:12px;background:#f5f9ff;overflow-wrap:anywhere}
+.rp-summary h2{margin:0 0 14px;font-size:18px}
+.rp-summary dl{margin:0;display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.rp-summary dt{font-weight:600}
+.rp-summary dd{margin:0 0 8px;line-height:1.7}
+.rp-summary-limits{border-top:1px solid var(--rule);margin-top:12px;padding-top:12px}
+.rp-summary-limits h3{font-size:14px;margin:0 0 8px}
+.rp-summary-limits ul{margin:0;padding-left:20px;line-height:1.7}
 .rp-kicker{font-size:12px;color:var(--ink-3)}
 .rp-head h1{margin:4px 0 12px;font-size:24px;font-weight:600;letter-spacing:.01em}
 .rp-head .ant-alert{margin:10px 0 0;border-radius:10px}
@@ -329,13 +337,17 @@
 .checkup-note-warning{color:#b35c00}
 @media(max-width:760px){
   .checkup-report{grid-template-columns:minmax(0,1fr)}
-  .rp-toc{display:none}
+  .rp-toc{position:static;padding:12px 16px;border-bottom:1px solid var(--rule)}
+  .rp-toc-title{margin:0 0 6px;padding:0}
+  .rp-toc ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:0}
   .rp-main{padding:20px 16px 36px}
 }
 
 /* 设施密度图例：色带带着与地图相同的不透明度，竖线标出单个设施中心的读数。 */
 .density-ramp{position:relative;display:inline-block;width:96px;height:10px;flex:none;border-radius:2px;box-shadow:inset 0 0 0 1px #d5dae3}
 .density-ramp i{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:#1f2329}
+.checkup-completion { margin: 12px 0; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; }
+.checkup-completion p { margin: 6px 0; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
 
 /* 设施类别选择器：核心三类决定总体覆盖率，扩展类别走按需补查。 */
 .wb-scope{display:grid;gap:8px;margin-top:4px;padding-top:10px;border-top:1px solid var(--rule)}

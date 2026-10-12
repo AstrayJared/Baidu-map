@@ -15,7 +15,7 @@ export default defineConfig({
   outputDir: 'output/checkup-ui/results', reporter: [['list']],
   use: { baseURL: 'http://127.0.0.1:5180', ...offlineBrowser(),
     trace: 'retain-on-failure', screenshot: 'only-on-failure' },
-  webServer: { command: 'npm run dev -- --port 5180', url: 'http://127.0.0.1:5180',
+  webServer: { command: `"${process.execPath}" ./node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5180`, url: 'http://127.0.0.1:5180',
     reuseExistingServer: false,
     env: { VITE_ANALYSIS_MODE: 'checkup', VITE_API_BASE_URL: '', VITE_BAIDU_MAP_AK: 'offline-sdk-fixture',
       TEMP: resolve('output/checkup-ui'), TMP: resolve('output/checkup-ui') } },

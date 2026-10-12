@@ -29,6 +29,8 @@ def sequence(tile_id, x, y, size, category, query, projection):
 
 
 def build_plan(request, config):
+    if set(request.categories) - config.category_budgets.keys():
+        raise ValueError('explicit budget for every requested category required')
     origin = (request.center.lng, request.center.lat)
     projection = LocalProjection(origin)
     def extent(half):

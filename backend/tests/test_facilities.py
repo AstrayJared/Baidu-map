@@ -8,7 +8,7 @@ from shapely.geometry import box, mapping
 
 from app.analyses import RateGate
 from app.facilities import analyze_facilities
-from app.places import PlacesClient, classify
+from app.places import PlacesClient, classify, QUERIES
 from life_circle.models import CancelToken, RouteObservation
 from tools.test_origin import TEST_ORIGIN
 
@@ -17,11 +17,11 @@ ORIGIN = TEST_ORIGIN
 
 @pytest.mark.parametrize("name,expected", [
     ("社区菜市场", "market"), ("第一农贸市场", "market"), ("便民菜场", "market"),
-    ("联华超市", "supermarket"), ("生鲜超市", "supermarket"),
+    ("联华超市", "supermarket"), ("生鲜超市", "fresh_store"),
     ("第一药店", "pharmacy"), ("益民大药房", "pharmacy"), ("社区药房", "pharmacy"),
     ("医院药房", "hospital_pharmacy"), ("门诊药房", "hospital_pharmacy"),
     ("第一小学", "school"), ("实验小学", "school"), ("中心小学", "school"), ("附属小学", "school"), ("完全小学", "school"),
-    ("小学培训机构", None), ("幼儿园", None), ("制药公司", None), ("医院", None), ("兽药店", None),
+    ("小学培训机构", None), ("幼儿园", "preschool"), ("制药公司", None), ("医院", "hospital"), ("兽药店", None),
 ])
 def test_classification(name, expected):
     assert classify(name) == expected
@@ -72,7 +72,7 @@ def test_walking_distance_boundaries_with_same_analysis(distance, expected):
         assert "medical" in summary.service_blind_regions
         assert summary.service_blind_regions["medical"].type in ("Polygon", "MultiPolygon")
         assert summary.service_blind_regions["medical"].coordinates == []
-        assert summary.network_requests == 6
+        assert summary.network_requests == len(QUERIES) + 1
         assert "不生成覆盖率" in report
     asyncio.run(run())
 

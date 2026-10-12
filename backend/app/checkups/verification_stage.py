@@ -190,7 +190,7 @@ def candidate_order(facilities, *, majors, zones, entrances, origin, projection=
 
 
 async def verify_facilities(*, facilities, majors, zones, heatmap, entrances, session, origin,
-                            projection=None, progress=None, token=None) -> VerificationOutcome:
+                            projection=None, progress=None, token=None, previous=None) -> VerificationOutcome:
     """跑完核验阶段。``session`` 为 None 表示这个部署没有路线服务。
 
     ``session`` 一次调用就是一个候选的全部尝试（含重试），每条尝试各扣一次 ``route``
@@ -207,7 +207,16 @@ async def verify_facilities(*, facilities, majors, zones, heatmap, entrances, se
     candidates = candidate_order(facilities, majors=majors, zones=zones, entrances=entrances,
                                  origin=origin, projection=projection)
     plan = spot_check_plan(heatmap, facilities, majors=majors, projection=projection)
-    if not candidates and not plan:
+    old_records = [] if previous is None else list(previous.facilities)
+    old_spots = [] if previous is None else list(previous.spot_checks)
+    prior_queries = {} if previous is None else previous.queries
+    candidate_count = len(candidates)
+    candidate_ids = {row['facilityId'] for row in old_records}
+    candidates = [row for row in candidates if row['facilityId'] not in candidate_ids]
+    spot_keys = {(row['major'], row['cell'], row['facilityId']) for row in old_spots}
+    plan = [entry for entry in plan if (entry['major'], entry['point']['cell'],
+                                       str(entry['primary']['id'])) not in spot_keys]
+    if not candidates and not plan and not old_records and not old_spots:
         return VerificationOutcome(
             evidence=VerificationEvidence(
                 status='partial', provider=session.identity, checked=0,
@@ -221,9 +230,11 @@ async def verify_facilities(*, facilities, majors, zones, heatmap, entrances, se
         progress(0, total, session.attempts)
     # 第一层：中心可达性，最多 CENTER_ATTEMPTS 次尝试。
     for asked, item in enumerate(candidates, start=1):
-        if cancelled() or session.attempts >= CENTER_ATTEMPTS:
+        if cancelled() or session.attempts >= max(0, CENTER_ATTEMPTS - prior_queries.get('centerAttempts', 0)):
             # 取消后或本层额度用完不再问下一家：已经问到的留下，其余记为未核验。
             break
+        if not getattr(session, 'available', lambda *_: True)(item['facilityId'], origin, item['location']):
+            continue
         observation = await session(item['facilityId'], origin, item['location'])
         if progress is not None:
             progress(asked, total, session.attempts)
@@ -239,18 +250,24 @@ async def verify_facilities(*, facilities, majors, zones, heatmap, entrances, se
     center_attempts = session.attempts
     # 第二层：覆盖抽检，最多 SPOT_ATTEMPTS 次尝试（本层用不完的额度不回流）。
     spots, overrides = await _spot_checks(plan, session=session, cancelled=cancelled,
-                                          limit=center_attempts + SPOT_ATTEMPTS,
+                                          limit=center_attempts + max(0, SPOT_ATTEMPTS - prior_queries.get('spotAttempts', 0)),
                                           progress=None if progress is None else (
                                               lambda done: progress(len(records) + done, total,
                                                                     session.attempts)))
+    records = old_records + records
+    spots = old_spots + spots
+    overrides = ([] if previous is None else list(previous.local_overrides)) + overrides
+    failures = sum(row['verificationLayer'] is None for row in records)
+    unresolved = sum(row['entranceStatus'] == 'unresolved' for row in records)
     flags = [{'cell': spot['cell'], 'category': spot['major'], 'modelStatus': spot['modelStatus'],
               'facilityId': spot['facilityId'], 'routeDistanceM': spot['routeDistanceM'],
               'accessDistanceM': spot['accessDistanceM'], 'outcome': spot['outcome']}
              for spot in spots if spot['outcome'] in CONFLICT_OUTCOMES]
     checked = len(records)
-    unverified = len(candidates) - checked
+    unverified = max(0, candidate_count - checked)
     stopped = session.stop_reason or ('cancelled' if cancelled() else None)
-    summary = _spot_summary(plan, spots, attempts=session.attempts - center_attempts)
+    summary = _spot_summary(plan + old_spots, spots, attempts=session.attempts - center_attempts
+                            + prior_queries.get('spotAttempts', 0))
     notes = ['核验只对本次检索到的设施成立，不构成目录完整性证明。',
              '中心可达性：从体检中心到设施的步行路线，只说明中心这一点能否在规则内到达该设施，'
              '不核验任何一格的服务覆盖。',
@@ -271,13 +288,17 @@ async def verify_facilities(*, facilities, majors, zones, heatmap, entrances, se
     # 就是抽样：没抽到的格不是"没核验完"，所以不拿抽到几格去比可抽的格数。
     status = ('complete' if not unverified and not failures and not flags
               and (summary['checked'] > 0 or not plan) else 'partial')
-    queries = {'routeAttempts': session.attempts, 'candidates': len(candidates),
+    if previous is not None:
+        notes.append('复用仍匹配设施位置与入口的既有路线；新增设施未继承核验结论，核验总预算不重置。')
+    queries = {'routeAttempts': session.attempts + prior_queries.get('routeAttempts', 0), 'candidates': candidate_count,
                'checked': checked, 'unverified': unverified, 'stopReason': stopped,
-               'centerAttempts': center_attempts, 'spotAttempts': session.attempts - center_attempts}
+               'centerAttempts': center_attempts + prior_queries.get('centerAttempts', 0),
+               'spotAttempts': session.attempts - center_attempts + prior_queries.get('spotAttempts', 0)}
     return VerificationOutcome(
         evidence=VerificationEvidence(
             status=status, provider=session.identity, checked=checked,
             failed=failures, unresolved=unresolved, facilities=records, conflicts=flags,
+            **evidence_counts(records),
             spot_checks=spots, spot_check_summary=summary, local_overrides=overrides,
             queries=queries, notes=notes),
         status=status, network_requests=session.attempts, overrides=overrides)
@@ -285,6 +306,17 @@ async def verify_facilities(*, facilities, majors, zones, heatmap, entrances, se
 
 def _unresolved_note(count: int) -> str:
     return f'{count} 处设施的入口在模型里接入不了，路线证据也无法代替入口证据。'
+
+
+def evidence_counts(records: list[dict]) -> dict:
+    """Four independent counters; route returns overlap with evidence layers."""
+    return {
+        'route_returns': sum(item.get('routeDistanceM') is not None for item in records),
+        'strict_confirmed': sum(item.get('verificationLayer') == 'strict' for item in records),
+        'tolerance_estimated': sum(item.get('verificationLayer') == 'endpoint_tolerance' for item in records),
+        'no_usable_decision': sum(item.get('verificationLayer') not in ('strict', 'endpoint_tolerance')
+                                  for item in records),
+    }
 
 
 def _entrance(entrances, facility_id):
@@ -314,6 +346,35 @@ def carried_over(evidence: VerificationEvidence, *, entrances, revision: int) ->
         evidence=evidence.model_copy(update={'facilities': records, 'unresolved': unresolved,
                                              'notes': notes}),
         status=evidence.status)
+
+
+def compatible_verification(previous, facilities, entrances):
+    """Do not transplant a route onto a moved/reclassified facility or changed entrance.
+
+    Negative spot conclusions also depend on the other candidates of that major.
+    Retain them only when that candidate set remains unchanged.
+    """
+    if previous is None or previous.verification is None or previous.facilities is None:
+        return None
+    old = {f['id']: f for f in previous.facilities.facilities + previous.facilities.nearby_facilities}
+    new = {f['id']: f for f in facilities or []}
+    def identity(f):
+        return tuple(repr(f.get(k)) for k in ('category', 'location', 'navigationLocation', 'confirmedEntrances'))
+    stable = {uid for uid in old.keys() & new.keys() if identity(old[uid]) == identity(new[uid])}
+    records = []
+    for row in previous.verification.facilities:
+        uid = row['facilityId']
+        status, offset = _entrance(entrances, uid)
+        if uid in stable and row.get('entranceStatus') == status and row.get('entranceOffsetM') == offset:
+            records.append(row)
+    changed_majors = {major_of(f.get('category')) for pool in (old, new)
+                      for uid, f in pool.items() if uid not in stable}
+    spots = [row for row in previous.verification.spot_checks
+             if row['facilityId'] in stable and row['major'] not in changed_majors]
+    keys = {(row['major'], row['cell']) for row in spots}
+    overrides = [row for row in previous.verification.local_overrides if (row['major'], row['cell']) in keys]
+    return previous.verification.model_copy(update={'facilities': records, 'spot_checks': spots,
+                                                    'local_overrides': overrides})
 
 
 def _record(item, observation, origin) -> dict:
@@ -445,6 +506,8 @@ async def _spot_checks(plan, *, session, cancelled, limit, progress=None):
         origin = normalize((point['lng'], point['lat']))
         primary = entry['primary']
         destination = normalize((primary['location']['lng'], primary['location']['lat']))
+        if not getattr(session, 'available', lambda *_: True)(str(primary['id']), origin, destination):
+            continue
         observation = await session(str(primary['id']), origin, destination)
         if observation is None:
             break
@@ -454,7 +517,9 @@ async def _spot_checks(plan, *, session, cancelled, limit, progress=None):
             # 模型最近的那家走不到，不等于这一格没有服务：再问一家替代设施。
             other = entry['alternative']
             alt_judged = None
-            if other is not None and session.attempts < limit and not cancelled():
+            if (other is not None and session.attempts < limit and not cancelled()
+                    and getattr(session, 'available', lambda *_: True)(str(other['id']), origin,
+                        normalize((other['location']['lng'], other['location']['lat'])))):
                 alt_destination = normalize((other['location']['lng'], other['location']['lat']))
                 alt_observation = await session(str(other['id']), origin, alt_destination)
                 if alt_observation is not None:

@@ -20,7 +20,7 @@ import { Alert, Button, Checkbox, Descriptions, Drawer, InputNumber, Select, Spa
 import type { Center } from '../types';
 import { LocationControls } from '../analysis/LocationControls';
 import { createCheckupService, CheckupError } from './client';
-import { budgetFor, capabilityView, hybridTimeEstimate, type CapabilityView } from './capabilities';
+import { budgetFor, capabilityView, hybridTimeEstimate, continuationLabel, type CapabilityView } from './capabilities';
 import { isCheckupBusy, isTerminal, STAGE_LABELS } from './types';
 import type { CheckupState } from './types';
 import { checkupSession, useCheckupState } from './sessions';
@@ -29,17 +29,20 @@ import { DENSITY_ALL, drawableLayer, LAYER_STYLES, serviceSamples, type LayerDra
 import { CheckupMap, DEFAULT_CHECKUP_LAYERS, layerSwatch, type CheckupLayerToggles, type HeatLayer } from './CheckupMap';
 import { CheckupReport } from './CheckupReport';
 import { Fold } from './Fold';
-import { CATEGORY_ORDER, categoryLabel, coverageItems, percent } from './report';
+import { CATEGORY_ORDER, categoryLabel, coverageItems, percent, reportDirectory, reasonLabel,
+  verificationLayerLabel, overallUnavailableText } from './report';
+import { nearestFacilities } from './nearest';
 import { missingCoreMajors, estimatedFirstRoundPages, splitScope } from './categories';
 import { extensionLines } from './extensions';
 import { isRetryTerminal, retryActionLabel, retryLines } from './retry';
 import { expiryLine, expiryNotice, retainedSummaryLines } from './retained';
 import type { MajorCategory } from './contract';
-import { nearestEmptyNote, nearestFacilities } from './nearest';
+import { nearestEmptyNote } from './nearest';
 import { queryCoverageLine, queryCoverageRetryLine } from './queryCoverage';
 import { WeatherCard } from './WeatherCard';
 import { SERVICE_COMPOSITE } from '../map/layers/serviceField';
 import { outdatedText, recomputedText, versionView, waterView } from './water';
+import { CompletionSummary } from './CompletionSummary';
 import { duration, liveView, TICKING_PHASES, type LiveKind } from './live';
 import './checkup.css';
 
@@ -53,7 +56,7 @@ const HEAT_DEPENDENCIES: Record<HeatLayer, LayerId[]> = {
 };
 
 const SERVICE_MODES = [
-  { value: SERVICE_COMPOSITE, label: '综合（三类均已知处）' },
+  { value: SERVICE_COMPOSITE, label: '综合（全部类别均已知处）' },
   ...CATEGORY_ORDER.map(category => ({ value: category, label: categoryLabel(category) })),
 ];
 
@@ -117,12 +120,20 @@ function RouteDetail({ route, error, facilityName }: { route: CheckupState['rout
       { key: 'straight', label: '直线距离', children: route.straightLineM === null ? '无法确定' : `${route.straightLineM.toFixed(0)} 米` },
       // 判定跟着距离一起给；只有判定没有距离的响应在校验层就被拒了，这里不必兜底。
       { key: 'distance', label: '步行距离', children: route.routeDistanceM === null ? '无法确定' : `${route.routeDistanceM.toFixed(0)} 米` },
+      { key: 'layer', label: '证据层级', children: verificationLayerLabel(route.verificationLayer) },
+      { key: 'access', label: '接入距离估计', children: route.accessDistanceM === null
+        ? '无法确定' : `${route.accessDistanceM.toFixed(0)} 米` },
+      { key: 'offsets', label: '两端偏移', children: `${fixed(route.originOffsetM)} 米 / ${fixed(route.destinationOffsetM)} 米` },
+      { key: 'poi', label: '严格端点状态', children: ROUTE_VERDICT[route.poiStatus] ?? route.poiStatus },
+      { key: 'entrance', label: '入口状态', children: route.entranceStatus === 'unresolved'
+        ? '入口未解决' : route.entranceStatus ?? '本次详情未记录入口状态' },
       { key: 'verdict', label: '服务标准', children: route.withinRule === null ? '无法判定'
         : route.withinRule ? '在 1000 米步行范围内' : '超出 1000 米步行范围' },
       { key: 'grade', label: '证据等级', children: EVIDENCE_LABELS[route.evidenceGrade] ?? route.evidenceGrade },
       { key: 'provider', label: '来源', children: `${route.provider}${route.network ? '' : '（本地缓存）'}` },
     ]} />
-    {route.reason && <Alert type="info" title={route.reason} />}
+    {(route.poiReason || route.reason) && <Alert type="info"
+      title={reasonLabel(route.poiReason) ?? reasonLabel(route.reason) ?? '未确认'} />}
     {route.notes.length > 0 && <ul className="checkup-notes">{route.notes.map(note =>
       <li key={note}>{note}</li>)}</ul>}
   </>;
@@ -182,19 +193,27 @@ type PanelInteraction = {
   initial: PanelLayout;
 };
 
+const LEGEND_GAP = 12;
+const LEGEND_BOTTOM_MARGIN = 28;
+const LEGEND_HEADER_ALLOWANCE = 48;
+
 const PANEL_SIZE_LIMITS: Record<PanelId, { minWidth: number; maxWidth: number }> = {
   side: { minWidth: 300, maxWidth: 480 }, results: { minWidth: 320, maxWidth: 520 },
 };
 
-function boundedLayout(layout: PanelLayout, panel: PanelId, workspace: WorkspaceSize): PanelLayout {
+function boundedLayout(layout: PanelLayout, panel: PanelId, workspace: WorkspaceSize,
+  legendHeight = 0): PanelLayout {
   const limits = PANEL_SIZE_LIMITS[panel];
   const maxWidth = Math.min(limits.maxWidth, Math.max(limits.minWidth, workspace.width - 32));
-  const maxHeight = Math.min(760, Math.max(280, workspace.height - 32));
+  // The left panel and its legend move as one column. Leave 12px between
+  // them and 28px below the legend for map attribution.
+  const bottom = panel === 'side' && legendHeight > 0 ? legendHeight + LEGEND_GAP + LEGEND_BOTTOM_MARGIN : 16;
+  const maxHeight = Math.min(760, Math.max(280, workspace.height - 16 - bottom));
   const width = Math.min(maxWidth, Math.max(limits.minWidth, layout.width));
   const height = Math.min(maxHeight, Math.max(280, layout.height));
   return {
     x: Math.max(16, Math.min(layout.x, workspace.width - width - 16)),
-    y: Math.max(16, Math.min(layout.y, workspace.height - height - 16)),
+    y: Math.max(16, Math.min(layout.y, workspace.height - height - bottom)),
     width,
     height,
   };
@@ -230,9 +249,10 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
     width: window.innerWidth, height: Math.max(320, window.innerHeight - 52),
   }));
   const [panelLayouts, setPanelLayouts] = useState<Record<PanelId, PanelLayout>>(initialPanelLayouts);
+  const [legendHeight, setLegendHeight] = useState(0);
   const [frontPanel, setFrontPanel] = useState<PanelId>('side');
   const panelInteraction = useRef<PanelInteraction | null>(null);
-  const wasFloating = useRef(window.innerWidth > 1080);
+  const wasFloating = useRef(window.innerWidth > 1080 && window.innerHeight >= 560);
   const [tab, setTab] = useState<TabKey>(isTabKey(saved.tab) ? saved.tab : lastTab);
   const chooseTab = (key: TabKey) => { lastTab = key; setTab(key); };
   const initial = saved.draft ?? state.input?.center ?? DEFAULT_CENTER;
@@ -259,7 +279,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
       const bounds = workspace.getBoundingClientRect();
       const nextSize = { width: bounds.width, height: bounds.height };
       setWorkspaceSize(nextSize);
-      const floating = nextSize.width > 1080;
+      const floating = nextSize.width > 1080 && window.innerHeight >= 560;
       const enteringFloating = floating && !wasFloating.current;
       wasFloating.current = floating;
       setPanelLayouts(current => {
@@ -273,8 +293,9 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
     };
     const observer = new ResizeObserver(measure);
     observer.observe(workspace);
+    window.addEventListener('resize', measure);
     measure();
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); window.removeEventListener('resize', measure); };
   }, []);
 
   // 界面偏好随改随存：刷新或切回来时，图层开关、热力模式、报告开合都按离开时的样子。
@@ -310,7 +331,12 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
 
   const task = state.task;
   const snapshot = state.snapshot;
-  const revision = task?.revision;
+  const directory = snapshot?.report ? reportDirectory(snapshot) : view?.categoryDirectory ?? [];
+  const serviceModes = directory.length ? [SERVICE_MODES[0],
+    ...directory.map(item => ({ value: item.id, label: item.label }))] : SERVICE_MODES;
+  const densityCategories = directory.length ? [DENSITY_CATEGORIES[0],
+    ...directory.map(item => ({ value: item.id, label: item.label }))] : DENSITY_CATEGORIES;
+  const revision = snapshot?.revision ?? task?.revision;
   const busy = isCheckupBusy(state);
 
   /**
@@ -360,7 +386,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
    * 失败按"层 + 修订"记账：同一版不反复重试，换了修订再试一次。
    */
   useEffect(() => {
-    if (state.phase !== 'completed' || revision === undefined) return;
+    if (!snapshot || revision === undefined) return;
     const pending = MAP_LAYERS.find(id => (toggles[id] || id === 'facilities'
       || (Object.keys(HEAT_DEPENDENCIES) as HeatLayer[])
         .some(heat => toggles[heat] && HEAT_DEPENDENCIES[heat].includes(id)))
@@ -371,7 +397,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
         ? error.message : '该图层未能加载' }));
       setFailed(previous => ({ ...previous, [pending]: revision }));
     });
-  }, [controller, state.phase, state.layers, revision, toggles, failed]);
+  }, [controller, snapshot, state.phase, state.layers, revision, toggles, failed]);
 
   const drawables = useMemo(() => {
     const result: Partial<Record<LayerId, LayerDrawable>> = {};
@@ -468,8 +494,8 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
 
   const overall = snapshot?.report?.overall ?? snapshot?.scores?.overall ?? null;
   const items = useMemo(() => snapshot ? coverageItems(snapshot) : [], [snapshot]);
-  const nearestGroups = useMemo(() => nearestFacilities(drawables.facilities, taskCenter ?? null),
-    [drawables.facilities, taskCenter]);
+  const nearestGroups = useMemo(() => nearestFacilities(drawables.facilities, taskCenter ?? null,
+    undefined, directory), [drawables.facilities, taskCenter, snapshot, view]);
   // §5 B2 决策 1 的判决：查到多少、达没达标、没达标的话下一步能不能靠重试解决。
   // 旧修订不报这一项，两个值都是 null，界面上就什么都不显示（不补一个 0% 出来）。
   const queryCoverage = snapshot ? queryCoverageLine(snapshot.facilities) : null;
@@ -507,12 +533,23 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
           : `${duration(liveNow.activityAgo)}前`}</span> }] : []),
   ]} />;
 
-  const floatingPanels = workspaceSize.width > 1080;
+  const floatingPanels = workspaceSize.width > 1080 && window.innerHeight >= 560;
+  // Keep the requested size in state: collapsing the legend can restore the
+  // panel's height, rather than permanently shrinking the user's preferred size.
+  const visibleLayouts = {
+    side: boundedLayout(panelLayouts.side, 'side', workspaceSize, floatingPanels ? legendHeight : 0),
+    results: boundedLayout(panelLayouts.results, 'results', workspaceSize),
+  };
+  const legendStyle: CSSProperties | undefined = floatingPanels ? {
+    left: visibleLayouts.side.x, top: visibleLayouts.side.y + visibleLayouts.side.height + LEGEND_GAP,
+    right: 'auto', bottom: 'auto', width: visibleLayouts.side.width, maxWidth: 'none',
+    '--legend-body-max-height': `${Math.min(240, Math.max(0, workspaceSize.height - 280 - 16 - LEGEND_GAP - LEGEND_BOTTOM_MARGIN - LEGEND_HEADER_ALLOWANCE))}px`,
+  } as CSSProperties : undefined;
   const panelStyle = (panel: PanelId): CSSProperties | undefined => floatingPanels ? {
-    left: panelLayouts[panel].x,
-    top: panelLayouts[panel].y,
-    width: panelLayouts[panel].width,
-    height: panelLayouts[panel].height,
+    left: visibleLayouts[panel].x,
+    top: visibleLayouts[panel].y,
+    width: visibleLayouts[panel].width,
+    height: visibleLayouts[panel].height,
     zIndex: frontPanel === panel ? 12 : 10,
   } : undefined;
 
@@ -522,7 +559,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
     event.preventDefault();
     setFrontPanel(panel);
     panelInteraction.current = { panel, mode, pointerId: event.pointerId,
-      startX: event.clientX, startY: event.clientY, initial: panelLayouts[panel] };
+      startX: event.clientX, startY: event.clientY, initial: visibleLayouts[panel] };
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
@@ -536,7 +573,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
       : { ...interaction.initial, width: interaction.initial.width + deltaX,
         height: interaction.initial.height + deltaY };
     setPanelLayouts(current => ({ ...current,
-      [interaction.panel]: boundedLayout(next, interaction.panel, workspaceSize) }));
+      [interaction.panel]: boundedLayout(next, interaction.panel, workspaceSize, legendHeight) }));
   }
 
   function endPanelInteraction(event: ReactPointerEvent<HTMLButtonElement>) {
@@ -549,13 +586,13 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
     setFrontPanel(panel);
     const step = event.shiftKey ? 24 : 8;
     setPanelLayouts(current => {
-      const layout = current[panel];
+      const layout = boundedLayout(current[panel], panel, workspaceSize, legendHeight);
       const horizontal = event.key === 'ArrowRight' ? step : event.key === 'ArrowLeft' ? -step : 0;
       const vertical = event.key === 'ArrowDown' ? step : event.key === 'ArrowUp' ? -step : 0;
       const next = mode === 'move'
         ? { ...layout, x: layout.x + horizontal, y: layout.y + vertical }
         : { ...layout, width: layout.width + horizontal, height: layout.height + vertical };
-      return { ...current, [panel]: boundedLayout(next, panel, workspaceSize) };
+      return { ...current, [panel]: boundedLayout(next, panel, workspaceSize, legendHeight) };
     });
   }
 
@@ -647,10 +684,10 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
               </p>}
               {scopeMissingCore.length > 0 && <Alert type="warning" showIcon
                 data-testid="checkup-scope-missing"
-                title={`总体覆盖率将无法给出：缺 ${scopeMissingCore.map(categoryLabel).join('、')}`}
+                title={`总体覆盖率将无法给出：缺 ${scopeMissingCore.map(id => categoryLabel(id)).join('、')}`}
                 description="总体区间分只按核心三类加权，不会用已分析的类别重新加权。" />}
               {scopeParts.extended.length > 0 && <p className="wb-hint" data-testid="checkup-scope-extended">
-                待补查（结果出来后）：{scopeParts.extended.map(categoryLabel).join('、')}
+                待补查（结果出来后）：{scopeParts.extended.map(id => categoryLabel(id)).join('、')}
               </p>}
             </div> : view !== null ? <p className="wb-hint" data-testid="checkup-scope-unavailable">
               当前后端不提供设施类别目录，本次按后端的核心口径体检。
@@ -677,13 +714,13 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
                 <Checkbox checked={!!toggles.service}
                   onChange={event => toggleHeat('service', event.target.checked)}>服务覆盖热力</Checkbox>
                 {toggles.service && <Select className="wb-layer-select" size="small" aria-label="覆盖类别"
-                  value={serviceMode} onChange={setServiceMode} options={SERVICE_MODES} popupMatchSelectWidth={false} />}
+                  value={serviceMode} onChange={setServiceMode} options={serviceModes} popupMatchSelectWidth={false} />}
               </div>
               <div className="wb-layer">
                 <Checkbox checked={!!toggles.density}
                   onChange={event => toggleHeat('density', event.target.checked)}>设施密度热力</Checkbox>
                 {toggles.density && <Select className="wb-layer-select" size="small" aria-label="密度类别"
-                  value={densityCategory} onChange={setDensityCategory} options={DENSITY_CATEGORIES}
+                  value={densityCategory} onChange={setDensityCategory} options={densityCategories}
                   popupMatchSelectWidth={false} />}
               </div>
               <p className="wb-group">叠加</p>
@@ -737,6 +774,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
         .map(id => state.layers?.[id]?.revision))].join(',')}>
       <CheckupMap center={center} onPick={choose} resultCenter={taskCenter}
         layers={toggles} drawables={drawables} coverage={coverage} serviceMode={serviceMode}
+        categoryDirectory={directory} legendStyle={legendStyle} onLegendHeightChange={setLegendHeight}
         densityCategory={densityCategory} water={water}
         selectedId={selected} onSelect={setSelected} />
       <div className="wb-map-banners">
@@ -774,6 +812,12 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
           </div>}
           {state.phase === 'cancelled' && <Alert type="info" title="任务已取消"
             description="已发请求仍计入预算。" />}
+          <CompletionSummary value={task?.completion} />
+          {task?.completion?.canContinue && !busy && <Button block type="primary"
+            data-testid="checkup-continue" disabled={stale}
+            onClick={() => void controller.continueReport()}>
+            {continuationLabel(task.completion.restartRetrieval, view?.poiRoundLimit)}
+          </Button>}
           {state.error && <Alert type="error" title={state.error} showIcon data-testid="checkup-error"
             action={<Button aria-label="重试" size="small"
               onClick={() => void controller.retry()}>{state.recovery === 'unconfirmed' ? '重新提交'
@@ -795,7 +839,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
                   disabled={state.extensionRunning === true}
                   onClick={() => void controller.extend(scopeParts.extended)}>
                   {state.extensionRunning === true ? '检索中…'
-                    : `补查 ${scopeParts.extended.map(categoryLabel).join('、')}`}
+                    : `补查 ${scopeParts.extended.map(id => categoryLabel(id)).join('、')}`}
                 </Button>
               </>}
             {state.extensionError && <Alert type="error" showIcon data-testid="checkup-extension-error"
@@ -803,7 +847,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
             {(state.extensions?.length ?? 0) > 0 && <ul className="wb-extension-list"
               data-testid="checkup-extensions">
               {state.extensions?.map(item => <li key={item.extensionId} data-status={item.status}>
-                <b>{item.categories.map(categoryLabel).join('、')}</b>
+                <b>{item.categories.map(id => categoryLabel(id)).join('、')}</b>
                 {' · '}{EXTENSION_STATUS_LABELS[item.status] ?? item.status}
                 {Object.keys(item.countsByCategory).length > 0 && <span className="wb-extension-counts">
                   {' · '}{Object.entries(item.countsByCategory)
@@ -821,7 +865,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
         </>}
 
         {snapshot && <section className="wb-sec wb-summary" aria-label="覆盖区间摘要">
-          <p className="wb-label">覆盖率</p>
+          <p className="wb-label">{snapshot.completion?.evaluationStatus === 'partial' ? '阶段性总体覆盖区间' : '覆盖率'}</p>
           {overall && overall.available ? <>
             <p className="wb-range"><b>{fixed(overall.coverageLowerPct)}</b><span>～</span>
               <b>{fixed(overall.coverageUpperPct)}</b><small>%</small></p>
@@ -829,12 +873,12 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
             <p className="wb-meter-key"><i className="k-known" />已知覆盖<i className="k-unknown" />未知
               <span>可评估 {percent(overall.assessablePct)}</span></p>
           </> : <Alert type="warning" showIcon
-            title="总体区间暂不给出" description={overall?.reason ?? '缺少分类结论'} />}
+            title="总体区间暂不给出" description={overallUnavailableText(snapshot)} />}
           <ul className="wb-cats">{items.map(item => <li key={item.category}>
             <span className="wb-cat-name"><i style={{ background: item.color }} />{item.label}</span>
             <RangeMeter lower={item.lowerPct} upper={item.upperPct} color={item.color} />
             <span className="wb-cat-value">{item.supported
-              ? `${fixed(item.lowerPct)}–${fixed(item.upperPct)}%` : '无法确定'}</span>
+              ? item.assessablePct === 0 ? '全部未知' : `${fixed(item.lowerPct)}–${fixed(item.upperPct)}%` : '无法确定'}</span>
           </li>)}</ul>
           <Button block type="primary" ghost onClick={() => setReportOpen(true)}>查看体检报告</Button>
         </section>}
@@ -934,7 +978,9 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
 
     <Drawer title="体检报告" open={reportOpen} onClose={() => setReportOpen(false)} size={960}
       rootClassName="rp-drawer">
-      {snapshot ? <CheckupReport snapshot={snapshot} stale={stale} waterReviews={view?.waterReviews} />
+      {snapshot ? <CheckupReport snapshot={snapshot} stale={stale} waterReviews={view?.waterReviews}
+        continuation={task?.completion} continuationPoiLimit={view?.poiRoundLimit} busy={busy}
+        onContinue={() => void controller.continueReport()} onCancel={() => void controller.cancel()} />
         : retained ? <p className="api-muted" data-testid="checkup-report-expired">
             这次体检的明细已到期，报告不再提供；结论与汇总在左侧"明细已到期"一栏。</p>
         : <p className="api-muted">体检完成后在这里显示报告。</p>}

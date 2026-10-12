@@ -126,7 +126,7 @@ def load_graph_cache(path, progress=_unreported):
     try:
         progress("graph_read")
         with gzip.open(path, "rt", encoding="utf-8") as stream:
-            payload = bulk_load.loads(stream.read())
+            payload = bulk_load.loads(stream.read(), checkpoint=lambda: progress('graph_read'))
         if payload["cache_version"] != CACHE_VERSION:
             raise OsmDataError("graph_cache_version_mismatch")
         graph = nx.MultiDiGraph(**payload["metadata"])

@@ -1,0 +1,13 @@
+[build]
+  base = "life-circle-demo"
+  command = "node scripts/check-netlify-env.mjs && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+  VITE_ANALYSIS_MODE = "api"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
