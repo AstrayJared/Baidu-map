@@ -147,4 +147,3 @@ mock 的 major 只落在 `("shopping","medical","education")`，而词典早已�
 它属于 `NON_BUSINESS_PARENT_TAGS`。**这不是本次改动的回归，也不是依赖/导入失败** ——
 这 29 条在 `origin/main` 上同样失败，本轮按要求不弱化、不跳过、也不顺手改它们，
 留作独立的一次核对（它们可能与某个已合并的分类重构有关，需要单独判断）。
-
