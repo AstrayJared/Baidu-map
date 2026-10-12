@@ -63,6 +63,9 @@ export function readStored(engine: string, storage: Storage | undefined = safeSt
     && (handle.taskId === undefined || text(handle.taskId))) {
     out.handle = { input: handle.input, savedAt: finite(handle.savedAt) ? handle.savedAt : 0,
       ...(handle.taskId ? { taskId: handle.taskId } : {}),
+      ...(handle.continuation && text(handle.continuation.clientRequestId)
+        && Number.isInteger(handle.continuation.baseRevision) && handle.continuation.baseRevision > 0
+        ? { continuation: handle.continuation } : {}),
       ...(handle.cancelRequested === true ? { cancelRequested: true } : {}) };
   }
   if (prefs && typeof prefs === 'object') {

@@ -12,8 +12,10 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Callable
 from pathlib import Path
+from uuid import uuid4
 
 from ..persistence import atomic_dump
+from .rounds import ROUND_SCHEMA, RoundStore
 from . import retention
 
 SCHEMA = """
@@ -305,7 +307,7 @@ def extension_matches(record: ExtensionRecord, *, identity: dict,
     return declared_now == declared_then
 
 
-class CheckupStore:
+class CheckupStore(RoundStore):
     def __init__(self, root: Path, *, read_only: bool = False):
         """``read_only`` 打开这份库**只做读取**：不建表、不迁移、不写墓碑。
 
@@ -317,6 +319,12 @@ class CheckupStore:
         if not read_only:
             self.root.mkdir(parents=True, exist_ok=True)
         self.path = self.root / "checkups.sqlite3"
+        self._keeper = None
+
+    def close(self):
+        if self._keeper is not None:
+            self._keeper.close()
+            self._keeper = None
 
     @contextmanager
     def _connection(self):
@@ -355,7 +363,27 @@ class CheckupStore:
         if self.read_only:
             return
         with self._connection() as connection:
+            connection.execute("PRAGMA journal_mode=WAL")
+            # Keep WAL alive between short per-operation connections. Closing the
+            # last connection otherwise checkpoints and removes WAL on every page.
+            if self._keeper is None:
+                self._keeper = sqlite3.connect(self.path, check_same_thread=False,
+                                               isolation_level=None)
             connection.executescript(SCHEMA)
+            connection.executescript(ROUND_SCHEMA)
+            connection.execute("BEGIN IMMEDIATE")
+            round_columns = {row["name"] for row in connection.execute("PRAGMA table_info(checkup_rounds)")}
+            if "poi_limit" not in round_columns:
+                connection.execute("ALTER TABLE checkup_rounds ADD COLUMN poi_limit INTEGER NOT NULL DEFAULT 60")
+                # Old continuation rounds always used 60. Initial rounds could
+                # explicitly lower it; missing request fields meant 60 then.
+                for row in connection.execute("SELECT r.task_id,t.payload FROM checkup_rounds r "
+                                              "JOIN tasks t ON t.task_id=r.task_id WHERE r.number=1").fetchall():
+                    facilities = json.loads(row["payload"]).get("facilities", {})
+                    limit = facilities.get("max_poi_requests", facilities.get("maxPoiRequests", 60))
+                    connection.execute("UPDATE checkup_rounds SET poi_limit=? WHERE task_id=? AND number=1",
+                                       (limit, row["task_id"]))
+            connection.execute("COMMIT")
             present = {row["name"] for row in connection.execute("PRAGMA table_info(tasks)")}
             for name, declaration in ADDED_COLUMNS:
                 if name not in present:
@@ -575,10 +603,18 @@ class CheckupStore:
         既没有记录、也不可重试。
         """
         with self._connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
             cursor = connection.execute(
                 "UPDATE tasks SET details_cleared_at=? WHERE task_id=? AND details_cleared_at IS NULL",
                 (now, task_id))
-            return cursor.rowcount == 1
+            changed = cursor.rowcount == 1
+            if changed:
+                # Continuation state contains details too; retain paid accounting only.
+                connection.execute("DELETE FROM checkup_checkpoints WHERE task_id=?", (task_id,))
+                connection.execute("UPDATE checkup_requests SET context='{}', response=NULL WHERE task_id=?",
+                                   (task_id,))
+            connection.execute("COMMIT")
+            return changed
 
     def details_cleared_tasks(self) -> list[str]:
         with self._connection() as connection:
@@ -613,6 +649,9 @@ class CheckupStore:
                 if existing["fingerprint"] != fingerprint:
                     raise RequestIdConflict(client_request_id)
                 return _record(existing), False
+            if connection.execute('SELECT 1 FROM checkup_rounds WHERE request_id=?',
+                                  (client_request_id,)).fetchone():
+                raise RequestIdConflict(client_request_id)
             connection.execute(
                 "INSERT INTO tasks (task_id, client_request_id, engine, fingerprint, payload,"
                 " status, stage, revision, budget, created_at, updated_at, session_id)"
@@ -638,6 +677,9 @@ class CheckupStore:
             row = connection.execute("SELECT task_id FROM tasks WHERE client_request_id=?",
                                      (client_request_id,)).fetchone()
         if row is None:
+            continuation = self.round_request(client_request_id)
+            if continuation is not None:
+                return self._get(continuation['task_id'])
             raise TaskNotFound(client_request_id)
         return self._get(row["task_id"])
 
@@ -693,14 +735,23 @@ class CheckupStore:
         return self._get(task_id)
 
     def publish(self, task_id: str, *, stage: str, snapshot: dict, result_hash: str,
-                summary: dict | None = None) -> int:
+                summary: dict | None = None, cancelled=None) -> int:
         """Freeze one revision. The payload is durable before its index row exists."""
         record = self._get(task_id)
         revision = record.revision + 1
-        relative = Path("tasks") / task_id / f"revision-{revision:04d}-{stage}.json"
+        # A cancelled report can finish serializing after a continuation starts.
+        # Its unindexed file must never overwrite that continuation's revision.
+        suffix = '' if cancelled is None else f'-{uuid4().hex}'
+        relative = Path("tasks") / task_id / f"revision-{revision:04d}-{stage}{suffix}.json"
+        if cancelled is not None and cancelled():
+            from ..accessibility.grid import AssessmentCancelled
+            raise AssessmentCancelled()
         atomic_dump(self.root / relative, snapshot)
         with self._connection() as connection:
             connection.execute("BEGIN IMMEDIATE")
+            if cancelled is not None and cancelled():
+                from ..accessibility.grid import AssessmentCancelled
+                raise AssessmentCancelled()
             connection.execute(
                 "INSERT INTO revisions (task_id, revision, stage, created_at, result_hash, payload,"
                 " summary) VALUES (?,?,?,?,?,?,?)",

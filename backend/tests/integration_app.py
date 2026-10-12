@@ -103,8 +103,14 @@ def provider(origin):
 
 
 settings.hybrid_ledger_dir = Path(__file__).resolve().parents[1] / '.tmp/hybrid-browser'
+settings.checkup_dir = settings.hybrid_ledger_dir / 'checkups'
+settings.osm_graph_cache_path = settings.hybrid_ledger_dir / 'missing-graph'
+settings.osm_pbf_path = settings.hybrid_ledger_dir / 'missing.osm.pbf'
 settings.hybrid_obstacle_path = Path('missing-test-obstacles')
 settings.hybrid_risk_path = Path('missing-test-risks')
 app = create_app(settings, provider_factory=provider,
                  hybrid_provider_factory=lambda projection, config: HybridProvider(projection))
 app.state.hybrid.gate = FastGate()
+app.state.checkups.offline = None
+for engine in app.state.checkups.registry.engines.values():
+    engine.gate = FastGate()

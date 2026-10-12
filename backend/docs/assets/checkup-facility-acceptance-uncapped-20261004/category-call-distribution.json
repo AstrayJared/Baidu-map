@@ -1,0 +1,2551 @@
+{
+  "requestsByMajor": {
+    "medical": 6,
+    "shopping": 6,
+    "education": 6,
+    "care": 6,
+    "dining": 6,
+    "finance": 6,
+    "public": 6,
+    "leisure": 6,
+    "transport": 6,
+    "life": 6
+  },
+  "touchedBlocksByMajor": {
+    "medical": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "shopping": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "education": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "care": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "dining": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "finance": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "public": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "leisure": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "transport": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ],
+    "life": [
+      "r0c0",
+      "r0c1",
+      "r1c0",
+      "r1c1"
+    ]
+  },
+  "unfinishedByMajor": {
+    "medical": [
+      {
+        "tileId": "r1c1",
+        "category": "hospital_pharmacy",
+        "query": "医院药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "hospital_pharmacy",
+        "query": "医院药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "hospital",
+        "query": "医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "hospital",
+        "query": "医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "hospital",
+        "query": "医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "hospital",
+        "query": "医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "clinic",
+        "query": "社区卫生服务",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "clinic",
+        "query": "社区卫生服务",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "clinic",
+        "query": "社区卫生服务",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "clinic",
+        "query": "社区卫生服务",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "checkup",
+        "query": "体检中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "checkup",
+        "query": "体检中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "checkup",
+        "query": "体检中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "checkup",
+        "query": "体检中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "pharmacy",
+        "query": "药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "hospital_pharmacy",
+        "query": "门诊药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "hospital_pharmacy",
+        "query": "住院药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "hospital",
+        "query": "人民医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "hospital",
+        "query": "中医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "clinic",
+        "query": "诊所",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "clinic",
+        "query": "卫生室",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "checkup",
+        "query": "健康管理中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "checkup",
+        "query": "体检",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "pharmacy",
+        "query": "药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "hospital_pharmacy",
+        "query": "门诊药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "hospital_pharmacy",
+        "query": "住院药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "hospital",
+        "query": "人民医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "hospital",
+        "query": "中医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "clinic",
+        "query": "诊所",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "clinic",
+        "query": "卫生室",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "checkup",
+        "query": "健康管理中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "checkup",
+        "query": "体检",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "pharmacy",
+        "query": "药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "hospital_pharmacy",
+        "query": "门诊药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "hospital_pharmacy",
+        "query": "住院药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "hospital",
+        "query": "人民医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "hospital",
+        "query": "中医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "clinic",
+        "query": "诊所",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "clinic",
+        "query": "卫生室",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "checkup",
+        "query": "健康管理中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "checkup",
+        "query": "体检",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "pharmacy",
+        "query": "药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "hospital_pharmacy",
+        "query": "门诊药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "hospital_pharmacy",
+        "query": "住院药房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "hospital",
+        "query": "人民医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "hospital",
+        "query": "中医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "clinic",
+        "query": "诊所",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "clinic",
+        "query": "卫生室",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "checkup",
+        "query": "健康管理中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "checkup",
+        "query": "体检",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "shopping": [
+      {
+        "tileId": "r1c1",
+        "category": "fresh_store",
+        "query": "生鲜",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "fresh_store",
+        "query": "生鲜",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "supermarket",
+        "query": "超市",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "supermarket",
+        "query": "超市",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "supermarket",
+        "query": "超市",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "supermarket",
+        "query": "超市",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "market",
+        "query": "农贸市场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "market",
+        "query": "菜场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "market",
+        "query": "农副产品市场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "fresh_store",
+        "query": "果蔬店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "fresh_store",
+        "query": "水果店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "fresh_store",
+        "query": "肉铺",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "supermarket",
+        "query": "便利店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "supermarket",
+        "query": "商场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "market",
+        "query": "农贸市场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "market",
+        "query": "菜场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "market",
+        "query": "农副产品市场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "fresh_store",
+        "query": "果蔬店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "fresh_store",
+        "query": "水果店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "fresh_store",
+        "query": "肉铺",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "supermarket",
+        "query": "便利店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "supermarket",
+        "query": "商场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "market",
+        "query": "农贸市场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "market",
+        "query": "菜场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "market",
+        "query": "农副产品市场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "fresh_store",
+        "query": "果蔬店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "fresh_store",
+        "query": "水果店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "fresh_store",
+        "query": "肉铺",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "supermarket",
+        "query": "便利店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "supermarket",
+        "query": "商场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "market",
+        "query": "农贸市场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "market",
+        "query": "菜场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "market",
+        "query": "农副产品市场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "fresh_store",
+        "query": "果蔬店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "fresh_store",
+        "query": "水果店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "fresh_store",
+        "query": "肉铺",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "supermarket",
+        "query": "便利店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "supermarket",
+        "query": "商场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "education": [
+      {
+        "tileId": "r1c1",
+        "category": "combined_school",
+        "query": "九年一贯制",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "combined_school",
+        "query": "九年一贯制",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "middle_school",
+        "query": "中学",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "middle_school",
+        "query": "中学",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "middle_school",
+        "query": "中学",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "middle_school",
+        "query": "中学",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "college",
+        "query": "大学",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "college",
+        "query": "大学",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "college",
+        "query": "大学",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "college",
+        "query": "大学",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "preschool",
+        "query": "幼儿园",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "preschool",
+        "query": "幼儿园",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "preschool",
+        "query": "幼儿园",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "preschool",
+        "query": "幼儿园",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "training",
+        "query": "培训",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "training",
+        "query": "培训",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "training",
+        "query": "培训",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "training",
+        "query": "培训",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "combined_school",
+        "query": "完小",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "combined_school",
+        "query": "教学点",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "combined_school",
+        "query": "初中部",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "middle_school",
+        "query": "初中",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "middle_school",
+        "query": "高中",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "college",
+        "query": "学院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "college",
+        "query": "职业技术学院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "preschool",
+        "query": "托育",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "preschool",
+        "query": "早教中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "training",
+        "query": "辅导班",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "training",
+        "query": "兴趣班",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "combined_school",
+        "query": "完小",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "combined_school",
+        "query": "教学点",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "combined_school",
+        "query": "初中部",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "middle_school",
+        "query": "初中",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "middle_school",
+        "query": "高中",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "college",
+        "query": "学院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "college",
+        "query": "职业技术学院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "preschool",
+        "query": "托育",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "preschool",
+        "query": "早教中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "training",
+        "query": "辅导班",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "training",
+        "query": "兴趣班",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "combined_school",
+        "query": "完小",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "combined_school",
+        "query": "教学点",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "combined_school",
+        "query": "初中部",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "middle_school",
+        "query": "初中",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "middle_school",
+        "query": "高中",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "college",
+        "query": "学院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "college",
+        "query": "职业技术学院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "preschool",
+        "query": "托育",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "preschool",
+        "query": "早教中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "training",
+        "query": "辅导班",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "training",
+        "query": "兴趣班",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "combined_school",
+        "query": "完小",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "combined_school",
+        "query": "教学点",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "combined_school",
+        "query": "初中部",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "middle_school",
+        "query": "初中",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "middle_school",
+        "query": "高中",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "college",
+        "query": "学院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "college",
+        "query": "职业技术学院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "preschool",
+        "query": "托育",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "preschool",
+        "query": "早教中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "training",
+        "query": "辅导班",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "training",
+        "query": "兴趣班",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "care": [
+      {
+        "tileId": "r0c0",
+        "category": "nursing_home",
+        "query": "养老院",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "rehab",
+        "query": "康复中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "rehab",
+        "query": "康复中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "nursing_home",
+        "query": "敬老院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "nursing_home",
+        "query": "养老服务中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "rehab",
+        "query": "护理院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "rehab",
+        "query": "康复医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "nursing_home",
+        "query": "敬老院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "nursing_home",
+        "query": "养老服务中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "rehab",
+        "query": "护理院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "rehab",
+        "query": "康复医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "nursing_home",
+        "query": "敬老院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "nursing_home",
+        "query": "养老服务中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "rehab",
+        "query": "护理院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "rehab",
+        "query": "康复医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "nursing_home",
+        "query": "敬老院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "nursing_home",
+        "query": "养老服务中心",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "rehab",
+        "query": "护理院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "rehab",
+        "query": "康复医院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "dining": [
+      {
+        "tileId": "r0c1",
+        "category": "restaurant",
+        "query": "餐厅",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "restaurant",
+        "query": "餐厅",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "restaurant",
+        "query": "餐厅",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "restaurant",
+        "query": "餐厅",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "cafe",
+        "query": "咖啡店",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "cafe",
+        "query": "咖啡店",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "cafe",
+        "query": "咖啡店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "cafe",
+        "query": "咖啡店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "restaurant",
+        "query": "快餐",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "restaurant",
+        "query": "小吃",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "cafe",
+        "query": "奶茶",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "cafe",
+        "query": "饮品店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "restaurant",
+        "query": "快餐",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "restaurant",
+        "query": "小吃",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "cafe",
+        "query": "奶茶",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "cafe",
+        "query": "饮品店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "restaurant",
+        "query": "快餐",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "restaurant",
+        "query": "小吃",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "cafe",
+        "query": "奶茶",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "cafe",
+        "query": "饮品店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "restaurant",
+        "query": "快餐",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "restaurant",
+        "query": "小吃",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "cafe",
+        "query": "奶茶",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "cafe",
+        "query": "饮品店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "finance": [
+      {
+        "tileId": "r0c1",
+        "category": "bank",
+        "query": "银行",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "bank",
+        "query": "银行",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "bank",
+        "query": "银行",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "finance_service",
+        "query": "保险",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "finance_service",
+        "query": "保险",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "bank",
+        "query": "信用社",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "bank",
+        "query": "储蓄所",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "finance_service",
+        "query": "证券",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "finance_service",
+        "query": "基金",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "finance_service",
+        "query": "理财",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "bank",
+        "query": "信用社",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "bank",
+        "query": "储蓄所",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "finance_service",
+        "query": "证券",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "finance_service",
+        "query": "基金",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "finance_service",
+        "query": "理财",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "bank",
+        "query": "信用社",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "bank",
+        "query": "储蓄所",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "finance_service",
+        "query": "证券",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "finance_service",
+        "query": "基金",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "finance_service",
+        "query": "理财",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "bank",
+        "query": "信用社",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "bank",
+        "query": "储蓄所",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "finance_service",
+        "query": "证券",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "finance_service",
+        "query": "基金",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "finance_service",
+        "query": "理财",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "public": [
+      {
+        "tileId": "r1c1",
+        "category": "post",
+        "query": "邮政",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "post",
+        "query": "邮政",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "library",
+        "query": "图书馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "library",
+        "query": "图书馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "library",
+        "query": "图书馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "library",
+        "query": "图书馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "government",
+        "query": "街道办事处",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "government",
+        "query": "政务服务",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "post",
+        "query": "快递",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "post",
+        "query": "驿站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "library",
+        "query": "文化馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "library",
+        "query": "博物馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "government",
+        "query": "街道办事处",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "government",
+        "query": "政务服务",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "post",
+        "query": "快递",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "post",
+        "query": "驿站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "library",
+        "query": "文化馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "library",
+        "query": "博物馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "government",
+        "query": "街道办事处",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "government",
+        "query": "政务服务",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "post",
+        "query": "快递",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "post",
+        "query": "驿站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "library",
+        "query": "文化馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "library",
+        "query": "博物馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "government",
+        "query": "街道办事处",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "government",
+        "query": "政务服务",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "post",
+        "query": "快递",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "post",
+        "query": "驿站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "library",
+        "query": "文化馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "library",
+        "query": "博物馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "leisure": [
+      {
+        "tileId": "r0c1",
+        "category": "sports",
+        "query": "体育馆",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "sports",
+        "query": "体育馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "sports",
+        "query": "体育馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "entertainment",
+        "query": "电影院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "entertainment",
+        "query": "电影院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "entertainment",
+        "query": "电影院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "entertainment",
+        "query": "电影院",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "park",
+        "query": "广场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "park",
+        "query": "绿地",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "sports",
+        "query": "健身房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "sports",
+        "query": "游泳馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "entertainment",
+        "query": "KTV",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "entertainment",
+        "query": "网吧",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "park",
+        "query": "广场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "park",
+        "query": "绿地",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "sports",
+        "query": "健身房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "sports",
+        "query": "游泳馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "entertainment",
+        "query": "KTV",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "entertainment",
+        "query": "网吧",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "park",
+        "query": "广场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "park",
+        "query": "绿地",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "sports",
+        "query": "健身房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "sports",
+        "query": "游泳馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "entertainment",
+        "query": "KTV",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "entertainment",
+        "query": "网吧",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "park",
+        "query": "广场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "park",
+        "query": "绿地",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "sports",
+        "query": "健身房",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "sports",
+        "query": "游泳馆",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "entertainment",
+        "query": "KTV",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "entertainment",
+        "query": "网吧",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "transport": [
+      {
+        "tileId": "r0c1",
+        "category": "bus",
+        "query": "公交站",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "bus",
+        "query": "公交站",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "bus",
+        "query": "公交站",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "bus",
+        "query": "公交站",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "parking",
+        "query": "停车场",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "parking",
+        "query": "停车场",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "parking",
+        "query": "停车场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "parking",
+        "query": "停车场",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "fuel",
+        "query": "加油站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "fuel",
+        "query": "加油站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "fuel",
+        "query": "加油站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "fuel",
+        "query": "加油站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "bus",
+        "query": "地铁站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "bus",
+        "query": "火车站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "bus",
+        "query": "客运站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "parking",
+        "query": "停车楼",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "parking",
+        "query": "P+R",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "fuel",
+        "query": "充电站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "fuel",
+        "query": "加气站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "bus",
+        "query": "地铁站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "bus",
+        "query": "火车站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "bus",
+        "query": "客运站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "parking",
+        "query": "停车楼",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "parking",
+        "query": "P+R",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "fuel",
+        "query": "充电站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "fuel",
+        "query": "加气站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "bus",
+        "query": "地铁站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "bus",
+        "query": "火车站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "bus",
+        "query": "客运站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "parking",
+        "query": "停车楼",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "parking",
+        "query": "P+R",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "fuel",
+        "query": "充电站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "fuel",
+        "query": "加气站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "bus",
+        "query": "地铁站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "bus",
+        "query": "火车站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "bus",
+        "query": "客运站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "parking",
+        "query": "停车楼",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "parking",
+        "query": "P+R",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "fuel",
+        "query": "充电站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "fuel",
+        "query": "加气站",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ],
+    "life": [
+      {
+        "tileId": "r0c1",
+        "category": "repair",
+        "query": "维修店",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "repair",
+        "query": "维修店",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "repair",
+        "query": "维修店",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "repair",
+        "query": "维修店",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "beauty",
+        "query": "理发店",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "beauty",
+        "query": "理发店",
+        "status": "partial",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "beauty",
+        "query": "理发店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "beauty",
+        "query": "理发店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "repair",
+        "query": "手机维修",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "repair",
+        "query": "家电维修",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "beauty",
+        "query": "美容店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c1",
+        "category": "beauty",
+        "query": "洗衣店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "repair",
+        "query": "手机维修",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "repair",
+        "query": "家电维修",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "beauty",
+        "query": "美容店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r0c0",
+        "category": "beauty",
+        "query": "洗衣店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "repair",
+        "query": "手机维修",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "repair",
+        "query": "家电维修",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "beauty",
+        "query": "美容店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c1",
+        "category": "beauty",
+        "query": "洗衣店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "repair",
+        "query": "手机维修",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "repair",
+        "query": "家电维修",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "beauty",
+        "query": "美容店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      },
+      {
+        "tileId": "r1c0",
+        "category": "beauty",
+        "query": "洗衣店",
+        "status": "failed",
+        "stopReason": "budget_exhausted"
+      }
+    ]
+  },
+  "categoryDirectory": [
+    {
+      "id": "medical",
+      "label": "医疗健康",
+      "order": 0
+    },
+    {
+      "id": "shopping",
+      "label": "购物消费",
+      "order": 1
+    },
+    {
+      "id": "education",
+      "label": "教育",
+      "order": 2
+    },
+    {
+      "id": "care",
+      "label": "疗养康养",
+      "order": 3
+    },
+    {
+      "id": "dining",
+      "label": "餐饮",
+      "order": 4
+    },
+    {
+      "id": "finance",
+      "label": "金融",
+      "order": 5
+    },
+    {
+      "id": "public",
+      "label": "政务公共服务",
+      "order": 6
+    },
+    {
+      "id": "leisure",
+      "label": "文体休闲",
+      "order": 7
+    },
+    {
+      "id": "transport",
+      "label": "交通出行",
+      "order": 8
+    },
+    {
+      "id": "life",
+      "label": "生活服务",
+      "order": 9
+    }
+  ]
+}

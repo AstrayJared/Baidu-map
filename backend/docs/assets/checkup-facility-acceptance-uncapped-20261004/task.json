@@ -1,0 +1,22 @@
+{
+  "taskId": "146d2476-6419-4e76-b9a6-2f408338c99a",
+  "clientRequestId": "dc23ce52-7826-4036-a87c-7b2c70a34deb",
+  "engine": "baidu_e82",
+  "status": "completed",
+  "businessStatus": "partial",
+  "stage": "ready",
+  "revision": 5,
+  "budget": 400,
+  "requests": 580,
+  "networkRequests": 580,
+  "elapsedSeconds": 1258.155100107193,
+  "createdAt": 1791109115.7732024,
+  "cancelRequested": false,
+  "error": null,
+  "serverTime": 1791110374.6235456,
+  "startedAt": 1791109115.8205538,
+  "finishedAt": 1791110373.975654,
+  "stageStartedAt": 1791110374.010533,
+  "lastActivityAt": 1791110374.010533,
+  "progress": null
+}

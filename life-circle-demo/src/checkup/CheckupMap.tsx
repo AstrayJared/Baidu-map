@@ -8,7 +8,7 @@
  * - **同格合并，绝不截断**：几百处设施逐点铺满会互相遮盖，只画前 N 条却是说谎 ——
  *   被丢掉的设施在图上完全看不出来。
  */
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Center } from '../types';
 import { useBaiduMap } from '../map/useBaiduMap';
 import type { BMapMap, BMapOverlay, BMapViewEventType } from '../map/baiduMapTypes';
@@ -107,7 +107,8 @@ function dominant(points: LayerPoint[]): LayerPoint {
 }
 
 export function CheckupMap({ center, onPick, resultCenter, layers, drawables, coverage = null,
-  serviceMode = SERVICE_COMPOSITE, densityCategory = DENSITY_ALL, water = null, selectedId, onSelect }: {
+  serviceMode = SERVICE_COMPOSITE, densityCategory = DENSITY_ALL, water = null, selectedId, onSelect,
+  categoryDirectory = [], legendStyle, onLegendHeightChange }: {
   center: Center;
   onPick: (center: Center) => void;
   /** 已发布那一版修订的中心点；与选点分开，避免把"待分析选点"当成"结果中心"。 */
@@ -122,6 +123,9 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
   densityCategory?: string;
   /** 这一版的水系标注；null 表示这一版没有水系证据。 */
   water?: WaterView | null;
+  categoryDirectory?: Array<{ id: string; label: string; order: number }>;
+  legendStyle?: CSSProperties;
+  onLegendHeightChange?: (height: number) => void;
   selectedId?: string | null;
   onSelect?: (id: string) => void;
 }) {
@@ -132,6 +136,7 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
   const [viewTick, setViewTick] = useState(0);
   /** 图例可以收成一个"图例"按钮，把地图让出来；默认展开，读图先要看得懂颜色。 */
   const [legendOpen, setLegendOpen] = useState(true);
+  const legendBox = useRef<HTMLDivElement>(null);
   const pick = useRef(onPick);
   pick.current = onPick;
   const select = useRef(onSelect);
@@ -192,13 +197,13 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
   useEffect(() => {
     if (!api || !map) return;
     const overlay = createServiceOverlay(api, {
-      categories: CATEGORY_ORDER,
+      categories: categoryDirectory.length ? categoryDirectory.map(item => item.id) : [...CATEGORY_ORDER],
       viewport: () => ({ width: container.current?.clientWidth ?? 0,
         height: container.current?.clientHeight ?? 0 }),
     });
     serviceHeat.current = overlay;
     return () => { overlay?.destroy(); serviceHeat.current = null; };
-  }, [api, map]);
+  }, [api, map, categoryDirectory.map(item => item.id).join(',')]);
 
   useEffect(() => {
     const overlay = serviceHeat.current;
@@ -430,6 +435,16 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
     .filter(item => layers[item.id]), [drawables, layers]);
   const waterOn = !!(layers.water && water?.available
     && (water.shapes.length > 0 || water.crossings.length > 0));
+  const legendVisible = Object.values(drawables).some(Boolean) && (legend.length > 0 || heatOn || waterOn);
+  useLayoutEffect(() => {
+    const node = legendBox.current;
+    if (!node || !legendVisible) { onLegendHeightChange?.(0); return; }
+    const measure = () => onLegendHeightChange?.(node.getBoundingClientRect().height);
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    measure();
+    return () => observer.disconnect();
+  }, [legendVisible, onLegendHeightChange]);
   const unavailable = error || mode === 'fallback';
   return <div className="api-map-shell">
     <div ref={container} className="api-map" data-testid="checkup-map" aria-label="体检图层地图" />
@@ -445,8 +460,8 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
         : '加载后可在地图上选点。'}</p>
     </div>}
     {/* 还没有任何一层画上去时不出图例：空图上的一串色块只会让人以为已经有结论。 */}
-    {Object.values(drawables).some(Boolean) && (legend.length > 0 || heatOn || waterOn)
-      && <div className="api-map-legend" data-testid="checkup-legend" aria-label="体检图层图例"
+    {legendVisible
+      && <div ref={legendBox} style={legendStyle} className="api-map-legend" data-testid="checkup-legend" aria-label="体检图层图例"
         data-open={legendOpen ? 'yes' : 'no'}>
       <button type="button" className="lg-head" aria-expanded={legendOpen}
         onClick={() => setLegendOpen(open => !open)}>图例</button>
@@ -456,7 +471,7 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
             <span className="api-legend-line">
               <i className="api-legend-ramp" style={{ background: serviceRampCss(serviceMode) }} />
               {serviceMode === SERVICE_COMPOSITE
-                ? `三类均已知处覆盖类别占比 0–${SERVICE_SCORE_MAX}%`
+                ? `全部类别均已知处覆盖类别占比 0–${SERVICE_SCORE_MAX}%`
                 : `${categoryLabel(serviceMode)}：已覆盖处最近设施步行 0–${SERVICE_DISTANCE_MAX_M} 米`}</span>
             <span className="api-legend-line">
               <i className="api-legend-dot" style={{ background: rgbCss(SERVICE_GAP_RGB) }} />服务不足
@@ -517,9 +532,10 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
         </span>
         {layers.facilities && (drawables.facilities?.points.length ?? 0) > 0
           && <span className="api-legend-line api-legend-cats">设施类别
-            {CATEGORY_ORDER.map(category => <span key={category} className="api-legend-item">
-              <i className="api-legend-dot" style={{ background: CATEGORY_COLORS[category] }} />
-              {categoryLabel(category)}</span>)}</span>}
+            {(categoryDirectory.length ? categoryDirectory : CATEGORY_ORDER.map((id, order) => ({
+              id, label: categoryLabel(id), order }))).map(item => <span key={item.id} className="api-legend-item">
+              <i className="api-legend-dot" style={{ background: CATEGORY_COLORS[item.id] }} />
+              {item.label}</span>)}</span>}
         {legend.length > 1 && <span className="api-legend-note api-legend-count">共 {legend.length} 个点，同格合并显示，数据不截断</span>}
       </div>
     </div>}

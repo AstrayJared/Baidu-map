@@ -163,7 +163,22 @@ export function validTaskView(value: unknown): value is CheckupTaskView {
     && nullableText(value.error)
     // 失败必须有话说：一个只说 "failed" 的任务视图没法告诉人下一步该做什么。
     && (value.status !== 'failed' || text(value.error))
-    && validTiming(value);
+    && validTiming(value) && validCompletion(value.completion);
+}
+
+export function validCompletion(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  return object(value) && ['reportRevision', 'roundNumber', 'roundPoiLimit', 'roundPoiRequests',
+    'cumulativePoiRequests', 'routeRequests', 'routeRemaining', 'evaluatedCategories', 'totalCategories']
+    .every(key => count(value[key]))
+    && (value.roundPoiRequests as number) <= (value.roundPoiLimit as number)
+    && (value.roundPoiLimit as number) > 0
+    && (value.routeRequests as number) + (value.routeRemaining as number) <= 120
+    && (value.evaluatedCategories as number) <= (value.totalCategories as number)
+    && object(value.queryCompleteByMajor) && Object.values(value.queryCompleteByMajor).every(v => typeof v === 'boolean')
+    && typeof value.canContinue === 'boolean' && typeof value.restartRetrieval === 'boolean'
+    && nullableText(value.stopReason) && oneOf(value.evaluationStatus, ['partial', 'complete', 'limited'])
+    && Array.isArray(value.limitations) && value.limitations.every(text);
 }
 
 function validZone(value: unknown): value is ServiceZone {
@@ -191,6 +206,7 @@ function validReport(value: unknown): value is ReportEvidence {
     // 读成"这些结论就是事实"，而后端冻结的那一份从来不是空的（`LIMITATIONS`）。
     || !Array.isArray(value.limitations) || value.limitations.length === 0
     || !value.limitations.every(text) || !object(value.gaps) || !object(value.verification)) return false;
+  if (!validCompletion(value.completion)) return false;
   const domain = value.domainAreaM2;
   if (domain !== null && !finite(domain)) return false;
   for (const row of value.categories) {
@@ -248,6 +264,7 @@ function validVerification(value: unknown): boolean {
 
 export function validSnapshot(value: unknown): value is CheckupSnapshot {
   if (!object(value) || value.schemaVersion !== 'checkup-v1' || !text(value.taskId)) return false;
+  if (!validCompletion(value.completion)) return false;
   const revision = value.revision;
   if (!count(revision) || revision < 1 || !finite(value.generatedAt)
     || !point(value.center) || value.coordinateSystem !== 'bd09ll'
@@ -306,6 +323,8 @@ export type Capabilities = {
   rules: RecordValue;
   /** 当前部署采用的水系复核；旧后端不给这一项。条目由 water.ts 逐条认。 */
   waterReviews?: RecordValue[];
+  categoryDirectoryVersion?: string;
+  categoryDirectory?: Array<{ id: string; label: string; order: number }>;
   /** §3.4 的跨任务复用窗口；旧后端不给这一项。 */
   cache?: RecordValue;
   /**

@@ -6,6 +6,7 @@ import pytest
 import httpx
 from fastapi.testclient import TestClient
 
+from app import catalog
 from app.config import Settings
 from app.contracts import TaskResultResponse
 from app.main import create_app
@@ -44,7 +45,8 @@ def test_full_http_business_chain_and_server_owned_route_ids(monkeypatch, shift,
         result=client.get(f"/api/analyses/{task}/result").json()
         TaskResultResponse.model_validate(result)
         assert result["facilityAnalysis"]["assessed_points"]==9
-        assert len(result["data"]["facilities"])==5 and result["data"]["report"]
+        assert {f["category"] for f in result["data"]["facilities"]} == {
+            c.key for c in catalog.CATEGORIES if not c.negative} and result["data"]["report"]
         assert result["status"]=="partial" and "test-secret" not in str(result)
         before=len(calls)
         cached=next(iter(result["facilityAnalysis"]["routes"]))

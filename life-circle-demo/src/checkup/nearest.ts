@@ -70,7 +70,8 @@ const pointText = (value: unknown): string | null =>
  * 类别缺大类的记录归入 `other`，不在三类里冒充。
  */
 export function nearestFacilities(drawable: LayerDrawable | undefined, center: Center | null,
-  limit: number = NEAREST_LIMIT): NearestGroup[] {
+  limit: number = NEAREST_LIMIT,
+  directory: Array<{ id: string; label: string; order: number }> = []): NearestGroup[] {
   if (!center) return [];
   const groups = new Map<string, { total: number; facilities: NearestFacility[];
     seen: Set<string> }>();
@@ -91,13 +92,13 @@ export function nearestFacilities(drawable: LayerDrawable | undefined, center: C
       distanceM: straightLineM(center, { lng: point.lng, lat: point.lat }),
     });
   }
-  const known: readonly string[] = CATEGORY_ORDER;
+  const known: readonly string[] = directory.length ? directory.map(item => item.id) : CATEGORY_ORDER;
   const order = [...known.filter(category => groups.has(category)),
     ...[...groups.keys()].filter(category => !known.includes(category))];
   return order.map(category => {
     const group = groups.get(category)!;
     return {
-      category, label: categoryLabel(category),
+      category, label: directory.find(item => item.id === category)?.label ?? categoryLabel(category),
       color: CATEGORY_COLORS[category] ?? '#7c8b95',
       total: group.total,
       facilities: [...group.facilities].sort((a, b) => a.distanceM - b.distanceM).slice(0, limit),

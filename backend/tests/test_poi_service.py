@@ -19,7 +19,7 @@ FIXTURE = Path(__file__).parent / 'fixtures/poi/collection.json'
 
 
 def context(**overrides):
-    request = PoiCollectRequest(coordinateSystem='bd09ll')
+    request = PoiCollectRequest(coordinateSystem='bd09ll', categories=['market', 'pharmacy', 'primary_school'])
     config = RuntimeConfig(runId='test-run', **overrides)
     return request, config, build_plan(request, config)
 
@@ -34,16 +34,18 @@ def test_complete_offline_pipeline_has_explicit_quality_and_uid_uniqueness():
     result, runtime = collect()
     assert result.query_status == 'completed'
     assert result.catalog_completeness == 'unverified'
-    assert result.counts_by_category == {'market': 1, 'pharmacy': 2, 'primary_school': 1}
+    assert {c: n for c, n in result.counts_by_category.items() if n} == {
+        'market': 1, 'pharmacy': 2, 'primary_school': 1}
+    assert set(result.counts_by_category) == set(CATEGORIES)
     assert len({p['id'] for p in result.pois}) == 4
     assert len(result.review_candidates) == 1 and len(result.excluded_candidates) == 1
     assert result.statistics['invalidRecords'] == 32
     assert result.statistics['possibleDuplicateGroups'] == 1
-    assert result.statistics['attempts'] == 128
+    assert result.statistics['attempts'] == 144
     assert result.statistics['networkReservations'] == result.statistics['confirmedSent'] == 0
     assert result.statistics['responseMedianMs'] is None
-    assert all(e['pageNum'] == 0 for e in runtime.events[:96])
-    assert all(e['pageNum'] == 1 for e in runtime.events[96:])
+    assert all(e['pageNum'] == 0 for e in runtime.events[:112])
+    assert all(e['pageNum'] == 1 for e in runtime.events[112:])
     pharmacy = next(p for p in result.pois if p['category'] == 'pharmacy')
     assert len(pharmacy['provenance']) == 32
     assert pharmacy['operatingStatus'] == 'unknown' and pharmacy['navigationLocation'] is None
@@ -87,7 +89,7 @@ def test_empty_success_and_missing_fixture_are_different():
 def test_plan_grid_covers_all_corners_and_clips_inclusively():
     request, config, plan = context()
     projection = LocalProjection((request.center.lng, request.center.lat))
-    assert len(plan['sequences']) == 96 and plan['requestUpperBound'] == 300
+    assert len(plan['sequences']) == 112 and plan['requestUpperBound'] == 300
     assert plan['searchExtent']['localMeters'] == [-2600,-2600,2600,2600]
     for sequence in plan['sequences']:
         x0,y0,x1,y1 = sequence['localMeters']
@@ -127,7 +129,7 @@ def test_coordinate_accepts_finite_decimal_values(value):
 
 @pytest.mark.parametrize('name,tags,status',[
     ('合成药店',['医疗;药店'],'accepted'),('合成药店',[],'needs_review'),
-    ('合成医院门诊药房',['药店'],'needs_review'),('九年一贯制学校',['小学'],'needs_review'),
+    ('合成医院门诊药房',['药店'],'needs_review'),('九年一贯制学校',['小学'],'accepted'),
     ('合成生鲜超市',['菜市场'],'needs_review'),('合成小学北门',['小学'],'excluded'),
     ('合成小学辅导班',['小学'],'excluded'),('合成药店',['小学'],'needs_review')])
 def test_classification_evidence(name,tags,status):

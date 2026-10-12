@@ -39,6 +39,7 @@ from ..poi import plan as poi_plan
 from ..poi.online import coarse_blocks
 from ..poi.planner import RULES as POI_RULES
 from ..quota import PLACE, attach_token
+from ..request_control import RequestStopped, wait_with_cancel
 from .accessibility_stage import AccessibilityOutcome, assess_accessibility
 from .facilities import FacilityOutcome, collect_facilities, stale_for
 from .facility_stage import query_domain
@@ -52,11 +53,12 @@ from .models import (DEFAULT_POI_REQUESTS, DETAIL_ROUTE_REQUESTS, DISTANCE_RULE,
 from . import retention
 from .places import declared_identity
 from .progress import StepReporter, category_label
+from .continuation import ContinuationMixin
 from .reporting_stage import build_report
-from .routes import DETAIL_POOL, RoutesUnavailable, open_online as open_routes
+from .routes import DETAIL_POOL, ReplayRoutes, RoutesUnavailable, open_online as open_routes
 from .store import (CheckupStore, ExtensionNotFound, RequestIdConflict, TaskNotFound,
                     extension_identity, extension_matches)
-from .verification_stage import (VerificationOutcome, carried_over, judge_route,
+from .verification_stage import (VerificationOutcome, carried_over, judge_route, compatible_verification,
                                  refusal as verification_refusal, verify_facilities)
 
 logger = logging.getLogger(__name__)
@@ -242,7 +244,7 @@ class _ExtensionBoundary:
     revision: int
 
 
-class CheckupManager:
+class CheckupManager(ContinuationMixin):
     def __init__(self, settings, registry, store: CheckupStore, quota, place_factory=None,
                  route_factory=None, offline=None):
         self.settings, self.registry, self.store, self.quota = settings, registry, store, quota
@@ -578,11 +580,17 @@ class CheckupManager:
         if not self.store.claim(task_id):
             return
         record = self.store.get(task_id)
-        payload = CheckupRequest(**record.payload)
+        payload = CheckupRequest.from_stored(record.payload)
         token = CancelToken()
         self.tokens[task_id] = token
         try:
-            await self._stages(task_id, payload, record, token)
+            current = self.store.round(task_id)
+            if current is not None and current['number'] > 1:
+                await self._continue_stages(task_id, payload, record, token)
+            else:
+                await self._stages(task_id, payload, record, token)
+        except (AssessmentCancelled, RequestStopped):
+            self._finish(task_id, status='cancelled')
         finally:
             self.tokens.pop(task_id, None)
 
@@ -608,15 +616,15 @@ class CheckupManager:
             artifact_dir=self.store.artifact_dir(task_id),
             # The engine names its own sub-stage; the counts are its attempts
             # against the tier and what of them actually went to the network.
-            on_progress=lambda snapshot: report(
+            on_progress=lambda snapshot: None if token.cancelled else report(
                 snapshot.stage, count=snapshot.requests, limit=snapshot.budget,
                 requests=snapshot.requests, network_requests=snapshot.network_requests),
             # Its preparation counts edges or nothing: the task counters stay as they are.
-            on_step=report)
+            on_step=lambda *args, **kwargs: None if token.cancelled else report(*args, **kwargs))
         try:
-            snapshot = await self.registry.get(record.engine).compute(
-                IsochroneAsk(origin=origin, budget=record.budget), context)
-        except EngineCancelled:
+            snapshot = await wait_with_cancel(self.registry.get(record.engine).compute(
+                IsochroneAsk(origin=origin, budget=record.budget), context), token)
+        except (EngineCancelled, RequestStopped):
             # The user's cancel stopped the engine: the task ends, the worker serves on.
             self._finish(task_id, status="cancelled")
             return
@@ -630,6 +638,10 @@ class CheckupManager:
         # The boundary revision is frozen even when the run is then cancelled:
         # an orderly stop never discards a result that has been paid for.
         self._publish_isochrone(task_id, payload, snapshot, budget)
+        self.store.begin_round(task_id, payload.client_request_id, 0,
+                               self._round_identity(payload, snapshot), initial=True,
+                               poi_limit=payload.facilities.max_poi_requests)
+        self._bind_round(task_id, budget)
         if token.cancelled:
             self._finish(task_id, status="cancelled",
                          business_status=business_status_for(snapshot.quality, "not_integrated"))
@@ -642,9 +654,9 @@ class CheckupManager:
         boundary_network = snapshot.network_requests
         outcome = await collect_facilities(
             payload, snapshot, settings=self.settings, context=context, quota=self.quota,
-            budget=budget, cache=self.cache, places_factory=self.place_factory,
-            progress=lambda sent, limit: report(
-                "places", count=sent, limit=limit, requests=boundary_network + sent,
+            budget=budget, cache=self.cache, places_factory=self.place_factory, store=self.store,
+            progress=lambda sent, limit, label=None: report(
+                "places", count=sent, limit=limit, label=label, requests=boundary_network + sent,
                 network_requests=boundary_network + sent))
         business = self._publish_facilities(task_id, payload, snapshot, budget, outcome)
         if token.cancelled:
@@ -672,8 +684,12 @@ class CheckupManager:
         report("report")
         # Assembling and writing the report takes a second or more; off the event
         # loop, so status polls are answered meanwhile.
-        business = await asyncio.to_thread(self._publish_reporting, task_id, payload, snapshot, budget,
-                                           outcome, assessment, verification)
+        business = await wait_with_cancel(asyncio.to_thread(
+            self._publish_reporting, task_id, payload, snapshot, budget,
+            outcome, assessment, verification, token=token), token, keep_running=True)
+        if token.cancelled:
+            self._finish(task_id, status='cancelled', business_status=business)
+            return
         self._finish(task_id, status="completed", business_status=business)
         self.store.update(task_id, stage="ready")
 
@@ -690,6 +706,9 @@ class CheckupManager:
         of it, however many boundary samples it computed locally.
         """
         state = budget.state()
+        if getattr(budget, 'poi_prior', 0):
+            state['poi']['spent'] += budget.poi_prior
+            state['poi']['limit'] += budget.poi_prior
         state["isochrone"]["spent"] = snapshot.network_requests
         return state
 
@@ -869,7 +888,7 @@ class CheckupManager:
                  else outcome.group.model_dump(mode="json", by_alias=True))
         if report is not None and self.offline is not None:
             report("graph")
-        resolved = await self._resolve_offline(report)
+        resolved = await self._resolve_offline(report, token=token)
         inner = None if report is None else _assessment_progress(report)
 
         def progress(step, **detail):
@@ -908,7 +927,7 @@ class CheckupManager:
 
     async def _publish_verification(self, task_id: str, payload: CheckupRequest, snapshot, budget,
                                     outcome: FacilityOutcome, assessment: AccessibilityOutcome,
-                                    *, deadline: float, report=None, token=None) -> VerificationOutcome:
+                                    *, deadline: float, report=None, token=None, previous=None) -> VerificationOutcome:
         """Run and freeze the route verification (§6.3).
 
         A deployment without a walking-route service publishes the same revision
@@ -927,12 +946,15 @@ class CheckupManager:
         heatmap = (None if assessment.heatmap is None
                    else assessment.heatmap.model_dump(mode="json", by_alias=True))
         gaps = (None if assessment.service_gaps is None else assessment.service_gaps.zones)
+        carried = compatible_verification(previous, _service_sources(outcome.group), assessment.entrances)
         async with AsyncExitStack() as stack:
             try:
                 routes = (self.route_factory(self.settings) if self.route_factory is not None
                           else await open_routes(self.settings, stack))
             except RoutesUnavailable as exc:
-                result = verification_refusal(exc.reason)
+                result = (VerificationOutcome(evidence=carried, status=carried.status,
+                                               overrides=carried.local_overrides) if carried is not None
+                          else verification_refusal(exc.reason))
             else:
                 # The session takes the task's route bucket from the direction
                 # pool, so verification, both engines and the click-detail route
@@ -948,9 +970,10 @@ class CheckupManager:
                     origin=normalize((payload.center.lng, payload.center.lat)),
                     # 没有圈面时核验没有对象，而且原因在成圈不在这里。
                     boundary_available=snapshot.geometry is not None,
-                    session=attach_token(routes.session(self.quota.direction, budget=budget,
+                    session=ReplayRoutes(attach_token(routes.session(self.quota.direction, budget=budget,
                                                         deadline=deadline), token),
-                    progress=progress, token=token)
+                                         store=self.store, task_id=task_id, budget=budget),
+                    progress=progress, token=token, previous=carried)
         # §6.3 局部重算：覆盖抽检的冲突与实测补定只改它们所在的那几格，其余格照旧由
         # 模型判定。重算不发任何请求；没有路网或被取消时保留原评估。
         if result.overrides and assessment.accessibility is not None and not (token and token.cancelled):
@@ -967,7 +990,7 @@ class CheckupManager:
 
     async def _assess(self, snapshot, outcome, payload, *, verified=None, token=None):
         """Re-run the assessment off the event loop; None without a graph or on cancel."""
-        resolved = await self._resolve_offline()
+        resolved = await self._resolve_offline(token=token)
         if resolved is None:
             return None
 
@@ -1014,8 +1037,10 @@ class CheckupManager:
                            outcome: FacilityOutcome, assessment: AccessibilityOutcome,
                            verification: VerificationOutcome | None = None, *,
                            recomputed: dict | None = None,
-                           retried: dict | None = None) -> str:
+                           retried: dict | None = None, token=None) -> str:
         """Freeze the report revision: the same assessment, assembled for readers."""
+        if token is not None and token.cancelled:
+            raise AssessmentCancelled()
         revision = self.store.get(task_id).revision + 1
         isochrone = snapshot.model_dump(mode="json", by_alias=True)
         group = (None if outcome.group is None
@@ -1032,10 +1057,13 @@ class CheckupManager:
             accessibility=dump(evidence), service_gaps=dump(assessment.service_gaps),
             heatmap=dump(assessment.heatmap), scores=dump(assessment.scores),
             facilities=group,
+            requested_categories=payload.facilities.categories,
             verification=None if verification is None or verification.evidence is None
                          else verification.evidence.model_dump(mode="json", by_alias=True),
             water=dump(assessment.water))
         objects = self._analysis_objects(assessment, report, verification)
+        report.completion = self._completion(task_id, {'facilities': group, 'revision': revision,
+            'isochrone': isochrone, 'report': report.model_dump(mode='json', by_alias=True)}, frozen=True)
         result_hash = self._result_hash(isochrone, group, facilities_status=outcome.status,
                                         analysis=objects)
         business = business_status_for(snapshot.quality, outcome.status, assessment.status)
@@ -1050,7 +1078,7 @@ class CheckupManager:
                          extra_rules={"classification": POI_RULES["version"],
                                       "accessibility": RULE_VERSION},
                          recomputed=recomputed, retried=retried)), revision,
-            result_hash)
+            result_hash, token=token)
         return business
 
     # -- recompute after a data correction ---------------------------------
@@ -1079,7 +1107,7 @@ class CheckupManager:
         previous, _ = self.snapshot(task_id)
         if previous.stage != "reporting" or previous.facilities is None:
             raise CheckupError(409, "checkup_recompute_needs_report", "只有已出报告的任务可以重算")
-        payload = CheckupRequest(**record.payload)
+        payload = CheckupRequest.from_stored(record.payload)
         origin = normalize((payload.center.lng, payload.center.lat))
         frozen = IsochroneSnapshot(**previous.isochrone)
         engine = self.registry.get(record.engine)
@@ -1140,7 +1168,7 @@ class CheckupManager:
         self.store.update(task_id, stage="ready", business_status=business)
         return published
 
-    async def _resolve_offline(self, report=None):
+    async def _resolve_offline(self, report=None, *, token=None):
         """Resolve the walking graph off the event loop; None when there is none.
 
         A load in progress is told to ``report`` step by step, its edges counted.
@@ -1149,7 +1177,9 @@ class CheckupManager:
             return None
         try:
             return await resolve(self.offline, None if report is None else (
-                lambda step, done, total: report(step, count=done, limit=total)))
+                lambda step, done, total: report(step, count=done, limit=total)), token=token)
+        except RequestStopped:
+            raise AssessmentCancelled() from None
         except Exception:
             # A graph that fails to load is the same answer as a deployment that
             # has none: the assessment says why, and the rest of the revision
@@ -1157,12 +1187,16 @@ class CheckupManager:
             return None
 
     def _publish(self, task_id: str, stage: str, document: CheckupSnapshot, revision: int,
-                 result_hash: str) -> None:
+                 result_hash: str, *, token=None) -> None:
         # Published files use wire naming, so a stored revision round-trips back
         # into the response model without a translation step.
+        document.completion = self._completion(task_id, document.model_dump(mode='json', by_alias=True), frozen=True)
         wire = document.model_dump(mode="json", by_alias=True)
+        if token is not None and token.cancelled:
+            raise AssessmentCancelled()
         published = self.store.publish(task_id, stage=stage, snapshot=wire,
                                        result_hash=result_hash,
+                                       cancelled=None if token is None else lambda: token.cancelled,
                                        # §5 B2 决策 2：汇总与修订同一笔定稿 —— 明细删掉之后，
                                        # 它就是这份结论唯一还留下来的东西。
                                        summary=retention.summary_of(wire))
@@ -1211,7 +1245,7 @@ class CheckupManager:
         if item is None:
             raise CheckupError(404, "checkup_facility_not_found", "该设施不在本次体检结果中")
         record = self.get(task_id)
-        payload = CheckupRequest(**record.payload)
+        payload = CheckupRequest.from_stored(record.payload)
         origin = normalize((payload.center.lng, payload.center.lat))
         destination = normalize((item["location"]["lng"], item["location"]["lat"]))
         budget = self.detail_budget(task_id, record)
@@ -1236,7 +1270,11 @@ class CheckupManager:
                                f"本次没有取到路线结论（{stopped or 'unknown'}）")
         # 判定与核验阶段同一套（:func:`judge_route`）：严格层成立用路线距离，端点容差层
         # 用"路线距离＋两端偏移"的接入距离估计；两者都不成立时只留下返回的距离。
-        judged = judge_route(observation, origin, destination, item["id"])
+        prior = next((row for row in (snapshot.verification.facilities if snapshot.verification else [])
+                      if row.get('facilityId') == item['id']), None)
+        entrance_status = prior.get('entranceStatus') if prior else None
+        judged = judge_route(observation, origin, destination, item["id"],
+                             entrance_status=entrance_status)
         strict, returned = judged["strict"], judged["returned"]
         x, y = LocalProjection(origin).to_local(destination)
         return FacilityRoute(
@@ -1250,6 +1288,7 @@ class CheckupManager:
             verification_layer=judged["layer"],
             duration_s=observation.duration, observed_duration_s=observation.observed_duration,
             poi_status=strict.status, poi_reason=strict.reason,
+            entrance_status=entrance_status,
             evidence_grade="verified" if judged["layer"] is not None else "model",
             route_origin=_point(observation.route_origin),
             route_destination=_point(observation.route_destination),
@@ -1304,6 +1343,7 @@ class CheckupManager:
             error=record.error, server_time=now, started_at=record.started_at,
             finished_at=record.finished_at, stage_started_at=record.stage_started_at,
             last_activity_at=record.activity_at,
+            completion=self._completion(record.task_id),
             progress=None if record.progress is None else TaskProgress(**record.progress),
             retention=self.retention_of(record, now=now))
 
@@ -1513,7 +1553,7 @@ class CheckupManager:
         parent = self.get(task_id)
         if parent.status not in TERMINAL or task_id in self.tokens:
             raise CheckupError(409, "checkup_task_running", "任务仍在运行，不能重试")
-        request = CheckupRequest(**parent.payload)
+        request = CheckupRequest.from_stored(parent.payload)
         categories = list(request.facilities.categories)
         identity = extension_identity(categories=categories,
                                       max_poi_requests=payload.max_poi_requests)
@@ -1668,7 +1708,7 @@ class CheckupManager:
         stored = self.store.revision(task_id, record.base_revision)
         isochrone = (stored or {}).get("snapshot", {}).get("isochrone") or {}
         frozen = IsochroneSnapshot(**isochrone)
-        payload = CheckupRequest(**self.store.get(task_id).payload)
+        payload = CheckupRequest.from_stored(self.store.get(task_id).payload)
         resolved = await self._resolve_offline()
         overrides = ([] if previous.verification is None
                      else list(previous.verification.local_overrides))
@@ -1726,7 +1766,7 @@ class CheckupManager:
         if not self.store.claim_extension(extension_id):
             return
         record = self.store.extension(extension_id)
-        parent = CheckupRequest(**self.store.get(record.task_id).payload)
+        parent = CheckupRequest.from_stored(self.store.get(record.task_id).payload)
         stored = self.store.revision(record.task_id, record.base_revision)
         if stored is None:
             self.store.finish_extension(extension_id, status="failed", document_path=None,
@@ -1742,6 +1782,18 @@ class CheckupManager:
                                             max_route_requests=1)})
         # 只有 POI 这一个池会被用到：补查不成圈，也不请求步行路线。
         budget = self.quota.task_budget(isochrone=0, poi=record.budget, route=0, detail=0)
+        if record.kind == "retry":
+            prior = self._completion(record.task_id)
+            if prior is None:
+                self.store.finish_extension(extension_id, status="failed", document_path=None,
+                                            error="checkup_details_expired")
+                return
+            self.store.begin_round(record.task_id, record.client_request_id, record.base_revision,
+                                   self._round_identity(parent, IsochroneSnapshot(**isochrone)),
+                                   poi_before=prior.cumulative_poi_requests,
+                                   route_before=prior.route_requests, poi_limit=record.budget,
+                                   requeue=False)
+            self._bind_round(record.task_id, budget)
         token = CancelToken()
         self.extension_tokens[extension_id] = token
         # 缓存用原任务的标识：核心三类已经取过的页面在这里算"同任务命中"，不再付费。
@@ -1752,7 +1804,8 @@ class CheckupManager:
             outcome = await collect_facilities(
                 payload, snapshot, settings=self.settings, context=context, quota=self.quota,
                 budget=budget, cache=self.cache, places_factory=self.place_factory,
-                progress=lambda sent, limit: self.store.update_extension(
+                store=self.store if record.kind == "retry" else None,
+                progress=lambda sent, limit, label=None: self.store.update_extension(
                     extension_id, network_requests=sent))
         finally:
             self.extension_tokens.pop(extension_id, None)
@@ -1795,6 +1848,7 @@ class CheckupManager:
         if self.extension_worker is not None and not self.extension_worker.done():
             self.extension_worker.cancel()
             await asyncio.gather(self.extension_worker, return_exceptions=True)
+        self.store.close()
 
 
 def _extension_status(outcome: FacilityOutcome, token: CancelToken) -> str:

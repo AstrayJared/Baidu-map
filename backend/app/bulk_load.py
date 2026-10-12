@@ -11,7 +11,7 @@ def _hand_over(value):
     return value
 
 
-def loads(text):
+def loads(text, *, checkpoint=None):
     """``json.loads`` for data files of tens or hundreds of megabytes.
 
     The C parser holds the GIL for a whole document: the 283 MB graph cache is
@@ -19,7 +19,17 @@ def loads(text):
     nothing is answered (status polls neither). Called back once per object, it
     lets them in every few milliseconds, for a fraction more parse time.
     """
-    return json.loads(text, object_hook=_hand_over)
+    if checkpoint is None:
+        return json.loads(text, object_hook=_hand_over)
+    objects = 0
+    def checked(value):
+        nonlocal objects
+        objects += 1
+        if objects % 1024 == 0:
+            checkpoint()
+        return value
+    checkpoint()
+    return json.loads(text, object_hook=checked)
 
 
 _lock = threading.Lock()

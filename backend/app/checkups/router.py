@@ -5,9 +5,11 @@ from fastapi.responses import JSONResponse
 from ..algorithms.hybrid_isochrone.water_review import review_catalog
 from .. import catalog
 from ..catalog import major_of
+from .. import catalog
 from ..engines import STATUS_THRESHOLD_S
 from ..poi.online import PROCESSING_STEP_LIMIT
 from .manager import CheckupError, CheckupManager
+from .models import ContinueCheckupRequest
 from .models import (DEFAULT_POI_REQUESTS, DEFAULT_ROUTE_REQUESTS, DETAIL_ROUTE_REQUESTS,
                      DISTANCE_RULE, MAX_POI_REQUESTS, MAX_ROUTE_REQUESTS, QUERY_PADDING_M,
                      RULE_VERSION, CheckupCapabilities, CheckupLayer, CheckupRequest,
@@ -32,7 +34,7 @@ NO_STORE = "no-store"
 # The balance counts this application's own attempts. The browser SDK, other
 # applications and the console's accounting sit outside it, so the interface
 # must not present it as the account's remaining allowance.
-QUOTA_LABEL = "本应用预算余额（不含浏览器 SDK、其他应用及旧接口流量）"
+QUOTA_LABEL = "本应用请求限制（不含浏览器 SDK、其他应用及旧接口流量）"
 
 
 def _latest(manager: CheckupManager, task_id: str, revision: int | None = None):
@@ -269,7 +271,8 @@ def checkup_router(manager: CheckupManager):
     # a task id, which would otherwise shadow it.
     @router.get("/by-request/{client_request_id}", response_model=CheckupTaskView)
     async def by_request(client_request_id: str):
-        return manager.view(manager.by_request(client_request_id))
+        return manager.view(manager.by_request(client_request_id)).model_copy(
+            update={'client_request_id': client_request_id})
 
     @router.get("/{task_id}", response_model=CheckupTaskView)
     async def status(task_id: str):
@@ -294,6 +297,9 @@ def checkup_router(manager: CheckupManager):
         # 一个被缓存下来的副本会把"即将到期"一直显示成"还没到期"。
         return JSONResponse(status_code=200, headers={"Cache-Control": NO_STORE},
                             content=view.model_dump(mode="json", by_alias=True))
+    @router.post('/{task_id}/continue', status_code=202, response_model=CheckupTaskView)
+    async def continue_checkup(task_id: str, payload: ContinueCheckupRequest):
+        return manager.continue_checkup(task_id, payload)
 
     @router.get("/{task_id}/layers/{layer_id}")
     async def layer(task_id: str, layer_id: str, request: Request, revision: int | None = None):
@@ -391,6 +397,8 @@ def capabilities_router(manager: CheckupManager, settings, offline=None):
             and settings.osm_graph_cache_path.is_file()
         graph_state = "unavailable" if not graph_configured else (None if offline is None else offline.state)
         return CheckupCapabilities(
+            category_directory_version=catalog.VERSION,
+            category_directory=catalog.major_directory(),
             engines=[item.model_dump(mode="json", by_alias=True)
                      for item in manager.registry.capabilities()],
             # ``DistanceRule`` stays in its own snake-case form; it is the same

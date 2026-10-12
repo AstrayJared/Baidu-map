@@ -6,6 +6,7 @@ POI evidence types keep their existing serialization byte-for-byte.
 """
 import time
 from typing import Literal
+from typing_extensions import TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic.alias_generators import to_camel
@@ -25,16 +26,10 @@ TaskStatus = Literal["queued", "running", "cancelling", "completed", "failed", "
 BusinessStatus = Literal["complete", "partial", "insufficient"]
 Stage = Literal["isochrone", "poi", "accessibility", "verification", "reporting", "ready"]
 
-# The default is sized so that one checkup of the core three majors can actually
-# reach the 80% coverage goal. Measured cost of a 4-block core-three area (C0,
-# synthetic fixture, ``evidence/07``): 59 dispatches sparse, 203 moderate, 1379
-# dense. 240 completes the moderate case in a single pass; 1600 leaves room for the
-# dense one. The operator authorised both on 2026-10-09, along with a 2000/day
-# application budget. A ceiling is not a default: the dense case still has to be
-# asked for, and every page stays bounded by the pool at the moment of dispatch.
-DEFAULT_POI_REQUESTS = 240
+# Finite checkup budgets. Callers may lower these limits.
+DEFAULT_POI_REQUESTS = 1200
 DEFAULT_ROUTE_REQUESTS = 120
-MAX_POI_REQUESTS = 1600
+MAX_POI_REQUESTS = 1200
 MAX_ROUTE_REQUESTS = 120
 DETAIL_ROUTE_REQUESTS = 20
 
@@ -52,6 +47,12 @@ class CheckupModel(BaseModel):
     """Camel-case wire naming, like the rest of the project's HTTP contracts."""
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False, populate_by_name=True,
                               alias_generator=to_camel)
+
+
+class CategoryDirectoryEntry(TypedDict):
+    id: str
+    label: str
+    order: int
 
 
 class CheckupIsochrone(CheckupModel):
@@ -82,9 +83,45 @@ class CheckupRequest(CheckupModel):
     isochrone: CheckupIsochrone = Field(default_factory=CheckupIsochrone)
     facilities: CheckupFacilities = Field(default_factory=CheckupFacilities)
 
+    @classmethod
+    def from_stored(cls, values: dict):
+        """Read a previously accepted 1600-cap request without widening new admission."""
+        raw = values.get('facilities') or {}
+        key = 'maxPoiRequests' if 'maxPoiRequests' in raw else 'max_poi_requests'
+        limit = raw.get(key)
+        if type(limit) is int and MAX_POI_REQUESTS < limit <= 1600:
+            bounded = {**values, 'facilities': {**raw, key: MAX_POI_REQUESTS}}
+            request = cls(**bounded)
+            request.facilities = request.facilities.model_copy(update={'max_poi_requests': limit})
+            return request
+        return cls(**values)
+
     def fingerprint(self) -> dict:
         """Identity-free input digest; the request id names, it does not configure."""
         return self.model_dump(mode="json", exclude={"client_request_id"})
+
+
+class ContinueCheckupRequest(CheckupModel):
+    client_request_id: str = Field(min_length=1, max_length=100, pattern=r"^[a-zA-Z0-9_-]+$")
+    base_revision: int = Field(ge=1)
+
+
+class CheckupCompletion(CheckupModel):
+    report_revision: int = 0
+    round_number: int = 1
+    round_poi_limit: int = 60
+    round_poi_requests: int = 0
+    cumulative_poi_requests: int = 0
+    route_requests: int = 0
+    route_remaining: int = 120
+    query_complete_by_major: dict[str, bool] = Field(default_factory=dict)
+    evaluated_categories: int = 0
+    total_categories: int = 10
+    evaluation_status: Literal['partial', 'complete', 'limited'] = 'partial'
+    can_continue: bool = False
+    restart_retrieval: bool = False
+    stop_reason: str | None = None
+    limitations: list[str] = Field(default_factory=list)
 
 
 class SessionOpenRequest(CheckupModel):
@@ -563,6 +600,10 @@ class ReportVerification(CheckupModel):
     checked: int = 0
     failed: int = 0
     unresolved: int = 0
+    route_returns: int = Field(default=0, json_schema_extra={'x-legacy-optional': True})
+    strict_confirmed: int = Field(default=0, json_schema_extra={'x-legacy-optional': True})
+    tolerance_estimated: int = Field(default=0, json_schema_extra={'x-legacy-optional': True})
+    no_usable_decision: int = Field(default=0, json_schema_extra={'x-legacy-optional': True})
     #: 第一层：中心可达性（体检中心 → 设施）。
     facilities: list[dict] = Field(default_factory=list)
     conflicts: list[dict] = Field(default_factory=list)
@@ -602,6 +643,8 @@ class ReportEvidence(CheckupModel):
     domain: dict | None = None
     domain_area_m2: float | None = None
     categories: list[CoverageRow] = Field(default_factory=list)
+    category_directory_version: str | None = Field(default=None, json_schema_extra={'x-legacy-optional': True})
+    category_directory: list[CategoryDirectoryEntry] = Field(default_factory=list, json_schema_extra={'x-legacy-optional': True})
     overall: OverallScore | None = None
     # 三栏都是必填：一份"漏了核验栏"的报告与一份"核验缺席"的报告必须长得不一样，
     # 前者是组装错误，后者要带着原因出现在读者面前。
@@ -612,6 +655,7 @@ class ReportEvidence(CheckupModel):
     #: 在同一版修订的 ``water`` 栏。早于水系复核的报告没有这一栏。
     data_sources: dict | None = None
     limitations: list[str] = Field(default_factory=list)
+    completion: CheckupCompletion | None = Field(default=None, json_schema_extra={'x-legacy-optional': True})
 
 
 class VerificationEvidence(CheckupModel):
@@ -626,6 +670,10 @@ class VerificationEvidence(CheckupModel):
     checked: int = 0
     failed: int = 0
     unresolved: int = 0
+    route_returns: int = Field(default=0, json_schema_extra={'x-legacy-optional': True})
+    strict_confirmed: int = Field(default=0, json_schema_extra={'x-legacy-optional': True})
+    tolerance_estimated: int = Field(default=0, json_schema_extra={'x-legacy-optional': True})
+    no_usable_decision: int = Field(default=0, json_schema_extra={'x-legacy-optional': True})
     facilities: list[dict] = Field(default_factory=list)
     #: 覆盖抽检里与模型结论对不上的格子。它们交给局部重算：只在实测点所在的 25 米格
     #: 定论，同一父格里被推翻的模型结论降为未知，不整片改面积。
@@ -678,6 +726,7 @@ class CheckupSnapshot(CheckupModel):
     #: 水体障碍的来源与复核范围；早于水系复核的修订没有这一栏（null）。
     water: WaterDataEvidence | None = None
     warnings: list[Issue] = Field(default_factory=list)
+    completion: CheckupCompletion | None = Field(default=None, json_schema_extra={'x-legacy-optional': True})
 
 
 class TaskProgress(CheckupModel):
@@ -724,6 +773,7 @@ class CheckupTaskView(CheckupModel):
     #: a revision, a state change). A cancel request is not the worker's activity.
     last_activity_at: float | None = None
     progress: TaskProgress | None = None
+    completion: CheckupCompletion | None = Field(default=None, json_schema_extra={'x-legacy-optional': True})
     #: §5 B2 决策 2：这份结果的明细还能不能提供、为什么、什么时候到期。它是**任务视图**上
     #: 的活字段（不像修订那样冻结），因为它描述的是"现在"，而到期时刻会随后来发生的体检
     #: 变化 —— 冻结进修订就等于把一个会变的答案写成常数。
@@ -773,6 +823,7 @@ class FacilityRoute(CheckupModel):
     #: 严格 POI 证据这一层：端点不重合就是 pending；它是附加标志，不决定判定。
     poi_status: Literal["pending", "verified_reachable", "verified_unreachable"] = "pending"
     poi_reason: str | None = None
+    entrance_status: str | None = Field(default=None, json_schema_extra={'x-legacy-optional': True})
     evidence_grade: Literal["verified", "model"] = "model"
     route_origin: Origin | None = None
     route_destination: Origin | None = None
@@ -807,6 +858,8 @@ class CheckupCapabilities(CheckupModel):
     quota: dict
     #: Water reviews this deployment applies: ``[{reviewId, version, label, title, bbox}]``.
     water_reviews: list[dict] = Field(default_factory=list)
+    category_directory_version: str = catalog.VERSION
+    category_directory: list[CategoryDirectoryEntry] = Field(default_factory=catalog.major_directory)
 
 
 def new_trace(*, isochrone_hash: str, result_hash: str, data_versions: dict,

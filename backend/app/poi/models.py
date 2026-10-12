@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic.alias_generators import to_camel
 from app.catalog import POI_RUNTIME, poi_key
 from app.test_origin import TEST_ORIGIN
@@ -55,8 +55,8 @@ class RuntimeConfig(WireModel):
     @field_validator('category_budgets', mode='before')
     @classmethod
     def budgets(cls, value):
-        if not isinstance(value, dict) or set(value) != set(CATEGORIES):
-            raise ValueError('explicit budget for every category required')
+        if not isinstance(value, dict) or not value or not set(value) <= set(CATEGORIES):
+            raise ValueError('nonempty budgets for known categories required')
         if any(type(n) is not int or not 0 < n <= 10000 for n in value.values()):
             raise ValueError('positive integer budgets required')
         return value
@@ -72,6 +72,12 @@ class RuntimeConfig(WireModel):
 class CollectionConfig(WireModel):
     request: PoiCollectRequest
     runtime: RuntimeConfig
+
+    @model_validator(mode='after')
+    def requested_budgets(self):
+        if set(self.request.categories) - self.runtime.category_budgets.keys():
+            raise ValueError('explicit budget for every requested category required')
+        return self
 
 
 class PoiCollectionResult(WireModel):

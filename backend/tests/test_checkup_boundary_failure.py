@@ -2,7 +2,7 @@
 
 两次真实体检（2026-10-10 10:27:00 与 10:29:17，中心 31.299213,121.50847，预算 200）的
 修订是同一个形状：成圈花掉全部 200 次、``geometry: null``、``quality: insufficient``，
-设施检索一次也没派发（POI 桶 spent 0／240），而可达性与核验把每个类别的原因写成
+设施检索一次也没派发（POI 桶 spent 0／本轮默认 1200），而可达性与核验把每个类别的原因写成
 ``facility_stage_unavailable``。那份报告读起来像"设施检索失败了" —— 真正失败的却是成圈，
 读者会去查一个没有出错的阶段。成圈内部的拒收原因当时也没有留下，修订里只剩一个 budget。
 
@@ -64,7 +64,7 @@ def test_a_boundary_that_never_stood_up_is_not_reported_as_a_facility_failure(tm
     # "成圈花光了设施预算"的猜测在这里就被证伪了。
     assert frozen["facilities"] is None
     assert frozen["facilitiesStatus"] == "failed"
-    assert frozen["trace"]["budgets"]["poi"] == {"limit": 240, "spent": 0}
+    assert frozen["trace"]["budgets"]["poi"] == {"limit": 1200, "spent": 0}
     assert places.sent == []
     # 原因写边界，不写下游的设施阶段。
     assert frozen["accessibility"]["status"] == "failed"

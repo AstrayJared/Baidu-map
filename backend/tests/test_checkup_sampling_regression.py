@@ -38,8 +38,9 @@ CENTERS = ((121.491517, 31.299588), (121.463796, 31.314841), (121.483141, 31.276
 #: 第三处在查询范围内、圈面外（它是服务来源，不是发现）。
 INSIDE_OFFSETS, OUTSIDE_OFFSET = ((0, 0), (500, 0)), (0, 1600)
 CORE_MINORS = len(poi_keys(list(default_analysis_majors())))
-#: 每个位置每个小类回一条，判进本类的有 ``CORE_ACCEPTED_TOTAL`` 条（``combined_school``
-#: 与 ``training`` 的样本不判进本类）。两点在圈内、一点在圈外：所以"查到了"是两倍，
+#: 每个位置每个小类回一条，判进本类的有 ``CORE_ACCEPTED_TOTAL`` 条（只有负类 ``training``
+#: 的样本不判进本类；``combined_school`` 在 #53 收窄 ``review`` 之后按名字判进本类）。
+#: 两点在圈内、一点在圈外：所以"查到了"是两倍，
 #: "圈外的服务来源"是一倍，而圈外的**记录**是全部小类各一条。
 COUNTS = {category: 2 * count for category, count in CORE_ACCEPTED.items()}
 OUTSIDE_RECORDS = CORE_MINORS
