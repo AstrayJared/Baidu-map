@@ -1,0 +1,55 @@
+{
+  "note": "已知的历史断链：Phase 1 之前就存在，本机与 Git 里都没有目标文件。这里按“来源文件＋目标”精确匹配并写明原因，脚本只对它放行；新增断链一律失败。修好其中一条后，脚本会提示把对应条目删掉。",
+  "known": [
+    {
+      "source": "backend/docs/任务B_POI接口与验收说明.md",
+      "target": "reviews/2026-09-14/任务B_测试与验收报告.md",
+      "reason": "2026-09 的评审目录当时只在临时目录里，从未入库"
+    },
+    {
+      "source": "backend/docs/当前进度与接口报告.md",
+      "target": "reviews/2026-09-14/任务B_测试与验收报告.md",
+      "reason": "同上：reviews/ 目录从未入库"
+    },
+    {
+      "source": "backend/docs/当前进度与接口报告.md",
+      "target": "国定一社区_边界比较恢复报告.md",
+      "reason": "同批比较报告未入库，本机也没有"
+    },
+    {
+      "source": "backend/docs/当前进度与接口报告.md",
+      "target": "国定一社区_边界独立参考集比较报告.md",
+      "reason": "同批比较报告未入库，本机也没有"
+    },
+    {
+      "source": "backend/docs/当前进度与接口报告.md",
+      "target": "国定一社区_稳定性与三算法比较报告.md",
+      "reason": "同批比较报告未入库，本机也没有"
+    },
+    {
+      "source": "backend/docs/国定一社区_自适应算法漏纳与误纳原因分析报告.md",
+      "target": "国定一社区_边界比较恢复报告.md",
+      "reason": "同批比较报告未入库，本机也没有"
+    },
+    {
+      "source": "backend/docs/算法前后端接入任务报告.md",
+      "target": "reviews/2026-09-13/核验与阶段报告.md",
+      "reason": "同上：reviews/ 目录从未入库"
+    },
+    {
+      "source": "backend/docs/本地启动与前后端联调.md",
+      "target": "../../life-circle-demo/tests/analysis-ui.spec.ts",
+      "reason": "旧 /api/analyses 前端套件已不存在（现在是 checkup-ui.spec.ts 等）"
+    },
+    {
+      "source": "backend/docs/本地启动与前后端联调.md",
+      "target": "../../life-circle-demo/tests/integration/analysis.spec.ts",
+      "reason": "没有 tests/integration/ 目录；集成套件现在跑 checkup-browser.spec.ts"
+    },
+    {
+      "source": "life-circle-demo/docs/前端接口契约.md",
+      "target": "../../backend/docs/comparison-v1_审计修复报告.md",
+      "reason": "backend/docs 下没有这个文件（未找到同名文档）"
+    }
+  ]
+}

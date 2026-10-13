@@ -2,7 +2,7 @@
 
 独立 Python 模块，实现自适应四叉树采样、步行测时调度、带未知区域的时间场重建及 900 秒可达几何。包含均匀网格、32 方向扇形基线和离线实验入口。现已接入仓库内 FastAPI 和 React 的等时圈链路。
 
-实现依据是仓库根目录《15分钟生活圈_自适应网格算法与测试方案》。真实百度步行 API 与社区实验、设施统计尚未执行；前后端接入已通过离线验收。
+实现依据是 `docs/architecture/` 下的《15分钟生活圈_自适应网格算法与测试方案》。真实百度步行 API 与社区实验、设施统计尚未执行；前后端接入已通过离线验收。
 
 本轮在已有 N02 服务上增加任务接口，详见 [前后端接入任务报告](../backend/docs/算法前后端接入任务报告.md)。`TASK_COMPLETION.md` 和 `TEST_REPORT.md` 保留为算法首轮交付记录。
 
@@ -106,3 +106,15 @@ payload = result.to_dict()
 ## N04/N05 参数补充
 
 边界规则与合成接口说明见 [N04参数记录](../backend/docs/N04-算法参数与边界.md)，四组Mock与既有契约见 [N05接口契约](../backend/docs/N05-接口契约.md)。
+
+## 文档
+
+| 文档 | 内容 |
+| --- | --- |
+| [README.md](README.md)（本文件） | 安装、Python 接口、算法与调度口径、适配器边界 |
+| [TASK_COMPLETION.md](TASK_COMPLETION.md) | 阶段 1–5 的离线交付说明 |
+| [TEST_REPORT.md](TEST_REPORT.md) | 2026-09-12 的离线验证记录：单元、几何、契约与 225 组实验 |
+
+设计与需求在仓库级文档里：[自适应网格算法与测试方案](../docs/architecture/15分钟生活圈_自适应网格算法与测试方案.md)（本包的实现依据）、[总体技术实现方案](../docs/architecture/15分钟生活圈_技术实现方案.md)、[需求分析](../docs/architecture/15分钟生活圈_需求分析.md)、[文档总索引](../docs/README.md)。
+
+注意：**生产成圈不走本包的历史自适应网格**。线上百度边界搜索的适配层在 `backend/app/algorithms/baidu_e82.py`，核心在 `backend/tools/endpoint_multicross_boundary.py`；本包的 `engine.compute_isochrone` 与实验入口只用于离线实验与 CLI。

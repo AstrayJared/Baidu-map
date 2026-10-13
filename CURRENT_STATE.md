@@ -25,4 +25,4 @@
 - 2026-10-11：**第二吸附点的证据可以转移使用，但只在能被证明时**（离线验证，尚未接入生产路径）。做法是：对每一条来自另一处实际起点的观测，先实测一次 A→B 的连接耗时 `t`，用三角不等式得 `d_A ∈ [d_B − t, d_B + t]`；整段落在 900 秒同一侧才给标签，否则原样交回、照旧按 `different_actual_origin` 拒收。它自带保护：两点隔着河或墙时 `t` 变大、区间变宽，转移自动被拒绝。离线对照（`tools/endpoint_origin_transfer.py`，21 个用例）：单起点下完全不触发、结果与基线逐项相同；真实失败形状（20 米分裂）从"没有几何"变成 IoU 0.9827、环合上，代价是一次连接实测；隔河 600 秒时一条都不接受、仍不发布几何，而**去掉那条界**会发布一个 IoU 只有 0.6419、面积少 35% 却看起来正常的区域。真实失败样本里被拒收的 7 条观测全部可判（连接约 20 米）。生产化还缺三件事：连接实测必须走同一个服务池、不改写 `route_origin` 而是新增来源与不确定度字段、以及声明受影响弧段的误差上界。见 [转移可行性结论](evidence/10-origin-transfer-feasibility.md)。
 - 本地数据：运行时路网包使用固定快照 `shanghai-latest.osm.pbf`（数据版本 `geofabrik-shanghai-260913`，PBF SHA256 `11e420b2fe24176856b31c26da308e3ec41a9a7f5a2b849d91c34f7069837c12`），已生成并校验 `shanghai.osm-cache`、`shanghai.poly` 及障碍/风险层；国定一水系复核仍绑定旧版 20260912 版本，因此在本机会以版本不符告警、不被采用。
 
-[Hybrid 设计](HYBRID_ISOCHRONE_DESIGN.md) · [后端说明](backend/README.md) · [本地启动与前后端联调](backend/docs/本地启动与前后端联调.md)
+[Hybrid 设计](docs/architecture/HYBRID_ISOCHRONE_DESIGN.md) · [后端说明](backend/README.md) · [本地启动与前后端联调](backend/docs/本地启动与前后端联调.md)

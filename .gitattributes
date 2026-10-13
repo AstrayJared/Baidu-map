@@ -5,3 +5,11 @@
 
 # Windows 批处理必须保持 CRLF。
 *.bat text eol=crlf
+
+# 仓库里有一批文件在索引里就是 CRLF（`CURRENT_STATE.md`、`backend/app/checkups/manager.py`、
+# `life-circle-demo/tests/checkup-live.spec.ts` 等）。这些行尾是有意保留的，不是脏数据；但
+# `git diff --check` / `git show --check` 默认把行尾的 `\r` 读成"trailing whitespace"，于是
+# **任何往这类文件里加一行的提交**都会被 `repo-layout.yml` 里那一项判红（历史提交里
+# `63f035d5`、`c4c4f4ea` 就是这样被误报的）。下面这条只说"行尾的 `\r` 属于行终止符"，
+# 真正的行尾空格、EOF 空行、缩进里的 tab 照旧会被抓 —— 不是放宽检查。
+* whitespace=cr-at-eol
