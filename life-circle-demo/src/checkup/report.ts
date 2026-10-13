@@ -64,6 +64,7 @@ const UNAVAILABLE_LABELS: Record<string, string> = {
   no_spatial_support: '缺少该区域的步行路网或无法建立网格',
   osm_graph_unavailable: '步行路网不可用，无法建立覆盖评估',
   facility_stage_unavailable: '设施检索阶段未产出可用结果',
+  no_boundary_geometry: '成圈结果没有可用范围，无法建立覆盖评估',
   facility_query_incomplete: '设施检索未完成，证据不足以评估覆盖率',
   assessment_domain_exceeds_grid_limit: '评估范围超过网格上限',
   area_partition_mismatch: '评估面积分区不一致，结果暂不可用',

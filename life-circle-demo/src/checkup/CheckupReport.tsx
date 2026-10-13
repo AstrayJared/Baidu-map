@@ -128,6 +128,12 @@ function CoverageRow({ item, count }: { item: CoverageItem; count?: number }) {
 }
 
 function ZoneList({ gaps }: { gaps: GapSummary }) {
+  // 评估没跑完时面积是"没有结论"，不是 0：这一节读后端冻结的原因，而不是把"没算出来"
+  // 写成"灰区合计 0 m²"。没有评估域的报告正是这种形状（A、C、G、U 都不存在）。
+  if (gaps.status === 'failed') return <Alert type="warning" showIcon
+    data-testid="gaps-unavailable" title="本次未取得灰区清单"
+    description={`${gaps.reason ?? '服务覆盖评估未完成。'}`
+      + '没有评估域就没有灰区面积与条数可言：这一节只能写“未评估”，不能写成 0。'} />;
   if (!gaps.assessed) return <Alert type="warning" showIcon
     title="本次未进行服务覆盖评估，因此没有灰区清单"
     description="灰区面积与条数都需要评估域和步行路网；缺少其中之一时就只能写“未评估”，不能写成 0。" />;
@@ -218,6 +224,10 @@ export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS, cont
   const sources = useMemo(() => dataSourcesView(snapshot), [snapshot]);
   const version = useMemo(() => versionView(snapshot, waterReviews), [snapshot, waterReviews]);
   const domainAreaM2 = snapshot.accessibility?.domainAreaM2 ?? snapshot.report?.domainAreaM2 ?? null;
+  // 逐类别的理由里出现"没有可用范围"，就是整份报告的前提不成立：评估域、已覆盖、缺口、
+  // 未知都不存在。这里只翻译后端已经冻结的结论，不在前端另做判断。
+  const noBoundary = (snapshot.accessibility?.categories ?? [])
+    .some(row => row.unavailableReason === 'no_boundary_geometry');
   const generated = new Date(snapshot.generatedAt * 1000).toLocaleString('zh-CN', { hour12: false });
   const root = useRef<HTMLElement>(null);
 
@@ -241,7 +251,16 @@ export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS, cont
         {snapshot.businessStatus !== 'complete' && <p className="rp-status"
           data-tone={snapshot.businessStatus === 'insufficient' ? 'warn' : 'info'}>
           {snapshot.businessStatus === 'insufficient' ? '证据不足：结论只覆盖已评估的部分'
-            : '部分结果：有阶段未能完成，未知部分不计入已知覆盖，仍可能影响覆盖区间上界。'}</p>}
+            // 后端把"每个阶段都跑完"的修订也记成 partial：目录的完整性从来不靠关键词检索
+            // 建立。所以这里的"部分"说的是证据的性质，不是"某个阶段挂了"；而区间里的未知
+            // 面积是**进上界**的（最高覆盖率 = (C+U)/A），写成"不计入覆盖率"与图上的区间条
+            // 正好相反。
+            : '部分结果：设施目录完整性未经独立核验；覆盖率区间中的未知面积不计入已知覆盖，但计入上界。'}</p>}
+        {/* 成圈立不住时，逐类别的理由已经写明"没有可用范围"；页头再给一句整体说明，
+            因为"这一带没有评估域"和"评估过了、覆盖率为零"在版面上只差一行字。 */}
+        {noBoundary && <Alert type="warning" showIcon data-testid="report-no-boundary"
+          title="未形成可用生活圈范围，未取得覆盖率结论。"
+          description="成圈阶段没有产出可用的边界几何，设施检索因此没有查询范围，覆盖率与灰区都无从计算；这不代表这一带没有设施，也不代表服务缺失。" />}
       </header>
 
       <section className="rp-summary" aria-label="结论摘要" data-testid="report-summary">

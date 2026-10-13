@@ -15,6 +15,8 @@ type HybridClient = ReturnType<typeof createHybridClient>;
 
 const MESSAGES: Record<string, string> = {
   baidu_walking_not_configured: '后端尚未配置百度步行服务',
+  // 有意的拒绝，不是连不上：说成"请检查服务连接"会把部署配置问题指成网络问题。
+  synthetic_mode_offline: '当前为离线合成模式，未接入百度端点核验，无法运行该分析',
   hybrid_busy: '服务正在处理其他分析，请稍后重试',
   hybrid_execution_failed: '分析执行失败，请检查数据配置',
   hybrid_invalid_response: '服务返回的结果格式异常',

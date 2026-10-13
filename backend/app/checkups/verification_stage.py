@@ -45,6 +45,9 @@ SPOT_SUSPECTS_PER_SPREAD = 2
 
 NO_TRANSPORT = 'route_transport_unavailable'
 NO_FACILITIES = 'facility_stage_unavailable'
+#: 成圈没有立住：没有圈面就没有候选设施可言。它不是设施阶段的失败 —— 那个阶段
+#: 的第一个前置条件就是几何，所以把两种情况写成同一个码会指向错误的阶段。
+NO_BOUNDARY = 'no_boundary_geometry'
 
 
 def usable_route(observation, requested) -> bool:
@@ -124,6 +127,7 @@ def refusal(reason: str, *, message: str | None = None) -> VerificationOutcome:
     text = message or {
         NO_TRANSPORT: '本次体检没有可用的步行路线服务，灰区只有模型证据。',
         NO_FACILITIES: '设施阶段没有建立结果，核验阶段没有可核验的对象。',
+        NO_BOUNDARY: '成圈结果没有可用范围，核验阶段没有可核验的对象。',
         'missing_ak': '未配置百度地图 AK，本次体检没有可用的步行路线服务，灰区只有模型证据。',
         'synthetic_mode_offline': '当前为离线合成模式，未接入真实路线服务，灰区只有模型证据。',
         'task_budget_exhausted': '本任务的路线预算已用尽，核验阶段未开始。',
@@ -190,7 +194,8 @@ def candidate_order(facilities, *, majors, zones, entrances, origin, projection=
 
 
 async def verify_facilities(*, facilities, majors, zones, heatmap, entrances, session, origin,
-                            projection=None, progress=None, token=None, previous=None) -> VerificationOutcome:
+                            projection=None, progress=None, token=None, previous=None,
+                            boundary_available: bool = True) -> VerificationOutcome:
     """跑完核验阶段。``session`` 为 None 表示这个部署没有路线服务。
 
     ``session`` 一次调用就是一个候选的全部尝试（含重试），每条尝试各扣一次 ``route``
@@ -201,6 +206,10 @@ async def verify_facilities(*, facilities, majors, zones, heatmap, entrances, se
     """
     if session is None:
         return refusal(NO_TRANSPORT)
+    # 边界缺失排在设施之前：没有圈面时设施阶段根本没开始，把它的缺席读成它的失败
+    # 会让读者去查一个没有出错的阶段。
+    if not boundary_available:
+        return refusal(NO_BOUNDARY)
     if facilities is None:
         return refusal(NO_FACILITIES)
     projection = LocalProjection(origin) if projection is None else projection

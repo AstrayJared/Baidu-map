@@ -1,5 +1,5 @@
 {
-  "version": "poi-categories-v2.2",
+  "version": "poi-categories-v2.3",
   "displayGroups": [
     {"key":"healthcare","label":"健康照护","order":1,"majors":["medical","care"]},
     {"key":"education","label":"教育成长","order":2,"majors":["education"]},
@@ -19,7 +19,7 @@
     {"key":"school","major":"education","displayGroup":"education","label":"小学","poiRuntime":true,"poiName":"primary_school","query":"小学","extraQueries":[],"nameHints":["小学"],"tagHints":["小学"],"excludeHints":["培训","补习","辅导","美术","音乐","舞蹈","书法","编程","驾驶"],"priority":34},
     {"key":"combined_school","major":"education","displayGroup":"education","secondaryCategories":["school","middle_school"],"capabilities":["primary_education","middle_education"],"label":"九年一贯制/完小/教学点","poiRuntime":true,"query":"九年一贯制","extraQueries":["完小","教学点","初中部"],"nameHints":["九年一贯制","一贯制","完小","教学点","小学部","初中部"],"tagHints":["九年一贯制","小学部"],"excludeHints":["培训","补习","辅导"],"priority":30},
     {"key":"middle_school","major":"education","displayGroup":"education","label":"中学","poiRuntime":true,"query":"中学","extraQueries":["初中","高中"],"nameHints":["中学","初中","高中","高级中学","初级中学","实验中学","职业中学"],"tagHints":["中学","初中","高中"],"excludeHints":["培训","补习","辅导"],"priority":26},
-    {"key":"college","major":"education","displayGroup":"education","label":"高等院校","poiRuntime":true,"query":"大学","extraQueries":["学院","职业技术学院"],"nameHints":["大学","学院","高等专科","职业技术学院","职业学院","研究生院"],"tagHints":["大学","学院","高等教育"],"excludeHints":["培训学院","教育学院","继续教育"],"priority":24},
+    {"key":"college","major":"education","displayGroup":"education","label":"高等院校","poiRuntime":true,"query":"大学","extraQueries":["学院","职业技术学院"],"nameHints":["大学","学院","高等专科","职业技术学院","职业学院","研究生院"],"tagHints":["大学","学院","高等教育","高等院校"],"excludeHints":["培训学院","教育学院","继续教育"],"priority":24},
     {"key":"preschool","major":"education","displayGroup":"education","label":"幼儿园/学前","poiRuntime":true,"query":"幼儿园","extraQueries":["托育","早教中心"],"nameHints":["幼儿园","学前教育","学前","幼教","托育","保育","早教中心"],"tagHints":["幼儿园","学前教育","托育"],"priority":28},
     {"key":"training","major":"education","displayGroup":"education","label":"培训机构","poiRuntime":true,"negative":true,"query":"培训","extraQueries":["辅导班","兴趣班"],"nameHints":["培训","辅导","辅导班","补习","教育科技","教育集团","教育咨询","课外","兴趣班","书院","私塾","网校","在线教育","美术","音乐","舞蹈","书法","编程","机器人","考研","留学","职业技能","技能培训","驾校","驾驶员培训"],"tagHints":["教育培训","培训机构"],"priority":90},
     {"key":"nursing_home","major":"care","displayGroup":"healthcare","label":"养老院/敬老院","poiRuntime":true,"query":"养老院","extraQueries":["敬老院","养老服务中心"],"nameHints":["养老院","敬老院","老年公寓","颐养院","养老服务中心","托老所","日间照料","长者照护","养老照护","福利院"],"tagHints":["养老","老年照护"],"excludeHints":["养老地产","养老咨询","养老投资","养老保险"],"priority":30},

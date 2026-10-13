@@ -21,9 +21,9 @@ from life_circle.models import RouteObservation
 
 from app.accessibility.service_graph import Entrance
 from app.catalog import major_of
-from app.checkups.verification_stage import (CANDIDATE_STRAIGHT_LINE_M, NO_FACILITIES,
-                                             NO_TRANSPORT, candidate_order, usable_route,
-                                             verify_facilities, within_rule)
+from app.checkups.verification_stage import (CANDIDATE_STRAIGHT_LINE_M, NO_BOUNDARY,
+                                             NO_FACILITIES, NO_TRANSPORT, candidate_order,
+                                             usable_route, verify_facilities, within_rule)
 from app.quota import BudgetExhausted
 from app.quota import TaskBudget
 from app.checkups.routes import ReplayRoutes
@@ -247,6 +247,22 @@ def test_a_deployment_without_a_route_service_refuses_by_name():
         session=SyntheticRoutes(straight_routes()).session(FastPool(), budget=None,
                                                            deadline=time_out()),
         origin=ORIGIN)).evidence.reason == NO_FACILITIES
+
+
+def test_a_missing_boundary_is_answered_before_a_missing_facility_group():
+    """没有圈面时核验说的是边界，不是设施阶段：设施阶段根本没开始。
+
+    两次真实体检（2026-10-10）的核验修订写的都是 ``facility_stage_unavailable``，而成圈
+    返回的是 ``geometry: null``、路线一次也没发出去。
+    """
+    outcome = asyncio.run(verify_facilities(
+        facilities=None, majors=MAJORS, zones=[], heatmap={}, entrances={},
+        session=SyntheticRoutes(straight_routes()).session(FastPool(), budget=None,
+                                                           deadline=time_out()),
+        origin=ORIGIN, boundary_available=False))
+    assert outcome.evidence.reason == NO_BOUNDARY
+    assert outcome.network_requests == 0
+    assert outcome.issues[0].code == "VERIFICATION_UNAVAILABLE"
 
 
 def test_a_candidate_that_could_not_be_answered_is_unverified_not_unreachable():

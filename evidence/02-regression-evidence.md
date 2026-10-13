@@ -1,7 +1,7 @@
 # A3｜针对性复现与端到端数据流回归
 
 **任务**：`scheme.md` A3
-**执行时间**：2026-10-08
+**执行时间**：2026-10-08；**2026-10-11 追加 §5（本轮交付的验收复核）**
 **口径**：全部使用 mock/synthetic provider、临时 SQLite、受控时钟、外连阻断（`conftest.py` 的全会话防护记录为 **0 次尝试**）。测试穿过真实链路 `manager → store → facilities → poi/plan → OnlinePlanner → poi/cache → KeyedCache → ServicePool`，不只断言新 helper。
 
 ---
@@ -101,3 +101,49 @@ cd backend
 - 13 类 A3 场景全部有穿过真实链路的用例，且都带页数/派发/账本三类数字。
 - 三个高严重度缺陷（共享失败归属、纯缓存取消、关停卡死）都先复现再修，并留下失败→通过的对照。
 - 所有运行的外连尝试为 0。
+
+---
+
+## 5. 2026-10-11 验收复核（本轮交付）
+
+**口径与 §1 相同**：无真实调用、外连 0 次、临时 SQLite 与受控时钟；两个环境各用自己的虚拟环境。
+
+### 5.1 执行与结果
+
+| 检查 | 环境 | 结果 |
+| --- | --- | --- |
+| 后端定向套件（额度 / 缓存 / 补查幂等 / 无边界报告） | WSL，Python 3.12.3 | **54 passed**（71.8 s） |
+| 后端定向套件（同一批文件） | Windows，Python 3.14.5 | **54 passed**（81.4 s） |
+| 后端全量套件 | WSL，Python 3.12.3 | **29 failed / 1103 passed / 10 skipped**（18 min 19 s）→ 归因见 §5.2 |
+| 前端 `npx tsc -b` | WSL | 干净，无诊断输出 |
+| 前端 `npm test` | WSL | **523 passed**（46 个文件） |
+| 前端 `npm run build` | WSL | 成功（3739 模块；`built in 1.10s`） |
+| 前端 `npm run test:checkup-ui` | WSL，Playwright | **20 passed**（1.2 min；`reuseExistingServer: false` 未改动） |
+| 契约只读检查 `python -m tools.export_contract --check` | WSL | 9 份生成物与仓库一致 |
+| 配置核验 `tools.verify_deployment_config` | WSL 与 Windows | 两份都"未发现问题"，外连各 **0** 次（`05` §1.3） |
+| 全新 `git clone --shared` 后的 `git status` | WSL | **干净**（`start.bat` 行尾规范化后不再显示为已修改） |
+
+### 5.2 全量套件 29 项失败的归因（同环境对照，不靠旧提交说明）
+
+方法：把涉及失败的 9 个文件在**同一台机器、同一虚拟环境**下跑两次 ——
+一次在 `origin/main`（`9cbca57`）的全新共享克隆里，一次在当前 HEAD（`2624704`）的主树里。
+
+| 运行 | 结果 |
+| --- | --- |
+| 基线 `9cbca57` | **30 failed / 137 passed**（187.6 s） |
+| 当前 `2624704` | **29 failed / 147 passed**（183.3 s） |
+
+逐条比对 node id：
+
+- **共同失败 29 条** → 基准已存在，**不是本次引入**；
+- **只在基准失败 1 条** → 本次修复：
+  `test_poi_acceptance.py::test_v3_parent_education_tag_is_not_a_training_business[合成小学-tags0-accepted]`
+  （即 `教育培训` 容器标签那条，见 `CURRENT_STATE.md` 2026-10-10）；
+- **只在当前失败 0 条** → 本次**没有引入任何失败**。
+
+抽样看到的形态是**测试期望与已重构的分类词典 / 报告结构不一致**：`test_analysis.py` 仍要求
+mock 的 major 只落在 `("shopping","medical","education")`，而词典早已扩展出
+`care`/`dining`/`finance`；`test_catalog.py` 仍要求 `EXCLUSIONS` 含 `培训`，而按现在的口径
+它属于 `NON_BUSINESS_PARENT_TAGS`。**这不是本次改动的回归，也不是依赖/导入失败** ——
+这 29 条在 `origin/main` 上同样失败，本轮按要求不弱化、不跳过、也不顺手改它们，
+留作独立的一次核对（它们可能与某个已合并的分类重构有关，需要单独判断）。

@@ -1,4 +1,5 @@
 """Adapt the team's E8.2 core to task/POI contracts without changing its evidence."""
+import math
 from dataclasses import replace
 
 from shapely.geometry import MultiPolygon, box, shape
@@ -23,6 +24,74 @@ class EndpointAnalyticProvider(AnalyticProvider):
         observation = await super().query_walking_time(origin, destination, deadline)
         return replace(observation, request_origin=origin, route_origin=origin,
                        route_destination=destination, origin_offset_m=0, destination_offset_m=0)
+
+
+# 一次成圈里每条观测被接收还是被拒收。求解器运行时一直记着这些行，但修订此前只带走了
+# 调度器的传输计数 —— 于是一次没有圈面的运行只留下一个 ``budget``。两次真实体检因此
+# 无法分辨"上游没回端点"、"回来的端点对不上起点"和"边界本身没收敛"。这里只把已经记下
+# 的东西数出来，不新增任何判断：诊断不改变判定。
+def _tally(values) -> dict:
+    """把取值数成计数，键按字典序固定；``None`` 归到 ``none``（没有要报的原因）。"""
+    counts: dict[str, int] = {}
+    for value in values:
+        key = 'none' if value is None else str(value)
+        counts[key] = counts.get(key, 0) + 1
+    return dict(sorted(counts.items()))
+
+
+def _finite(value):
+    """有限数或 None：NaN 与 Infinity 不是可发布的数（契约里 allow_inf_nan=False）。"""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return float(value) if math.isfinite(float(value)) else None
+
+
+def _ring_assembly(raw) -> dict | None:
+    """环面合没合起来，没合起来是为什么；旧修订没有这一项，读作"未记录"。
+
+    这句话求解器一直算着（相邻已定方向之间的最大角隙，以及角隙大到不能连成环时的具名
+    原因），此前却不发布：一次没有几何的运行只剩一个 ``budget``。它不含坐标。
+    """
+    if not isinstance(raw, dict):
+        return None
+    nodes = raw.get('localizedNodes')
+    return {
+        'assembled': raw.get('assembled') if isinstance(raw.get('assembled'), bool) else None,
+        'reason': raw.get('reason') if isinstance(raw.get('reason'), str) else None,
+        'maxGapRadians': _finite(raw.get('maxGapRadians')),
+        'localizedNodes': None if isinstance(nodes, bool) or not isinstance(nodes, int) else nodes,
+    }
+
+
+def boundary_diagnostics(raw) -> dict:
+    """成圈这一趟接收／拒收了什么、各方向的结果，以及那个环是怎么合起来的。只计数，不含坐标。"""
+    log = [row for row in (raw.get('observationEvidence') or []) if isinstance(row, dict)]
+    rejected = [row for row in log if not row.get('accepted')]
+    origins = {tuple(row['route_origin']) for row in log
+               if isinstance(row.get('route_origin'), (list, tuple))}
+    directions = [row for row in (raw.get('directions') or []) if isinstance(row, dict)]
+    completion = raw.get('completion') or {}
+    return {
+        'observations': {
+            'logged': len(log), 'accepted': len(log) - len(rejected), 'rejected': len(rejected),
+            'rejectedReasons': _tally(row.get('rejected') for row in rejected),
+            'kinds': _tally(row.get('kind') for row in log),
+            # 实际起点有几个：多过一个就说明上游把同一次体检的路线吸到了不同的路上，而
+            # 求解器只采纳第一个起点的一致性证据 —— 这正是"每次都回了结果、却没有圈面"
+            # 的一种成因，只靠传输计数看不出来。
+            'actualOriginGroups': len(origins),
+        },
+        'directions': {
+            'total': len(directions),
+            'byStatus': _tally(row.get('status') for row in directions),
+            'byReason': _tally(row.get('reason') for row in directions),
+        },
+        'ringAssembly': _ring_assembly(raw.get('ringAssembly')),
+        'completion': {key: completion.get(key) for key in
+                       ('reason', 'resolutionReached', 'budgetExhausted', 'unresolvedEdges',
+                        'pendingUnattemptedEdges', 'pendingScanRays',
+                        'initialUnfinishedDirections', 'runComplete')},
+    }
 
 
 async def compute_e82(request, provider, token, *, on_progress=None, refinement=None):
@@ -54,6 +123,9 @@ async def compute_e82(request, provider, token, *, on_progress=None, refinement=
     local_unknown = local(unknown)
     stats = Statistics(**raw['_statistics'])
     stats.unknown_area = local_unknown.area
+    # 没有环面的那一趟，未决边数**没有被量过**（那两个数只在补丁窗口内量，而没有环面时
+    # 窗口是空的，量出来只会是 0），因此这里是 None 而不是 0。旧 refinement 路径
+    # （/api/analyses）给得出数字，所以旧契约照旧拿到 int。
     stats.unfinished_boundary = raw['completion']['unresolvedEdges']
     warnings = ['e82_experimental_estimate', 'interior_not_independently_verified']
     if raw.get('truncated'):
@@ -75,6 +147,7 @@ async def compute_e82(request, provider, token, *, on_progress=None, refinement=
         sample_observations=raw['_observations'],
         metadata=dict(algorithm=ALGORITHM, validationStatus='not_independently_validated',
             completion=raw['completion'], assumption=raw['assumption'],
+            boundaryDiagnostics=boundary_diagnostics(raw),
             unknownRegionMeaning=('solver-unresolved region; may overlap geometry; not an error bound'
                                   if established else 'no boundary established'),
             unresolvedArea=dict(insideM2=local_unknown.intersection(local_geometry).area if established else 0,

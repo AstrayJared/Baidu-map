@@ -26,7 +26,7 @@ from fastapi.testclient import TestClient
 
 from app.algorithms.baidu_e82 import EndpointAnalyticProvider
 from app.algorithms.hybrid_isochrone.models import Evidence, Validity
-from app.catalog import default_analysis_majors, poi_keys
+from app.catalog import default_analysis_majors, major_of, poi_keys
 from app.checkups.facilities import collect_facilities
 from app.checkups.facility_stage import query_domain
 from app.checkups.places import POI_POOL, declared_identity
@@ -52,9 +52,11 @@ SYNTHETIC_ROUTES = "synthetic:checkup-routes"
 # 断言写在这条关系上，词典增删小类时数字跟着走，而不是把某一次运行的快照钉死。
 CORE_MINORS = len(poi_keys(list(default_analysis_majors())))
 CORE_PAGES = 4 * CORE_MINORS
-# 每个小类各回一条落在中心的记录；十四个小类里 combined_school 与 training 的样本标签
-# 不判进本类，所以被接收的是十二处 —— 这三条数字来自词典，不是来自某次运行。
-CORE_ACCEPTED = {"shopping": 3, "medical": 5, "education": 4}
+# 每个小类各回一条落在中心的记录，标签按真实形态给（教育类是 ``教育培训;<type>``）；
+# 十四个小类里只有 training 的样本不判进本类（它是负类），所以被接收的是十三处。
+# ``combined_school`` 曾因为 ``review`` 里有 ``九年一贯`` 而停在待复核；#53 收窄 review 后
+# 它按名字判进本类，于是教育类多一处 —— 这三条数字仍然来自词典，不是来自某次运行的快照。
+CORE_ACCEPTED = {"shopping": 3, "medical": 5, "education": 5}
 CORE_ACCEPTED_TOTAL = sum(CORE_ACCEPTED.values())
 
 
@@ -107,6 +109,19 @@ def analytic(origin):
 def supported_tag(category):
     """One tag the dictionary classifies into this category, taken from it."""
     return sorted(RULES["supportedTags"][category])[0]
+
+
+def provider_tag(category, word):
+    """The way the provider really tags a row of this category.
+
+    A v3 education POI arrives as ``教育培训;<type>``. The container word is the
+    provider's own group — and it is also this dictionary's *name* for the training
+    category, which is why a fixture sending only ``<type>`` made every one of these
+    tests look right while a real run threw every school, college and kindergarten
+    away as ``negative:training``.
+    """
+    container = sorted(RULES["nonBusinessParentTags"])[0]
+    return f"{container};{word}" if major_of(category) == "education" and word != container else word
 
 
 def offset(meters, *, east=1.0, north=0.0):
@@ -248,7 +263,8 @@ def row(sequence, index, *, at, uid=None):
     word = supported_tag(sequence["category"])
     return {"uid": uid or f"{sequence['category']}-{index}", "name": f"{word}样本",
             "address": f"{word}路{index}号", "location": {"lng": at[0], "lat": at[1]},
-            "detail_info": {"classified_poi_tag": word, "parent_id": None}}
+            "detail_info": {"classified_poi_tag": provider_tag(sequence["category"], word),
+                            "parent_id": None}}
 
 
 def every_page(points):
@@ -413,10 +429,13 @@ def test_both_engines_close_the_loop_over_their_own_boundary(tmp_path):
             assert group["statistics"]["livePages"] == CORE_PAGES
             assert group["statistics"]["budgetSpent"] == CORE_PAGES
             assert group["statistics"]["pageAttempts"] == CORE_PAGES
-            # 这一轮只发了主关键词（primary_queries_only），并且有一条候选需要人工
-            # 复核（classification_needs_review）：两个都记在案，不是"没有警告"。
+            # 这一轮只发了主关键词（primary_queries_only）：记在案，不是"没有警告"。
+            # 曾经还有一条 classification_needs_review —— ``combined_school`` 的名字撞上
+            # ``review`` 里的 ``九年一贯``；#53 收窄 review 后它按名字判进本类，于是这里
+            # 只剩一条限制。复核告警本身仍有覆盖：
+            # ``test_a_review_word_is_a_named_warning_not_a_silent_drop``。
             assert group["stopReason"] is None
-            assert group["warnings"] == ["classification_needs_review", "primary_queries_only"]
+            assert group["warnings"] == ["primary_queries_only"]
             assert group["queryDomain"]["paddingMeters"] == 1300
             assert group["dataObtainedAt"] > 0
             # §5 B2 决策 1：全部小类都查完了，所以"共同完成"就是整个圈面 ——
@@ -428,7 +447,7 @@ def test_both_engines_close_the_loop_over_their_own_boundary(tmp_path):
             # 首轮计划与它实际的执行一致：56 页、没有缓存可复用、需要 56 次新增调用。
             assert group["initialPlan"] == {
                 "initialPageCount": CORE_PAGES, "reusableInitialPageCount": 0,
-                "estimatedNewInitialCalls": CORE_PAGES, "remainingTaskBudget": 240,
+                "estimatedNewInitialCalls": CORE_PAGES, "remainingTaskBudget": 1200,
                 "remainingDailyBudget": 1600, "blocks": 4, "minorCategories": CORE_MINORS,
                 "primaryQueriesOnly": True, "isReservation": False}
 
@@ -447,6 +466,29 @@ def test_both_engines_close_the_loop_over_their_own_boundary(tmp_path):
 
             # The key is a credential: it may not appear anywhere in a revision.
             assert SECRET not in path.read_text(encoding="utf-8")
+
+
+def test_a_review_word_is_a_named_warning_not_a_silent_drop(tmp_path):
+    """词典不肯替人判的说法（``review`` 里的 ``九年制``）要留下具名警告。
+
+    #53 收窄 ``review`` 之后，``combined_school`` 的名字不再撞上它，于是"这一轮有一条
+    候选没被判进任何一类"这件事在没有专门夹具时就没人触发了。它必须仍然说得出口：
+    检索照常跑完，但把复核原因具名记在案，而不是让这条候选悄悄消失。
+    """
+    def reviewed(sequence, page):
+        rows = [row(sequence, 0, at=ORIGIN)]
+        rows[0]["name"] = "九年制样本"
+        return {"status": 0, "total": 1, "result_type": "poi_type", "results": rows}, None
+
+    places = SyntheticPlaces(reviewed)
+    app = make_app(tmp_path, places)
+    with TestClient(app) as client:
+        task_id, view = run(client, body())
+        assert view["status"] == "completed", view
+        group = document(client, task_id)["facilities"]
+
+    assert group["queryStatus"] == "completed"
+    assert "classification_needs_review" in group["warnings"]
 
 
 def test_the_boundary_decides_what_counts_and_the_search_range_only_reaches(tmp_path):
@@ -508,7 +550,7 @@ def test_a_facility_run_that_fails_every_page_is_a_failed_query(tmp_path):
     with TestClient(app) as client:
         # 显式钉住 60 次：这一节测的是"额度在重试中途用完时，被拒的页面按名字记下来，
         # 而不是让整轮消失"。它必须是一个会中途用完的预算，不能跟着部署默认值走 ——
-        # 默认值现在是 240，足够把 56 个序列的两次尝试都发完，那样这个分支就没人测了。
+        # 默认值现在是 1200，足够把 56 个序列的两次尝试都发完，那样这个分支就没人测了。
         task_id, view = run(client, body(facilities={"categories": CORE_MAJORS,
                                                      "maxPoiRequests": 60}))
         assert view["status"] == "completed", view
@@ -960,13 +1002,13 @@ def test_a_cancelled_extension_keeps_what_it_retrieved_and_never_touches_the_rep
         created = submit_extension(client, task_id, "ext-cancel", EXTENDED)
         extension_id = created["extensionId"]
         # 等它真的开始花钱再取消 —— 取消是在配额入口逐次生效的，不是事后改状态。
+        # "开始花钱"读 provider 真实收到的请求：运行中的视图在网络计数上不保证逐次刷新
+        # （缓存重放不逐个回报），只盯视图会让取消落在一轮已经跑完的补查上，那时
+        # cancelled 就永远等不到了。
         deadline = time.monotonic() + 60
-        while time.monotonic() < deadline:
-            view = client.get(f"/api/v2/checkups/{task_id}/facility-extensions/"
-                              f"{extension_id}").json()
-            if view["status"] == "running" and view["networkRequests"] > 0:
-                break
+        while time.monotonic() < deadline and not places.sent:
             time.sleep(0.02)
+        assert places.sent, "取消之前补查必须先真的发出请求"
         client.post(f"/api/v2/checkups/{task_id}/facility-extensions/{extension_id}/cancel")
         view = extension_of(client, task_id, extension_id)
         assert view["status"] == "cancelled", view
@@ -1224,10 +1266,13 @@ def test_an_omitted_budget_replay_survives_a_changed_default(tmp_path, monkeypat
         task_id, _view = run(client, body())
         first = submit_extension(client, task_id, "ext-default", EXTENDED)
         extension_of(client, task_id, first["extensionId"])
-        assert first["budget"]["limit"] == 240          # 省略 → 取部署默认值
+        assert first["budget"]["limit"] == 1200         # 省略 → 取部署默认值
 
         raised = DEFAULT_POI_REQUESTS * 2              # 一个比当前默认更大的新默认
+        # 默认值与上限现在是同一个数（都是 1200），只抬默认值会被 ``min(MAX, …)``
+        # 夹回原值，那样测的就不再是"换了默认值"，而是一个被上限吃掉的常数。
         monkeypatch.setattr("app.checkups.manager.DEFAULT_POI_REQUESTS", raised)
+        monkeypatch.setattr("app.checkups.manager.MAX_POI_REQUESTS", raised)
         replay = submit_extension(client, task_id, "ext-default", EXTENDED)
         assert replay["extensionId"] == first["extensionId"]
 
@@ -1304,8 +1349,8 @@ def test_a_row_written_before_the_identity_column_is_still_replayable(tmp_path):
         store = app.state.checkups.store
         revision = store.revision(task_id)["revision"]
         # 旧行冻的是"当时按默认值解析出来的那个数"，所以这里必须写当前默认真正解析出的
-        # 预算，而不是一个字面量：等价规则比的是这个数，不是默认值本身。默认值从 60 变成
-        # 240 之后，写死 60 会让这一行看起来"预算不同"，测的就不再是旧行的重放了。
+        # 预算，而不是一个字面量：等价规则比的是这个数，不是默认值本身。默认值从 60 经 240
+        # 变成 1200 之后，写死旧数会让这一行看起来"预算不同"，测的就不再是旧行的重放了。
         frozen = app.state.checkups._extension_boundary(
             task_id, FacilityExtensionRequest(client_request_id="probe",
                                               categories=EXTENDED)).requested
@@ -1420,7 +1465,7 @@ CORE_MAJORS = list(default_analysis_majors())
 #: 单任务请求上限的默认值（60）。首轮 56 页只是"至少"，密集数据下整轮要 112 页 ——
 #: 这个差距正是本节要测的东西，所以每次请求都显式写它，不靠默认值恰好也是 60。
 #: 单任务请求上限。这一节要的是"预算会在中途用完"的那种情形（首轮 56 页、整轮 112 页、
-#: 每次只给 60），所以显式钉住 60，而不是读部署默认值 —— 默认值现在是 240，够把整轮一次
+#: 每次只给 60），所以显式钉住 60，而不是读部署默认值 —— 默认值现在是 1200，够把整轮一次
 #: 跑完，"跨日推进"这一节就不再成立了。
 REQUEST_LIMIT = 60
 
