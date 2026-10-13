@@ -68,7 +68,7 @@ E8.3（POI 引导联合构圈）仍为离线实验，不接入浏览器或生产
 
 以上不调用真实百度。两套算法的真实验收必须分别记录入口、配置与调用预算，不能用一套结果替代另一套。
 
-[当前状态](../CURRENT_STATE.md) · [Hybrid设计](../HYBRID_ISOCHRONE_DESIGN.md) · [2.1失败报告](reports/baidu-v21-live-20260917-network/report.md)
+[当前状态](../CURRENT_STATE.md) · [Hybrid设计](../docs/architecture/HYBRID_ISOCHRONE_DESIGN.md) · [2.1失败报告](reports/baidu-v21-live-20260917-network/report.md)
 
 
 ### 设施检索预算（2026-10-10）

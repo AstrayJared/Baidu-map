@@ -1,8 +1,8 @@
 # OSM＋百度 Hybrid v1.5：实现与接入约定
 
-本次已回滚到对话前v1.5成圈核心；[回滚核对](backend/docs/HYBRID_ROLLBACK_CHECK.md)。v1.6实验已停用，正方形范围、采样调度和填充算法恢复原版。
+本次已回滚到对话前v1.5成圈核心；[回滚核对](../../backend/docs/HYBRID_ROLLBACK_CHECK.md)。v1.6实验已停用，正方形范围、采样调度和填充算法恢复原版。
 
-本版只生成 900 秒步行圈估计。当前结果和精度结论见 [核验报告](backend/docs/OSM_BAIDU_CHECK.md)。设施检索留在独立阶段；生成圈面不会触发 POI 请求。
+本版只生成 900 秒步行圈估计。当前结果和精度结论见 [核验报告](../../backend/docs/OSM_BAIDU_CHECK.md)。设施检索留在独立阶段；生成圈面不会触发 POI 请求。
 
 ## 计算范围与证据
 
