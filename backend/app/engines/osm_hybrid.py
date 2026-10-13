@@ -26,6 +26,14 @@ from .protocol import EngineCancelled, EngineCapabilities, EngineContext, Isochr
 # The Hybrid core caps generation at 400 attempts; the checkup offers no more.
 BUDGET_TIERS = (200, 400)
 DEFAULT_QPS = 3.0
+#: An offline deployment has no Baidu endpoint evidence and no local stand-in for it,
+#: so the refusal happens before a task exists rather than after it tried. These notes
+#: replace the normal ones, the way ``SYNTHETIC_NOTES`` does for E8.2: the claim that
+#: endpoints are validated against what Baidu returned must not survive unavailability.
+OFFLINE_ENGINE_NOTES = [
+    "本部署为离线合成模式：该引擎用百度实际返回的端点核验边界，本地没有替身",
+    "提交该引擎会在建任务之前具名拒绝（checkup_engine_unavailable）",
+]
 
 
 class OsmHybridEngine:
@@ -37,13 +45,43 @@ class OsmHybridEngine:
         self.settings, self.gate, self.offline = settings, gate, offline
         self.provider_factory = provider_factory
 
+    @property
+    def offline_without_provider(self) -> bool:
+        """An offline deployment with nothing local to validate the boundary against."""
+        return (self.provider_factory is None
+                and self.settings.analysis_provider == "synthetic")
+
+    def unavailable_reason(self) -> str | None:
+        """Why a task could not run at all, known before it is admitted.
+
+        This engine validates its boundary against endpoints Baidu actually
+        returned. With no provider injected there is no local stand-in for that
+        evidence, so an offline deployment must refuse by name instead of
+        admitting a task that could only reach for the network and end as
+        ``consecutive_api_failures``. A deployment with no walking key says so
+        the same way E8.2 does, for the same reason.
+        """
+        if self.provider_factory is not None:
+            return None
+        if self.settings.analysis_provider == "synthetic":
+            return "synthetic_mode_offline"
+        return None if self.settings.ak_configured else "walking_ak_not_configured"
+
     def capabilities(self) -> EngineCapabilities:
+        # An offline deployment must say so where the engine is chosen, the same way
+        # E8.2 relabels its synthetic stand-in: a boundary with no Baidu endpoint
+        # evidence must not look like one that was validated.
+        offline = self.offline_without_provider
+        notes = list(OFFLINE_ENGINE_NOTES) if offline else [
+            "OSM 引导成圈，端点由百度实际返回核验",
+            "displayGeometry 只用于外轮廓展示，不参与计数与评估范围",
+            "缺图或缺风险层时标记 degraded，不冒充完整 Hybrid"]
         return EngineCapabilities(
-            engine_id=self.engine_id, label="OSM＋百度", engine_version=ALGORITHM_VERSION,
+            engine_id=self.engine_id,
+            label="OSM＋百度" + ("· 离线不可用" if offline else ""),
+            engine_version=ALGORITHM_VERSION,
             budgets=BUDGET_TIERS, default_budget=400, requires_osm_graph=True,
-            notes=["OSM 引导成圈，端点由百度实际返回核验",
-                   "displayGeometry 只用于外轮廓展示，不参与计数与评估范围",
-                   "缺图或缺风险层时标记 degraded，不冒充完整 Hybrid"])
+            notes=notes)
 
     def _config(self, budget: int) -> HybridConfig:
         qps = self.settings.analysis_qps or DEFAULT_QPS

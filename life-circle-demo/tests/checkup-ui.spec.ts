@@ -11,8 +11,8 @@
 import { test, expect, type Page } from '@playwright/test';
 import { installMapSdk } from './mapSdk';
 import type { CheckupCompletion } from '../src/checkup/contract';
-import { capabilities, collection, feature, layer, point, polygon, report, retainedView, retentionView, retryView, snapshot, task, zone }
-  from '../src/checkup/fixtures';
+import { CATEGORIES, capabilities, collection, feature, layer, point, polygon, report,
+  retainedView, retentionView, retryView, row, snapshot, task, zone } from '../src/checkup/fixtures';
 
 const REVISION = 5;
 const HASH = 'hash-5';
@@ -102,6 +102,10 @@ type Options = {
   unmetCoverage?: boolean;
   /** 明细已到期：任务视图说明细不可用，明细接口一律 410，保留汇总仍可读。 */
   detailsExpired?: boolean;
+  /** 业务状态：默认 partial。报告首行的措辞按它分岔，两个分支都要验到。 */
+  businessStatus?: 'partial' | 'insufficient';
+  /** 成圈没立住：没有评估域，也没有分数、灰区与热力。报告要说"没有范围"。 */
+  noBoundary?: boolean;
 };
 
 async function setup(page: Page, options: Options = {}) {
@@ -203,7 +207,8 @@ async function setup(page: Page, options: Options = {}) {
         budget: 400, engine: submitted?.engine ?? 'baidu_e82' }) });
     }
     return route.fulfill({ json: task({ status: 'completed', stage: 'ready', revision: REVISION,
-      businessStatus: 'partial', budget: 400, engine: submitted?.engine ?? 'baidu_e82',
+      businessStatus: options.businessStatus ?? 'partial', budget: 400,
+      engine: submitted?.engine ?? 'baidu_e82',
       ...(options.detailsExpired ? { retention: retentionView({ detailsAvailable: false,
         reason: 'legacy', cleared: true }) } : {}) }) });
   });
@@ -273,6 +278,7 @@ function serviceCells(): Record<string, unknown>[] {
 }
 
 function snapshotFor(options: Options, submitted: { center: { lng: number; lat: number } }) {
+  if (options.noBoundary) return noBoundarySnapshot(submitted);
   const zones = options.holedGaps
     ? [zone({ id: 'zone-0', geometry: holed(), displayGeometry: holed(), reason: 'no_valid_entrance',
       suggestion: '核对通道接入与门牌归属。' }),
@@ -302,10 +308,55 @@ function snapshotFor(options: Options, submitted: { center: { lng: number; lat: 
     : base.facilities!;
   return snapshot({
     center: { lng: submitted.center.lng, lat: submitted.center.lat },
+    businessStatus: options.businessStatus ?? 'partial',
     serviceGaps: { ...base.serviceGaps!, zones },
     report: frozen,
     accessibility: { ...base.accessibility!, domain: polygon(0.03) },
     facilities,
+  });
+}
+
+/**
+ * 成圈没有立住的那一版：几何为空，评估域、分数、灰区与热力都不存在。
+ *
+ * 这不是"覆盖率为零"：A、C、G、U 四个量都没有，所以一个百分比也不能给。后端把这种修订
+ * 记成 ``accessibilityStatus: failed`` 加每个类别 ``no_boundary_geometry``，核验同样是
+ * ``no_boundary_geometry``（设施阶段根本没开始）。夹具照这个形态给，界面才是在翻译一份
+ * 真实后端可能产生的修订。
+ */
+function noBoundarySnapshot(submitted: { center: { lng: number; lat: number } }) {
+  const base = snapshot();
+  const categories = (base.accessibility?.categories ?? []).map(item => ({
+    ...item, supported: false, coveredM2: 0, gapM2: 0, unknownM2: 0, domainAreaM2: null,
+    unavailableReason: 'no_boundary_geometry', cells: {}, entrances: {}, coverage: null }));
+  return snapshot({
+    center: { lng: submitted.center.lng, lat: submitted.center.lat },
+    businessStatus: 'insufficient',
+    isochrone: { geometry: null },
+    facilities: null, facilitiesStatus: 'failed',
+    accessibilityStatus: 'failed',
+    accessibility: { ...base.accessibility!, status: 'failed', domain: null, domainAreaM2: null,
+      excludedAreaM2: null, views: {}, categories },
+    serviceGaps: null, heatmap: null, scores: null,
+    verification: { ...base.verification!, status: 'not_integrated', checked: 0, failed: 0,
+      unresolved: 0, facilities: [], conflicts: [], spotChecks: [], spotCheckSummary: {},
+      localOverrides: [], queries: {}, reason: 'no_boundary_geometry', notes: [] },
+    report: report({
+      domain: null, domainAreaM2: null,
+      categories: categories.map(item => row({ category: item.category, supported: false,
+        coverageLowerPct: null, coverageUpperPct: null, assessablePct: null, unknownPct: null,
+        intervalWidthPct: null, intervalDegenerate: null, unavailableReason: 'no_boundary_geometry',
+        coveredM2: 0, gapM2: 0, unknownM2: 0, cells: {}, entrances: {} })),
+      overall: { available: false, reason: 'categories_not_analysed',
+        missingCategories: [...CATEGORIES], coverageLowerPct: null, coverageUpperPct: null,
+        assessablePct: null, unknownPct: null, categories: [], weights: {} },
+      gaps: { ...report().gaps, status: 'failed', zones: [], byCategoryM2: {}, compositeAreaM2: 0,
+        gapAreaM2: 0, reason: '服务覆盖阶段未完成，本报告不含灰区清单。' },
+      verification: { available: false, status: 'not_integrated', provider: null, checked: 0,
+        failed: 0, unresolved: 0, facilities: [], conflicts: [], spotChecks: [],
+        spotCheckSummary: {}, localOverrides: [], queries: {}, reason: 'no_boundary_geometry',
+        notes: [] },
+    }),
   });
 }
 
@@ -555,6 +606,59 @@ test('a published revision draws its layers, opens the report and keeps the view
   expect(drawn.creations).toBe(1);
   expect(drawn.pans.map(pan => [pan.lng, pan.lat])).toEqual([[116.405, 39.916]]);
   expect(errors).toEqual([]);
+});
+
+/**
+ * 报告首行那句"部分结果"说的是**证据的性质**，不是"某个阶段挂了"。
+ *
+ * 后端把每个阶段都跑完的修订也记成 `partial`：目录的完整性从来不靠关键词检索建立。所以
+ * 这句话不能写成"有阶段未能完成"；而区间里的未知面积进的是**上界**（最高覆盖率 = (C+U)/A），
+ * 写成"不计入覆盖率"与图上的区间条正好矛盾 —— 一字之差，读者对同一个数字的理解就反了。
+ */
+test('the partial banner says what partial means instead of blaming a failed stage', async ({ page }) => {
+  await setup(page);
+  await page.goto('/');
+  await pickAndStart(page);
+  const status = page.locator('.rp-status');
+  await expect(status).toHaveAttribute('data-tone', 'info');
+  await expect(status).toHaveText(
+    '部分结果：设施目录完整性未经独立核验；覆盖率区间中的未知面积不计入已知覆盖，但计入上界。');
+});
+
+/** 证据不足是另一回事：那句话讲的是结论只覆盖已评估的部分，配色也必须跟着警告走。 */
+test('an insufficient revision keeps the warning tone and its own wording', async ({ page }) => {
+  await setup(page, { businessStatus: 'insufficient' });
+  await page.goto('/');
+  await pickAndStart(page);
+  const status = page.locator('.rp-status');
+  await expect(status).toHaveAttribute('data-tone', 'warn');
+  await expect(status).toHaveText('证据不足：结论只覆盖已评估的部分');
+});
+
+/**
+ * 成圈没立住时，报告说的是"没有范围"，而不是"没有设施"。
+ *
+ * 两次真实体检（2026-10-10）的成圈返回空几何、设施一次也没派发（POI 桶 spent 0／240），
+ * 而每个类别的理由写成了 `facility_stage_unavailable` —— 读者会去查一个没有出错的阶段；
+ * 灰区那一节还会写成"合计 0 m²"。这一版需要三处都说清：页头一句整体说明、每个类别写明
+ * "成圈结果没有可用范围"、灰区写成"未取得清单"。旧修订里冻结的通用码照旧能读
+ * （见 report.test.ts）：报告是冻结件，新码出现不该让旧措辞失效。
+ */
+test('a revision with no boundary says so instead of blaming the facility stage', async ({ page }) => {
+  await setup(page, { noBoundary: true });
+  await page.goto('/');
+  await pickAndStart(page);
+  const banner = page.getByTestId('report-no-boundary');
+  await expect(banner).toContainText('未形成可用生活圈范围，未取得覆盖率结论。');
+  await expect(banner).toContainText('不代表这一带没有设施');
+  for (const category of CATEGORIES) {
+    await expect(page.getByTestId(`coverage-${category}`)).toContainText('成圈结果没有可用范围');
+  }
+  // 没有评估域就没有灰区面积：这一节读后端冻结的原因，不是"合计 0 m²"。
+  const gaps = page.getByTestId('gaps-unavailable');
+  await expect(gaps).toContainText('本次未取得灰区清单');
+  await expect(gaps).toContainText('服务覆盖阶段未完成');
+  await expect(gaps).not.toContainText('0 m²');
 });
 
 test('layers are independent: unchecking one leaves the others on the map', async ({ page }) => {

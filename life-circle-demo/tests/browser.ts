@@ -21,10 +21,20 @@ import { resolve } from 'node:path';
 /** 解包出来的运行库目录，由 `scripts/ensure-browser-libs.sh` 生成（仓库不收录）。 */
 const BROWSER_LIBS = resolve('../.tmp/playwright-libs/root/usr/lib/x86_64-linux-gnu');
 
-if (process.platform === 'linux' && existsSync(BROWSER_LIBS)) {
+/**
+ * 把解出的运行库接到本进程；Playwright 启动浏览器时子进程会继承环境变量。
+ *
+ * 离线套件在导入本模块时就自动接上；用**自带 Chromium 的其他配置**（真实底图验收就是）
+ * 要显式调一次 —— 少了这一个库，浏览器连启动都启动不了，而报告里看起来像"用例失败"。
+ */
+export function useBrowserLibs(): string | null {
+  if (process.platform !== 'linux' || !existsSync(BROWSER_LIBS)) return null;
   process.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH
     ? `${BROWSER_LIBS}:${process.env.LD_LIBRARY_PATH}` : BROWSER_LIBS;
+  return BROWSER_LIBS;
 }
+
+useBrowserLibs();
 
 /** 离线套件的 `use` 片段：自带 Chromium，`PLAYWRIGHT_CHANNEL` 可指到系统浏览器。 */
 export function offlineBrowser() {

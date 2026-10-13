@@ -4,6 +4,7 @@ The legacy manager runs ``analyze_facilities`` right after ``compute_e82``. That
 full pipeline is deliberately not reused here; a checkup retrieves facilities
 once, in its own stage, under its own budget.
 """
+import logging
 import math
 from contextlib import AsyncExitStack
 
@@ -15,7 +16,10 @@ from ..algorithms.baidu_e82 import (ALGORITHM, DEFAULT_REFINEMENT, REFINEMENT_VE
                                     EndpointAnalyticProvider, compute_e82)
 from ..analyses import LimitedProvider, effective_qps
 from ..baidu import silence_transport_logs
+from ..persistence import atomic_dump
 from .protocol import EngineCapabilities, EngineContext, IsochroneAsk, IsochroneSnapshot
+
+logger = logging.getLogger(__name__)
 
 # The boundary core is tuned for this request shape; a checkup never overrides it.
 MAX_EXTENT_M = 1600
@@ -43,6 +47,76 @@ def e82_request(origin, budget: int, *, qps: float | None = None,
         origin, "bd09ll", budget=budget, max_extent=MAX_EXTENT_M, expand=False,
         time_bands=(15,), config_version=REFINEMENT_VERSIONS[refinement], qps=qps,
         deadline_seconds=600 if budget <= 400 else 1200)
+
+
+#: 逐条观测证据的文件名。它与修订文件同住一个任务明细目录，也就与它们同时到期：
+#: 保留期一到，整份证据和修订一起消失，任何汇总里都不会留下一条指向已删文件的路径。
+EVIDENCE_NAME = 'boundary-observation-evidence.json'
+EVIDENCE_SCHEMA = 'boundary-observation-evidence-v1'
+
+
+def _coordinate(value):
+    """一个坐标对，或 None。其余形状（缺字段、字符串、布尔、非有限数）一律不写进证据。"""
+    if not isinstance(value, (list, tuple)) or len(value) != 2:
+        return None
+    if any(isinstance(item, bool) or not isinstance(item, (int, float)) for item in value):
+        return None
+    if any(not math.isfinite(float(item)) for item in value):
+        return None
+    return [float(value[0]), float(value[1])]
+
+
+def observation_evidence(evidence, *, task_id: str, engine_version: str, statistics: dict) -> dict:
+    """逐条观测的落盘形态：问了什么、回了什么、被接收还是被哪个原因拒收。
+
+    这里**不投影求解器的全部证据**。几何（候选面、未知区、不确定带）、负证据、AK、
+    请求 URL 与原始 HTTP 响应都不在写入范围内；方向只留角度、状态与原因 —— 完整的方向
+    记录里带着每一次二分的历史与坐标，那是几何的另一种写法。
+    """
+    rows = []
+    for row in evidence.get('observationEvidence') or []:
+        if not isinstance(row, dict):
+            continue
+        rows.append({
+            'id': row.get('id'), 'kind': row.get('kind'),
+            'accepted': bool(row.get('accepted')), 'rejection': row.get('rejected'),
+            'outcomeReason': row.get('reason'),
+            'requestOrigin': _coordinate(row.get('request_origin')),
+            'requestDestination': _coordinate(row.get('destination')),
+            'actualOrigin': _coordinate(row.get('route_origin')),
+            'actualDestination': _coordinate(row.get('route_destination')),
+            'durationSeconds': row.get('observed_duration'),
+            'endpointVerified': bool(row.get('endpoint_verified')),
+            'attempts': row.get('attempts'),
+            'destinationOffsetM': row.get('destination_offset_m'),
+        })
+    directions = [{'angle': row.get('angle'), 'status': row.get('status'),
+                   'reason': row.get('reason')}
+                  for row in (evidence.get('directions') or []) if isinstance(row, dict)]
+    return {'schemaVersion': EVIDENCE_SCHEMA, 'taskId': task_id, 'engineId': 'baidu_e82',
+            'engineVersion': engine_version,
+            'requests': statistics.get('requests'),
+            'networkRequests': statistics.get('network_requests'),
+            'observations': rows, 'directions': directions,
+            'completion': evidence.get('completion') or {}}
+
+
+def save_observation_evidence(context, payload: dict, statistics: dict) -> str | None:
+    """把这一趟的逐条观测证据写进任务明细目录；写了就返回文件名，没写返回 None。
+
+    写失败不改结论：这次成圈已经付过费、也已经算出结果，证据存不下来不该把它作废。
+    调用方会在这种情况下留一条具名警告。
+    """
+    if context.artifact_dir is None:
+        return None
+    document = observation_evidence(payload.get('evidence') or {}, task_id=context.task_id,
+                                    engine_version=ALGORITHM, statistics=statistics)
+    try:
+        atomic_dump(context.artifact_dir / EVIDENCE_NAME, document)
+    except (OSError, TypeError, ValueError):
+        logger.exception('boundary observation evidence was not saved: %s', context.task_id)
+        return None
+    return EVIDENCE_NAME
 
 
 class BaiduE82Engine:
@@ -102,6 +176,20 @@ class BaiduE82Engine:
             result = await compute_e82(request, provider, context.token,
                                        on_progress=context.progress)
         payload = result.to_dict()
+        # 修订带走的成圈统计里多一项诊断：一次没有圈面的运行因此能说出"哪些观测被拒收、
+        # 各自什么原因"，而不是只剩一个 ``budget``。它只数求解器已经记下的东西。
+        statistics = dict(payload["statistics"])
+        diagnostics = payload.get("boundaryDiagnostics")
+        if diagnostics is not None:
+            statistics["boundaryDiagnostics"] = diagnostics
+        warnings = list(result.warnings)
+        saved = save_observation_evidence(context, payload, statistics)
+        if saved is not None:
+            statistics["observationEvidence"] = saved
+        elif context.artifact_dir is not None:
+            # 证据没落盘时报告里要有名字：一份没有逐条观测的修订和一份有的修订，读起来
+            # 不能一样。这只是缺一份明细，成圈结果照常发布。
+            warnings.append('boundary_evidence_not_saved')
         # E8.2 exposes no separate display shell; the computed boundary is drawn.
         return IsochroneSnapshot.build(
             engine_id=self.engine_id, engine_version=ALGORITHM, algorithm=ALGORITHM,
@@ -109,7 +197,7 @@ class BaiduE82Engine:
             display_geometry=payload["geometry"], unknown_region=payload["unknownRegion"],
             uncertain_region=payload["uncertainRegion"],
             computation_extent=payload["computationExtent"], quality=result.quality,
-            stop_reason=result.stop_reason, warnings=list(result.warnings),
-            statistics=payload["statistics"],
+            stop_reason=result.stop_reason, warnings=warnings,
+            statistics=statistics,
             requests_used=payload["statistics"]["requests"],
             network_requests=payload["statistics"]["network_requests"])

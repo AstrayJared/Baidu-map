@@ -31,6 +31,12 @@ def fail(status, code, message=None):
     raise HTTPException(status, detail={"code": code, "message": message or code})
 
 
+#: The same sentence the checkup engine's admission uses for the same reason, so one
+#: condition does not read as two different things depending on which door was used.
+SYNTHETIC_MODE_OFFLINE = ("当前为离线合成模式，OSM＋百度的成圈需要百度端点核验，"
+                          "本地没有替身，无法运行。")
+
+
 @dataclass
 class HybridJob:
     payload: HybridRequest
@@ -98,8 +104,15 @@ class HybridManager:
             view = running.view()
             fail(409, "hybrid_busy", f"另一项 OSM＋百度分析正在进行（已运行 {view.elapsed_seconds:.0f} 秒，"
                                      f"已用 {view.requests}/{view.budget} 次百度调用）。请等待其完成或取消后重试")
-        if not self.provider_factory and not self.settings.ak_configured:
-            fail(503, "baidu_walking_not_configured")
+        if not self.provider_factory:
+            # An offline deployment never reaches the real service, even with a key
+            # set: this engine's boundary is validated against endpoints Baidu
+            # returned, and there is no local stand-in for that evidence. A key
+            # alone used to be enough to pass this gate and dial out.
+            if self.settings.analysis_provider == "synthetic":
+                fail(503, "synthetic_mode_offline", SYNTHETIC_MODE_OFFLINE)
+            if not self.settings.ak_configured:
+                fail(503, "baidu_walking_not_configured")
         job = HybridJob(payload)
         self.jobs[job.task_id] = job
         job.task = asyncio.create_task(self.run(job, offline))

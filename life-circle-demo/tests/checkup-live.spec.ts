@@ -23,9 +23,9 @@ const redact = (value: string) => value.replace(/([?&](?:ak|key|token)=)[^&\s]+/
 const CENTER = { lng: 121.513925, lat: 31.313079 };
 /** 档位与引擎可以按轮次收窄（例如只跑 E8.2.1 的 800 档），默认仍是两个引擎各 400。 */
 const BUDGET = Number(process.env.CHECKUP_LIVE_BUDGET ?? 400);
-const ALL_ENGINES: Record<string, { label: string; version: string }> = {
-  baidu_e82: { label: '百度边界搜索（E8.2）', version: 'local-multicross-e82' },
-  osm_hybrid: { label: 'OSM＋百度', version: 'hybrid-v1.5.0' },
+const ALL_ENGINES: Record<string, { label: string; version: string; switchId: string }> = {
+  baidu_e82: { label: '百度边界搜索（E8.2）', version: 'local-multicross-e82', switchId: 'algorithm-e82' },
+  osm_hybrid: { label: 'OSM＋百度', version: 'hybrid-v1.5.0', switchId: 'algorithm-hybrid' },
 };
 const ENGINES = Object.fromEntries(Object.entries(ALL_ENGINES).filter(([id]) =>
   !process.env.CHECKUP_LIVE_ENGINES || process.env.CHECKUP_LIVE_ENGINES.split(',').includes(id)));
@@ -84,6 +84,35 @@ async function expectRealBasemap(page: Page) {
   await page.waitForTimeout(9000);
 }
 
+/**
+ * 站点画廊取图（`intro-page/Baidu-map-site` 的四张"操作界面"与首页首屏）。
+ *
+ * 取景按 3:2：站点卡片是 300×200，而覆盖区间、地图署名都在画面边缘，靠 CSS
+ * `object-fit: cover` 裁是会把它们裁掉的。这里先按元素外框裁成 3:2，站点那边整幅显示。
+ *
+ * 这些图是**同一轮真实体检**拍下来的，和报告、图层同修订；它们只说明界面长什么样，
+ * 不构成精度验收证据 —— 那要看本用例的断言与落盘的 `snapshot.json`。
+ */
+const SITE = resolve(OUTPUT, 'site');
+
+function frame3x2(box: { x: number; y: number; width: number; height: number },
+  anchor: 'center' | 'top' = 'center') {
+  const ratio = 3 / 2;
+  let { x, y, width, height } = box;
+  if (width / height > ratio) { const w = height * ratio; x += (width - w) / 2; width = w; }
+  else if (anchor === 'top') { height = width / ratio; }
+  else { const h = width / ratio; y += (height - h) / 2; height = h; }
+  return { x: Math.round(x), y: Math.round(y), width: Math.round(width), height: Math.round(height) };
+}
+
+/** 截一个元素到站点画廊目录；`top` 用于比 3:2 高得多的面板（齐顶裁，保住标题）。 */
+async function shootSite(page: Page, name: string, selector: string, anchor: 'center' | 'top' = 'center') {
+  const box = await page.locator(selector).first().boundingBox();
+  if (box === null) throw new Error(`取景元素不在页面上：${selector}`);
+  mkdirSync(SITE, { recursive: true });
+  await page.screenshot({ path: resolve(SITE, name), fullPage: true, clip: frame3x2(box, anchor) });
+}
+
 test('浏览器 AK 能加载真实 BMapGL 底图，页面也能连上真后端', async ({ page }) => {
   // 排在最前：这个不花额度，却决定了后面两张截图有没有意义。AK 被 Referer 白名单
   // 挡住时，页面仍会跑完体检并"成功"，只有地图是空的；后端连不上时反过来 ——
@@ -108,6 +137,14 @@ test('浏览器 AK 能加载真实 BMapGL 底图，页面也能连上真后端',
     });
   await expect(page.getByTestId('quota-label'))
     .toHaveText('本应用请求限制（不含浏览器 SDK、其他应用及旧接口流量）');
+  // 算法切换控件也要在这里验：这一步不提交任务、不花额度，而后面那套要花。
+  // 切换控件选错引擎是"看起来跑通了"的典型来源，所以先在不花钱的地方把它钉住。
+  await page.getByTestId('checkup-tab-engine').click();
+  for (const { label, version, switchId } of Object.values(ENGINES)) {
+    await page.getByTestId(switchId).click();
+    await expect(page.getByTestId('checkup-engine')).toContainText(label);
+    await expect(page.getByTestId('checkup-engine')).toContainText(version);
+  }
   await page.locator('.api-map-shell').screenshot({
     path: resolve(OUTPUT, 'basemap.png') });
 });
@@ -126,17 +163,38 @@ async function pick(page: Page, combo: string, item: string) {
     .filter({ hasText: item }).first().click();
 }
 
-for (const [engine, { label, version }] of Object.entries(ENGINES)) {
+/**
+ * 站点画廊的「选择分析位置」：**不提交任何任务，因此不花额度**。
+ *
+ * 与体检用例分开，是因为这张图要的是"任务开始之前"的界面，而那一刻与真实体检无关；
+ * 放进付费用例里还出过一次错：填完坐标地图会平移，瓦片没贴完就截图，拍出来是一张
+ * 灰底图（中段 75% 是同一个灰值）。所以顺序是"先填坐标、再等底图"。
+ */
+test('站点画廊：选点界面（不提交任务，不花额度）', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('spinbutton', { name: '经度', exact: true }).fill(String(CENTER.lng));
+  await page.getByRole('spinbutton', { name: '纬度', exact: true }).fill(String(CENTER.lat));
+  await expectRealBasemap(page);
+  // 平移之后还要一次贴图：expectRealBasemap 的等待有一部分花在平移之前。
+  await page.waitForTimeout(6000);
+  await shootSite(page, '01-select-location.png', 'main.wb-body');
+});
+
+for (const [engine, { label, version, switchId }] of Object.entries(ENGINES)) {
   test(`${label}：一次真实体检，从选点到报告`, async ({ page, request }) => {
     const dir = resolve(OUTPUT, engine);
     mkdirSync(dir, { recursive: true });
     await page.goto('/');
+    // 真底图先在场：这一步不花额度，却决定了后面每一张截图有没有意义。
+    await expectRealBasemap(page);
 
     // 引擎在「采样与引擎」选项卡里切换，档位来自后端能力表：界面不自己编档位，这里也不替它编。
     await page.getByRole('spinbutton', { name: '经度', exact: true }).fill(String(CENTER.lng));
     await page.getByRole('spinbutton', { name: '纬度', exact: true }).fill(String(CENTER.lat));
     await page.getByTestId('checkup-tab-engine').click();
-    await page.getByRole('radio', { name: engine === 'baidu_e82' ? '百度边界搜索' : '百度 + OSM', exact: true }).check();
+    // 算法切换控件上的标签是**简称**（能力表里的全称带括注）。里面那个 radio input 是
+    // 视觉隐藏的：按 role 点会一直等到超时（element is not visible）。点标签上的稳定标识。
+    await page.getByTestId(switchId).click();
     await expect(page.getByRole('combobox', { name: '调用预算' })).toBeEnabled({ timeout: 60000 });
     // 选中的证据用面板上的引擎版本，而不是控件内部的类名：换了引擎版本就该跟着变。
     await expect(page.getByTestId('checkup-engine')).toContainText(label);
@@ -186,22 +244,6 @@ for (const [engine, { label, version }] of Object.entries(ENGINES)) {
       .toEqual([]);
     expect(report.resultHash, '报告图层应当带着这一版的结果指纹').toBeTruthy();
     expect(report.revision).toBe(finished.revision);
-    // checked/failed 计数不能证明路线返回过；必须检查实际端点与距离。
-    const verification = (snapshot as { verification?: { facilities?: {
-      routeDistanceM?: number | null; durationS?: number | null;
-      routeOrigin?: unknown; routeDestination?: unknown; poiStatus?: string;
-      verificationLayer?: string | null;
-    }[] } }).verification?.facilities ?? [];
-    const roadEvidence = verification.filter(row => typeof row.routeDistanceM === 'number'
-      && Number.isFinite(row.routeDistanceM) && typeof row.durationS === 'number'
-      && row.routeOrigin != null && row.routeDestination != null);
-    writeFileSync(resolve(dir, 'verification-audit.json'), JSON.stringify({
-      returnedRoutes: roadEvidence.length,
-      strictConfirmed: verification.filter(row => row.verificationLayer === 'strict').length,
-      toleranceEstimated: verification.filter(row => row.verificationLayer === 'endpoint_tolerance').length,
-      noUsableDecision: verification.filter(row => row.verificationLayer == null).length,
-      pendingStrictEndpoint: verification.filter(row => row.poiStatus === 'pending').length,
-    }, null, 2));
 
     // 界面上必须真的报告了这一版：抽屉在完成时自动打开，指纹与修订都要对得上。
     const drawn = page.getByTestId('checkup-report');
@@ -215,6 +257,8 @@ for (const [engine, { label, version }] of Object.entries(ENGINES)) {
     expect(text).toContain('分类覆盖');
     expect(await page.locator('li[data-testid^="coverage-"]').count()).toBe(10);
 
+    // 报告这一张趁抽屉开着拍（齐顶 3:2，保住标题、覆盖区间与列表表头）。
+    await shootSite(page, '04-report.png', '[data-testid="checkup-report"]', 'top');
     await page.screenshot({ path: resolve(dir, 'report-top.png') });
     await page.keyboard.press('Escape');
     await expect(drawn).toBeHidden();
@@ -230,10 +274,50 @@ for (const [engine, { label, version }] of Object.entries(ENGINES)) {
     await page.locator('.api-map-shell').screenshot({ path: resolve(dir, 'map.png') });
     await page.screenshot({ path: resolve(dir, 'page.png') });
 
+    // 站点画廊剩下的三张：步行生活圈、整屏总览、核对民生设施。
+    await shootSite(page, '02-walkable-area.png', '.api-map-shell');
+    await shootSite(page, '00-overview.png', 'main.wb-body');
+    // 设施那张要两边都在画面里：地图上的设施点位，加右侧"每类最近 5 处"的清单。
+    // 清单在结果卡里可能要滚动才看得到，所以先滚到它，再按它的位置取一条横带。
+    const panelBox = await page.locator('aside.wb-results').boundingBox();
+    await page.locator('[data-testid="checkup-nearest"]').scrollIntoViewIfNeeded();
+    const listBox = await page.locator('[data-testid="checkup-nearest"]').boundingBox();
+    const viewport = page.viewportSize();
+    if (panelBox === null || listBox === null || viewport === null) {
+      throw new Error('取不到结果卡或周边设施清单的位置，无法为站点取景');
+    }
+    const bandWidth = Math.round(panelBox.width + 560);
+    const bandHeight = Math.round(bandWidth / 1.5);
+    mkdirSync(SITE, { recursive: true });
+    await page.screenshot({ path: resolve(SITE, '03-facilities.png'), fullPage: true,
+      clip: { x: Math.round(panelBox.x - 560),
+        y: Math.max(0, Math.min(Math.round(listBox.y) - 40, viewport.height - bandHeight)),
+        width: bandWidth, height: bandHeight } });
+
     await page.getByRole('checkbox', { name: '设施密度热力', exact: true }).check();
     await expect(page.getByTestId('service-heat-canvas')).toHaveCount(0);
     await expect(page.getByTestId('facility-density-canvas')).toBeVisible();
     // The map may have no drawable density in a budget-limited category; the capture remains evidence.
     await page.locator('.api-map-shell').screenshot({ path: resolve(dir, 'map-density.png') });
+
+    // 路线证据放在最后判：这一条依赖真实数据（本轮真的取回了路线），失败时前面该落的
+    // 证据与站点取图都已经落盘了。断言本身没有放宽 —— checked/failed 计数不能证明路线
+    // 返回过，必须有实际端点与距离，pending/deadline 不算实测。
+    const verification = (snapshot as { verification?: { facilities?: {
+      routeDistanceM?: number | null; durationS?: number | null;
+      routeOrigin?: unknown; routeDestination?: unknown; poiStatus?: string;
+      verificationLayer?: string | null;
+    }[] } }).verification?.facilities ?? [];
+    const roadEvidence = verification.filter(row => typeof row.routeDistanceM === 'number'
+      && Number.isFinite(row.routeDistanceM) && typeof row.durationS === 'number'
+      && row.routeOrigin != null && row.routeDestination != null);
+    writeFileSync(resolve(dir, 'verification-audit.json'), JSON.stringify({
+      returnedRoutes: roadEvidence.length,
+      strictConfirmed: verification.filter(row => row.verificationLayer === 'strict').length,
+      toleranceEstimated: verification.filter(row => row.verificationLayer === 'endpoint_tolerance').length,
+      noUsableDecision: verification.filter(row => row.verificationLayer == null).length,
+      pendingStrictEndpoint: verification.filter(row => row.poiStatus === 'pending').length,
+    }, null, 2));
+    expect(roadEvidence.length, '需要至少一条带实际端点和距离的路线，pending/deadline 不算实测').toBeGreaterThan(0);
   });
 }

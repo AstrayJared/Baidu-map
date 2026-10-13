@@ -44,6 +44,10 @@ describe('formatting', () => {
   it('translates unavailable coverage reasons instead of exposing backend codes', () => {
     expect(unavailableLabel('facility_query_incomplete'))
       .toBe('设施检索未完成，证据不足以评估覆盖率');
+    // 成圈没立住和设施阶段没跑是两件事，中文说明也要分开：前者去查成圈，后者才查设施。
+    expect(unavailableLabel('no_boundary_geometry')).toBe('成圈结果没有可用范围，无法建立覆盖评估');
+    // 旧修订里冻结的通用码照旧能读：报告是冻结件，新码出现不该让旧措辞失效。
+    expect(unavailableLabel('facility_stage_unavailable')).toBe('设施检索阶段未产出可用结果');
     expect(unavailableLabel(null)).toBe('本类别没有空间支持，未给出百分比');
   });
 });

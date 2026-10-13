@@ -105,4 +105,4 @@ def test_both_consumers_classify_the_same_vocabulary_the_same_way():
             result, status, _ = strict(f"合成{name}", list(category.tag_hints[:1]))
             if status == 'accepted':
                 assert catalog.contract_key(result) == classify(f"合成{name}", category.tag_hints[0])
-    assert catalog.VERSION == "poi-categories-v2.2"
+    assert catalog.VERSION == "poi-categories-v2.3"

@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { useBrowserLibs } from './tests/browser';
 
 /**
  * 真实验收跑（§11.4）：真 AK、真 BMapGL 底图、真后端、真百度接口。
@@ -19,6 +20,22 @@ import { resolve } from 'node:path';
  * 但每一个 `/api/v2` 请求都会在浏览器里被 CORS 挡掉 —— 页面照样画地图、照样报错，
  * 看起来只是"接口没通"，而那时已经不知道该不该信这一轮的截图了。
  */
+/**
+ * 用哪个浏览器：默认是本机做真实验收的 Edge。系统里没有 Edge 时（精简的 Linux 就是），
+ * 设 `PLAYWRIGHT_CHANNEL=bundled` 用 Playwright 自带的 Chromium，或写别的通道名。
+ *
+ * 为什么必须留这个出口：`channel: 'msedge'` 在没有 Edge 的机器上会让整套用例停在
+ * 浏览器启动，一条断言都跑不到 —— 看起来像"真实体检跑不起来"，实际只是这台机器上
+ * 没装那个浏览器而已。
+ */
+function liveBrowser() {
+  const channel = process.env.PLAYWRIGHT_CHANNEL ?? 'msedge';
+  if (channel !== 'bundled') return { ...devices['Desktop Edge'], channel };
+  // 自带 Chromium 在精简的 Linux 上缺 libasound.so.2：接上离线套件解出的运行库再启动。
+  useBrowserLibs();
+  return devices['Desktop Chrome'];
+}
+
 const out = resolve(process.env.CHECKUP_LIVE_OUTPUT_DIR ?? 'output/checkup-live');
 mkdirSync(out, { recursive: true });
 process.env.TEMP = out;
@@ -29,7 +46,7 @@ export default defineConfig({
   // 真任务的上限是后端自己的 1800 秒（DEADLINE_SECONDS），这里留出取图层与截图的时间。
   timeout: 1700000, expect: { timeout: 20000 },
   outputDir: resolve(out, 'results'), reporter: [['list']],
-  use: { baseURL: 'http://127.0.0.1:5173', ...devices['Desktop Edge'], channel: 'msedge',
+  use: { baseURL: 'http://127.0.0.1:5173', ...liveBrowser(),
     // 真实 SDK 请求 URL 含 AK，不将请求上下文写入 Trace 归档。
     viewport: { width: 1600, height: 1000 }, trace: 'off',
     screenshot: 'only-on-failure',

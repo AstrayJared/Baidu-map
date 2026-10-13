@@ -78,7 +78,10 @@ MAINTENANCE_SECONDS = 60.0
 RETENTION_NOTE = ("明细（设施名称、UID、地址与坐标）已按保留期到期不再提供；"
                   "这里的结论、分数与汇总是到期前定稿的那一份，未重算。")
 ENGINE_UNAVAILABLE = {
-    "walking_ak_not_configured": "后端未配置百度步行服务 AK，百度边界搜索（E8.2）无法成圈。",
+    # 两个引擎都要百度端点证据，所以这句话不再点名 E8.2。
+    "walking_ak_not_configured": "后端未配置百度步行服务 AK，需要百度端点证据的成圈无法运行。",
+    # 离线合成模式连一个端点都不会问，所以它在成圈之前就必须被拒绝。
+    "synthetic_mode_offline": "当前为离线合成模式，OSM＋百度的成圈需要百度端点核验，本地没有替身，无法运行。",
 }
 LATER_STAGES_NOTICE = "服务覆盖、灰区与报告阶段尚未接入，本修订只包含成圈结果与设施检索。"
 #: The accessibility revision runs before verification, so its grey zones are
@@ -965,6 +968,8 @@ class CheckupManager(ContinuationMixin):
                                                      for zone in gaps],
                     heatmap=heatmap, entrances=assessment.entrances,
                     origin=normalize((payload.center.lng, payload.center.lat)),
+                    # 没有圈面时核验没有对象，而且原因在成圈不在这里。
+                    boundary_available=snapshot.geometry is not None,
                     session=ReplayRoutes(attach_token(routes.session(self.quota.direction, budget=budget,
                                                         deadline=deadline), token),
                                          store=self.store, task_id=task_id, budget=budget),

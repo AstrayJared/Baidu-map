@@ -137,7 +137,9 @@ class Statistics:
     network_wait_seconds: float = 0
     cells_by_size: dict[str, int] = field(default_factory=dict)
     unknown_area: float = 0
-    unfinished_boundary: int = 0
+    #: 未决边数。``None`` 表示这一趟**没有量过**它：没有圈面时补丁窗口是空的，按窗口量只会
+    #: 得到 0，而 0 会被读成"边界都完成了"。能给出数字的路径照旧给数字。
+    unfinished_boundary: int | None = 0
     active_points: int = 0
     exploration_requests: int = 0
     matrix_route_pairs: int = 0
