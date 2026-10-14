@@ -38,6 +38,7 @@ from app.contracts import (AnalysisResponse, CategoryResult, Data, Facility, Fac
                            Issue, Origin, Rules, TaskResultResponse, TaskStatusResponse, OsmOfflineRequest)
 from app.hybrid_contracts import HybridRequest, HybridResultResponse, HybridError
 from app.rules import DistanceRule
+from app.coordinates_api import CoordinateRequest, CoordinateResult
 from app.catalog import display_group_keys, keys as catalog_keys, majors as catalog_majors
 
 ANALYSIS_MODELS = (AnalysisResponse, TaskStatusResponse, TaskResultResponse, OsmOfflineRequest,
@@ -47,10 +48,10 @@ CHECKUP_MODELS = (CheckupRequest, CheckupTaskView, CheckupSnapshot, CheckupLayer
                  FacilityRoute, CheckupCapabilities, CheckupFacilities, CheckupIsochrone,
                  FacilityExtensionRequest, FacilityExtensionView, FacilityExtensionDocument,
                  FacilityRetryRequest, FacilityRetryView, SessionOpenRequest, SessionView,
-                 RetentionView, RetainedCheckupView, ContinueCheckupRequest)
+                 RetentionView, RetainedCheckupView, ContinueCheckupRequest, CoordinateRequest, CoordinateResult)
 CHECKUP_REQUEST_MODELS = (CheckupRequest, CheckupFacilities, CheckupIsochrone,
                           FacilityExtensionRequest, FacilityRetryRequest, SessionOpenRequest,
-                          ContinueCheckupRequest)
+                          ContinueCheckupRequest, CoordinateRequest)
 
 BACKEND = Path(__file__).resolve().parents[1]
 REPO = BACKEND.parent
@@ -176,6 +177,7 @@ def openapi_spec() -> dict:
             return freeze_status_phrases(app.openapi())
         finally:
             app.state.checkups.store.close()
+            app.state.quota.ledger.close()
 
 
 def _mock_documents() -> dict[str, str]:

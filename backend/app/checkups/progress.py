@@ -32,6 +32,7 @@ STEPS: dict[str, tuple[str, str | None]] = {
     "views": ("准备步行图", None),
     "attachments": ("建立设施接入索引", None),
     "category": ("评估服务覆盖", "格"),
+    "essential_category": ("评估基础三项专项", "格"),
     "routes": ("核验候选设施的步行路线", "家"),
     "report": ("汇总报告", None),
 }

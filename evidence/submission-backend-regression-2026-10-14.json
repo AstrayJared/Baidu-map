@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-14",
+  "collected": 1210,
+  "passed": 1209,
+  "skipped": [
+    "tests/test_osm_offline_prepare.py::test_real_shanghai_pbf_smoke"
+  ],
+  "missing": [],
+  "unresolvedFailures": [],
+  "complete": true,
+  "fixedFollowup": {
+    "files": [
+      "poi-budget-fix.xml",
+      "coordinates-business.xml"
+    ],
+    "passed": 22,
+    "reason": "Explicit CLI category budgets; official Geoconv business error classifications and strict status validation.",
+    "sha256": {
+      "poi-budget-fix.xml": "ab74d30ebcfcc0eb201c02a781d10649b20f0f3603fbaad44cd9433d74eb8fa2",
+      "coordinates-business.xml": "d38c2728b28fd0a414047364cafc3798c841d87799fd93e0cf13cee2a09c453a"
+    }
+  },
+  "resumedAfterInterruption": true,
+  "resumedGroups": [
+    {
+      "tests": "114",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "1",
+      "time": "1541.516"
+    },
+    {
+      "tests": "114",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2097.093"
+    },
+    {
+      "tests": "114",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1759.048"
+    }
+  ],
+  "logs": [
+    {
+      "log": "backend-group-0.log",
+      "passedNodes": 388,
+      "sha256": "9a2c77de1f7cf34c0afaccb04e321ee3e714cffe56a6673331e3c7199eae9366"
+    },
+    {
+      "log": "backend-group-1.log",
+      "passedNodes": 242,
+      "sha256": "3924b562da2898370ea565b5e2a101d8ab5b2dc830f96331b9f2a426cec60216"
+    },
+    {
+      "log": "backend-group-2.log",
+      "passedNodes": 249,
+      "sha256": "478e14778290ef770724c71b695666e50971257d2915a98b0dc94251edf91386"
+    },
+    {
+      "log": "backend-resume-first.log",
+      "passedNodes": 3,
+      "sha256": "2c5ef2c5b518f1ecbc641be9460b361729ce7f8b1c45b5028c5a8f420dc867a1"
+    },
+    {
+      "log": "backend-resume-0.log",
+      "passedNodes": 113,
+      "sha256": "848082933629f591a34265e9c90c4b93ab94681473c14a40e25520acc4f7f30e"
+    },
+    {
+      "log": "backend-resume-1.log",
+      "passedNodes": 114,
+      "sha256": "23afbde9e058f750cca449684c41936b58f14a188ca9315bbef249015211f5cc"
+    },
+    {
+      "log": "backend-resume-2.log",
+      "passedNodes": 113,
+      "sha256": "997a679da9d0c93354958567451bf6fa6c1054f763dc81e77c9a5a8bf8cd3404"
+    }
+  ],
+  "collectedNodesSha256": "2c4dc3b67ef8dbe20bd4de822a60afdd3dad4969f007d6479d9e6b9453424a3a",
+  "notes": [
+    "Full suite covered across original and resumed runs; failed/changed and new cases rerun.",
+    "Initial native Windows stack-dump crash is excluded from passing evidence; resumed runs use Python-frame diagnostics.",
+    "No real AK or Baidu calls used in these tests.",
+    "Optional raw Shanghai PBF preparation smoke is skipped: offline runtime import does not need raw PBF or Pyrosm."
+  ],
+  "ciShardCounts": [
+    404,
+    403,
+    403
+  ]
+}

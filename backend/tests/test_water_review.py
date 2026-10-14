@@ -282,9 +282,11 @@ def test_a_replayed_boundary_without_a_data_change_is_the_paid_one(tmp_path):
     manager = app.state.checkups
     with TestClient(app) as client:
         task_id, view = run(client, body(engine='osm_hybrid', isochrone={'budget': 200}))
-    before = manager.store.revision(task_id)['snapshot']
-    sent = len(places.sent)
-    assert asyncio.run(manager.recompute(task_id, reason='fixture@1')) == [6, 7]
+        before = manager.store.revision(task_id)['snapshot']
+        sent = len(places.sent)
+        # Recompute uses the application's graph holder; keep its serving lifespan
+        # open rather than trying to load a graph after shutdown has stopped it.
+        assert asyncio.run(manager.recompute(task_id, reason='fixture@1')) == [6, 7]
     after = manager.store.revision(task_id)['snapshot']
     assert len(places.sent) == sent
     assert after['trace']['recomputed']['boundary'] == 'replayed_from_ledger'

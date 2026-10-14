@@ -32,7 +32,7 @@ E8.3（POI 引导联合构圈）仍为离线实验，不接入浏览器或生产
 
 独立 `/api/v1/analysis/osm_offline` 继续作为离线基线接口。`ANALYSIS_PROVIDER=baidu` 控制纯百度任务的 Provider；`synthetic` 仅用于离线测试。Hybrid 始终从自己的入口运行。
 
-每个管理器限制本算法的并发任务，并共享百度 QPS 限流器。Hybrid 账本位于 `.hybrid-ledgers`；重启不自动续跑。任务 completed 不等于精度验收通过；Hybrid 的 `facilitiesStatus=not_integrated` 表示设施没有接入。
+每个管理器限制本算法的并发任务，并共享百度 QPS 限流器。Hybrid 账本位于 `.hybrid-ledgers`；重启不自动续跑。任务 completed 不等于精度验收通过；旧 Hybrid 独立接口的 `facilitiesStatus=not_integrated` 表示该旧入口不执行设施检索；默认体检 v2 会独立执行设施、覆盖、专项与报告阶段。
 
 ## 设施检索的额度与缓存口径
 
@@ -41,7 +41,7 @@ E8.3（POI 引导联合构圈）仍为离线实验，不接入浏览器或生产
 | 限制 | 含义 | 在哪里看 |
 | --- | --- | --- |
 | QPS / 并发 | 每秒能发几次、同时几条在飞 | `quota.services.place.qps`、`maxInflight` |
-| 单任务预算 | 一个任务最多花几次地点检索 | `budgets.poiRequests`（默认 60、上限 160） |
+| 单任务预算 | 一个任务最多花几次地点检索 | `budgets.poiRequests`（v2 默认 1200、上限 1200） |
 | 应用日预算 | 本应用一天最多花几次，按北京时间跨日，重启不清零 | `quota.services.place.dailyBudget` / `remainingToday` |
 | 百度账号真实配额 | 不在本应用账本里 | 需按控制台授权自行核实 |
 
@@ -74,3 +74,11 @@ E8.3（POI 引导联合构圈）仍为离线实验，不接入浏览器或生产
 ### 设施检索预算（2026-10-10）
 
 v2 体检首轮及手动补全轮默认、最大均为 1200 次地点检索尝试；队列提前完成即停止，失败与重试计入预算，缓存不占网络额度。路线核验总上限仍为 120。能力接口 `/api/v2/capabilities` 返回新预算，当前轮 `completion.roundPoiLimit` 返回已入库的实际额度；历史轮次与冻结报告保留原预算。检索仍受共享限流、配置的日额度和任务超时约束，不保证目录全量或所有区域均可判定。
+
+## 当前提交入口
+
+详见 [评审启动指南](../docs/评审启动指南.md)。v2 快照和报告新增可选 `essentialServices`：菜市场、独立药店、小学的独立覆盖、疑似缺口与热力；不改变大类评分，旧快照缺字段即未评估。三个图层为 `essential_accessibility`、`essential_gaps`、`essential_heatmap`，共享修订、哈希、取消和保留期。能力接口声明目录与图层。
+
+`POST /api/v2/coordinates/convert` 接收 `point` 和 `sourceCoordinateSystem`（wgs84/gcj02/bd09ll），返回 point、BD09LL 与 provider；使用 Geoconv v2（GCJ02 model=1，WGS84 model=2），BD09LL 原样返回且不消耗上游额度。合成环境拒绝真实转换，异常不回退本地公式。独立 geoconv 账本与配额默认 1 QPS、100 次/日。
+
+完整覆盖与专项依赖 OSM；纯百度成圈不代表完整体检已可用。使用 `setup_osm_region.py import` 校验并导入成果附件，运行数据不进入 Git。

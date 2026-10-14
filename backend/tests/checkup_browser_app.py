@@ -27,6 +27,7 @@
     GET  /control/state      派发数、账本、缓存、任务、外部连接
 """
 import ipaddress
+import asyncio
 import json
 import os
 import shutil
@@ -160,7 +161,7 @@ def one_per_block(sequence, page):
 def two_pages(sequence, page):
     """每页 20 条、总数 40：一次检索要翻到第二页才算查完。
 
-    首轮 56 页装得进默认 60 次的单任务预算，整轮 112 页装不下 —— "首轮"与"查完"
+    首轮 56 页装得进用例显式设置的 60 次预算，整轮 112 页装不下 —— "首轮"与"查完"
     因此是两件事，正好用来在界面与接口上看 partial 与补查。
     """
     results = [row(sequence, page * 20 + index, at=CENTRE) for index in range(20)]
@@ -251,8 +252,15 @@ async def control_allowance(request: Request):
 
 
 @app.post("/control/reset")
-def control_reset():
+async def control_reset():
     """回到默认应答，并清空派发记录与当天账本：每个用例从同一行起跑。"""
+    manager = app.state.checkups
+    for task in _tasks():
+        if task['status'] not in ('completed', 'failed', 'cancelled'):
+            manager.cancel(task['taskId'])
+    for token in list(manager.extension_tokens.values()):
+        token.cancel()
+    await asyncio.wait_for(manager.queue.join(), 10)
     places.respond, places.delay = one_per_block, 0.0
     MODE["name"] = "sparse"
     places.sent.clear()

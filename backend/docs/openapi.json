@@ -1800,6 +1800,47 @@
         }
       }
     },
+    "/api/v2/coordinates/convert": {
+      "post": {
+        "tags": [
+          "coordinates"
+        ],
+        "summary": "Convert",
+        "operationId": "convert_api_v2_coordinates_convert_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoordinateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoordinateResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/analysis/mock/{scenario}": {
       "get": {
         "tags": [
@@ -2853,6 +2894,11 @@
       },
       "CheckupCapabilities": {
         "properties": {
+          "essentialServices": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Essentialservices"
+          },
           "schemaVersion": {
             "type": "string",
             "title": "Schemaversion",
@@ -3152,6 +3198,17 @@
             "const": "checkup-v1",
             "title": "Schemaversion",
             "default": "checkup-v1"
+          },
+          "essentialServices": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EssentialServicesEvidence"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
           },
           "taskId": {
             "type": "string",
@@ -3576,6 +3633,67 @@
           "baseRevision"
         ],
         "title": "ContinueCheckupRequest"
+      },
+      "CoordinateRequest": {
+        "properties": {
+          "point": {
+            "$ref": "#/components/schemas/Origin"
+          },
+          "sourceCoordinateSystem": {
+            "type": "string",
+            "enum": [
+              "wgs84",
+              "gcj02",
+              "bd09ll"
+            ],
+            "title": "Sourcecoordinatesystem"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "point",
+          "sourceCoordinateSystem"
+        ],
+        "title": "CoordinateRequest"
+      },
+      "CoordinateResult": {
+        "properties": {
+          "point": {
+            "$ref": "#/components/schemas/Origin"
+          },
+          "coordinateSystem": {
+            "type": "string",
+            "const": "bd09ll",
+            "title": "Coordinatesystem",
+            "default": "bd09ll"
+          },
+          "sourceCoordinateSystem": {
+            "type": "string",
+            "enum": [
+              "wgs84",
+              "gcj02",
+              "bd09ll"
+            ],
+            "title": "Sourcecoordinatesystem"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "identity",
+              "baidu_geoconv_v2"
+            ],
+            "title": "Provider"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "point",
+          "sourceCoordinateSystem",
+          "provider"
+        ],
+        "title": "CoordinateResult"
       },
       "CoverageEvidence": {
         "properties": {
@@ -4063,6 +4181,59 @@
           "label"
         ],
         "title": "EngineRef"
+      },
+      "EssentialServicesEvidence": {
+        "properties": {
+          "ruleVersion": {
+            "type": "string",
+            "title": "Ruleversion",
+            "default": "essential-services-v1"
+          },
+          "catalogCompleteness": {
+            "type": "string",
+            "const": "unverified",
+            "title": "Catalogcompleteness",
+            "default": "unverified"
+          },
+          "verificationStatus": {
+            "type": "string",
+            "const": "model_only",
+            "title": "Verificationstatus",
+            "default": "model_only"
+          },
+          "directory": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Directory"
+          },
+          "accessibility": {
+            "$ref": "#/components/schemas/AccessibilityEvidence"
+          },
+          "serviceGaps": {
+            "$ref": "#/components/schemas/ServiceGapsEvidence"
+          },
+          "heatmap": {
+            "$ref": "#/components/schemas/HeatmapEvidence"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "accessibility",
+          "serviceGaps",
+          "heatmap"
+        ],
+        "title": "EssentialServicesEvidence"
       },
       "Facility": {
         "properties": {
@@ -6612,6 +6783,17 @@
           "reportId": {
             "type": "string",
             "title": "Reportid"
+          },
+          "essentialServices": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EssentialServicesEvidence"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-legacy-optional": true
           },
           "generatedAt": {
             "type": "number",

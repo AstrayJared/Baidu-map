@@ -74,6 +74,8 @@ class Settings(BaseSettings):
     # never could under 80. Raising it further is a business decision, not a code one.
     baidu_place_daily_budget: int = Field(default=2000, ge=0)
     baidu_matrix_enabled: Literal[False] = False
+    baidu_geoconv_qps: float = Field(default=1, gt=0, allow_inf_nan=False)
+    baidu_geoconv_daily_budget: int = Field(default=100, ge=0)
     baidu_quota_fallback_at: datetime = DEFAULT_FALLBACK_AT
     # The two tiers now carry the same numbers. The switch was introduced on the
     # assumption that the console entitlement would lapse, and the console shows it has

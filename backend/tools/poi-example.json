@@ -12,6 +12,7 @@
     "runId": "guodingyi-poi-offline-v1",
     "phase": "collect",
     "totalBudget": 300,
+    "categoryBudgets": {"market": 100, "pharmacy": 100, "primary_school": 100},
     "deadlineSeconds": 600,
     "qps": null,
     "authorized": false,

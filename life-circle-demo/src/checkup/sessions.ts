@@ -24,6 +24,7 @@ export type CheckupPrefs = {
   toggles?: Record<string, boolean>;
   serviceMode?: string;
   densityCategory?: string;
+  essentialCategory?: string;
   reportOpen?: boolean;
   /** 左栏当前选项卡。 */
   tab?: string;
@@ -77,6 +78,7 @@ export function readStored(engine: string, storage: Storage | undefined = safeSt
     }
     if (text(prefs.serviceMode)) p.serviceMode = prefs.serviceMode;
     if (text(prefs.densityCategory)) p.densityCategory = prefs.densityCategory;
+    if (text(prefs.essentialCategory)) p.essentialCategory = prefs.essentialCategory;
     if (typeof prefs.reportOpen === 'boolean') p.reportOpen = prefs.reportOpen;
     if (text(prefs.tab)) p.tab = prefs.tab;
     out.prefs = p;

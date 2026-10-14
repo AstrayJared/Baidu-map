@@ -490,6 +490,17 @@ class HeatmapEvidence(CheckupModel):
     notes: list[str] = Field(default_factory=list)
 
 
+class EssentialServicesEvidence(CheckupModel):
+    rule_version: str = "essential-services-v1"
+    catalog_completeness: Literal["unverified"] = "unverified"
+    verification_status: Literal["model_only"] = "model_only"
+    directory: list[dict] = Field(default_factory=list)
+    accessibility: AccessibilityEvidence
+    service_gaps: ServiceGapsEvidence
+    heatmap: HeatmapEvidence
+    notes: list[str] = Field(default_factory=list)
+
+
 class WaterDataEvidence(CheckupModel):
     """这一版的水体障碍到底是什么：数据来源、版本、复核过的范围与仍然冲突的地方。
 
@@ -638,6 +649,7 @@ class ReportEvidence(CheckupModel):
     政策准入、与建设选址的关系）。它随报告一起冻结，不能由界面自行省略。
     """
     report_id: str
+    essential_services: EssentialServicesEvidence | None = Field(default=None, json_schema_extra={'x-legacy-optional': True})
     generated_at: float
     schema_version: Literal["checkup-v1"] = SCHEMA_VERSION
     domain: dict | None = None
@@ -691,6 +703,7 @@ class VerificationEvidence(CheckupModel):
 class CheckupSnapshot(CheckupModel):
     """One immutable stage revision. Published content is never rewritten."""
     schema_version: Literal["checkup-v1"] = SCHEMA_VERSION
+    essential_services: EssentialServicesEvidence | None = Field(default=None, json_schema_extra={'x-legacy-optional': True})
     task_id: str
     revision: int = Field(ge=1)
     generated_at: float
@@ -839,6 +852,9 @@ class FacilityRoute(CheckupModel):
 
 
 class CheckupCapabilities(CheckupModel):
+    essential_services: dict = Field(default_factory=lambda: {
+        'ruleVersion': 'essential-services-v1', 'directory': list(catalog.ESSENTIAL_SERVICES),
+        'layers': ['essential_accessibility', 'essential_gaps', 'essential_heatmap']})
     schema_version: str = SCHEMA_VERSION
     engines: list[dict]
     rules: dict

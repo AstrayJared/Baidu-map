@@ -44,6 +44,7 @@ export type CheckupLayerToggles = Partial<Record<LayerId | HeatLayer | 'water', 
 export const DEFAULT_CHECKUP_LAYERS: Record<LayerId | HeatLayer | 'water', boolean> = {
   isochrone: true, accessibility: true, service_gaps: false, facilities: true,
   heatmap: false, verification: true, report: false, density: false, service: true, water: true,
+  essential_accessibility: false, essential_gaps: true, essential_heatmap: false,
 };
 
 /** 面内标字：只标会被读错的那几类。河道本身有底图注记，范围只是虚线框，不再加字。 */
@@ -65,7 +66,7 @@ function waterSwatch(style: WaterStyle) {
 const rgbCss = ([r, g, b]: readonly number[]) => `rgb(${r}, ${g}, ${b})`;
 
 /** 有面积的图层画成方块（填色与描边同地图），点图层画成圆点。 */
-const AREA_LAYERS = new Set<LayerId>(['isochrone', 'accessibility', 'service_gaps']);
+const AREA_LAYERS = new Set<LayerId>(['isochrone', 'accessibility', 'service_gaps', 'essential_accessibility', 'essential_gaps']);
 
 function alpha(hex: string, opacity: number): string {
   const value = Number.parseInt(hex.slice(1), 16);
@@ -197,13 +198,14 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
   useEffect(() => {
     if (!api || !map) return;
     const overlay = createServiceOverlay(api, {
-      categories: categoryDirectory.length ? categoryDirectory.map(item => item.id) : [...CATEGORY_ORDER],
+      categories: layers.essential_heatmap ? ['market', 'pharmacy', 'primary_school']
+        : categoryDirectory.length ? categoryDirectory.map(item => item.id) : [...CATEGORY_ORDER],
       viewport: () => ({ width: container.current?.clientWidth ?? 0,
         height: container.current?.clientHeight ?? 0 }),
     });
     serviceHeat.current = overlay;
     return () => { overlay?.destroy(); serviceHeat.current = null; };
-  }, [api, map, categoryDirectory.map(item => item.id).join(',')]);
+  }, [api, map, layers.essential_heatmap, categoryDirectory.map(item => item.id).join(',')]);
 
   useEffect(() => {
     const overlay = serviceHeat.current;
@@ -213,8 +215,8 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
     overlay.setSamples(coverage?.samples ?? [], coverage?.domain ?? null);
     overlay.setMode(serviceMode);
     overlay.setBoundary(drawables.isochrone?.shapes[0]?.geometry ?? null);
-    if (layers.service) overlay.attach(map); else overlay.detach();
-  }, [api, map, layers.service, coverage, serviceMode, drawables.isochrone]);
+    if (layers.service || layers.essential_heatmap) overlay.attach(map); else overlay.detach();
+  }, [api, map, layers.service, layers.essential_heatmap, coverage, serviceMode, drawables.isochrone]);
 
   useEffect(() => {
     if (!api || !map) return;
@@ -272,7 +274,7 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
   // 开着热力时圈面只描边：BMapGL 的面画在 WebGL 底层，热力画布在其上的 DOM 容器里，
   // 面填色不会盖住热力，却会透过半透明热力把整圈染成一片青绿，渐变就看不出来了。
   // 服务覆盖热力自己就把缺口画成灰，所以灰区此时也只留边线和编号对应的轮廓。
-  const heatOn = !!(layers.service || layers.density);
+  const heatOn = !!(layers.service || layers.density || layers.essential_heatmap);
   useEffect(() => {
     const instance = map;
     if (!instance || !api) return;
@@ -281,7 +283,7 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
     try {
       replaceGroup(instance, 'vector', () => {
         const created: BMapOverlay[] = [];
-        for (const id of ['isochrone', 'accessibility', 'service_gaps'] as LayerId[]) {
+        for (const id of ['isochrone', 'accessibility', 'service_gaps', 'essential_accessibility', 'essential_gaps'] as LayerId[]) {
           const drawable = drawables[id];
           if (!layers[id] || !drawable) continue;
           for (const shape of drawable.shapes) {
@@ -297,7 +299,8 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
       });
     } catch { setError(true); }
   }, [api, map, layers.isochrone, layers.accessibility, layers.service_gaps, heatOn, layers.service,
-    drawables.isochrone, drawables.accessibility, drawables.service_gaps]);
+    drawables.isochrone, drawables.accessibility, drawables.service_gaps,
+    layers.essential_accessibility, layers.essential_gaps, drawables.essential_accessibility, drawables.essential_gaps]);
 
   // 点：设施、热力采样、核验记录。按屏幕像素分格合并，数量写在标记上，一条也不丢。
   useEffect(() => {
@@ -524,6 +527,7 @@ export function CheckupMap({ center, onPick, resultCenter, layers, drawables, co
             <span className="api-legend-note">· 以复核后的水系计算，底图水面仅作参照</span>
           </>}
         </span>}
+        <a className="api-legend-note" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors · ODbL</a>
         <span className="api-legend-line api-legend-layers">
           {Object.entries(LAYER_STYLES).filter(([id]) => layers[id as LayerId])
             .map(([id, style]) => <span key={id} className="api-legend-item">

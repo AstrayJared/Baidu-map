@@ -1,5 +1,10 @@
 {
   "version": "poi-categories-v2.2",
+  "essentialServices": [
+    {"key":"market","label":"菜市场","categories":["market"],"queryCategories":["market"]},
+    {"key":"pharmacy","label":"药店","categories":["pharmacy"],"queryCategories":["pharmacy"],"excludeNameHints":["医院","住院","门诊"]},
+    {"key":"primary_school","label":"小学","categories":["school","combined_school"],"queryCategories":["school","combined_school"],"combinedPrimaryHints":["小学","完小","九年一贯","十二年一贯","九年制","9年一贯","12年一贯"]}
+  ],
   "displayGroups": [
     {"key":"healthcare","label":"健康照护","order":1,"majors":["medical","care"]},
     {"key":"education","label":"教育成长","order":2,"majors":["education"]},

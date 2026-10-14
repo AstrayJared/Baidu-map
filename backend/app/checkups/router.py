@@ -3,7 +3,6 @@ from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse
 
 from ..algorithms.hybrid_isochrone.water_review import review_catalog
-from .. import catalog
 from ..catalog import major_of
 from .. import catalog
 from ..engines import STATUS_THRESHOLD_S
@@ -25,7 +24,7 @@ from .models import (DEFAULT_POI_REQUESTS, DEFAULT_ROUTE_REQUESTS, DETAIL_ROUTE_
 # endpoint so a client can address any group of one revision the same way, and
 # the layer says which of the two it is by which field it fills.
 LAYER_IDS = ("isochrone", "facilities", "accessibility", "service_gaps", "heatmap",
-             "verification", "report")
+             "verification", "report", "essential_accessibility", "essential_gaps", "essential_heatmap")
 CACHE_CONTROL = "private, max-age=0, must-revalidate"
 #: 含明细的响应一律不许落任何缓存。修订是不可变的，所以浏览器**可以**按 ETag 复用旧正文 ——
 #: 而"不可变"只对内容成立：§5 B2 决策 2 的到期说的是这些明细从某一刻起不该再被读到，
@@ -68,6 +67,14 @@ def _layer_geometry(snapshot, layer_id: str):
     collection drawn on a map reads as "nothing here", which is exactly the
     claim the stage refused to make.
     """
+    if layer_id.startswith('essential_'):
+        if snapshot.essential_services is None:
+            raise CheckupError(409, 'checkup_essential_not_ready', '本修订尚未评估基础三项专项')
+        name = {'essential_accessibility': 'accessibility', 'essential_gaps': 'service_gaps',
+                'essential_heatmap': 'heatmap'}[layer_id]
+        copy = snapshot.model_copy(update={name: getattr(snapshot.essential_services, name)})
+        return {'accessibility': _accessibility_layer, 'service_gaps': _service_gaps_layer,
+                'heatmap': _heatmap_layer}[name](copy)
     if layer_id == "isochrone":
         # Stored revisions use the wire (camelCase) names; the snake_case read never matched.
         display = snapshot.isochrone.get("displayGeometry", snapshot.isochrone.get("display_geometry"))

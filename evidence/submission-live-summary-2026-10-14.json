@@ -1,0 +1,198 @@
+{
+  "date": "2026-10-14",
+  "commit": "ce689c1",
+  "taskId": "839c8e22-79b2-40ec-a666-5df0cc762ae9",
+  "center": {
+    "lng": 121.513925,
+    "lat": 31.313079
+  },
+  "engine": {
+    "engineId": "baidu_e82",
+    "engineVersion": "local-multicross-e82",
+    "label": "百度边界搜索（E8.2）"
+  },
+  "businessStatus": "partial",
+  "elapsedSecondsObserved": 536,
+  "budgets": {
+    "isochrone": {
+      "limit": 200,
+      "spent": 200
+    },
+    "poi": {
+      "limit": 1200,
+      "spent": 84
+    },
+    "route": {
+      "limit": 120,
+      "spent": 108
+    },
+    "detail": {
+      "limit": 20,
+      "spent": 0
+    }
+  },
+  "facilitiesStatus": "complete",
+  "facilityCounts": {
+    "shopping": 3,
+    "medical": 3,
+    "education": 2
+  },
+  "minorCounts": {
+    "pharmacy": 3,
+    "preschool": 1,
+    "market": 1,
+    "supermarket": 2,
+    "primary_school": 1
+  },
+  "coverageScores": {
+    "ruleVersion": "walk-distance-1000-v1",
+    "domainAreaM2": 1135214.786443713,
+    "categories": [
+      {
+        "category": "medical",
+        "supported": true,
+        "coverageLowerPct": 67.44318424520115,
+        "coverageUpperPct": 99.99999999999945,
+        "assessablePct": 67.44318424520115,
+        "unknownPct": 32.55681575479829,
+        "intervalWidthPct": 32.55681575479829,
+        "intervalDegenerate": false,
+        "unavailableReason": null
+      },
+      {
+        "category": "shopping",
+        "supported": true,
+        "coverageLowerPct": 81.31721071849967,
+        "coverageUpperPct": 99.99999999999945,
+        "assessablePct": 81.31721071849967,
+        "unknownPct": 18.682789281499772,
+        "intervalWidthPct": 18.68278928149978,
+        "intervalDegenerate": false,
+        "unavailableReason": null
+      },
+      {
+        "category": "education",
+        "supported": true,
+        "coverageLowerPct": 81.86179502174303,
+        "coverageUpperPct": 99.99999999999945,
+        "assessablePct": 81.86179502174303,
+        "unknownPct": 18.13820497825639,
+        "intervalWidthPct": 18.13820497825641,
+        "intervalDegenerate": false,
+        "unavailableReason": null
+      }
+    ],
+    "overall": {
+      "available": true,
+      "reason": null,
+      "missingCategories": [],
+      "coverageLowerPct": 76.87406332848128,
+      "coverageUpperPct": 99.99999999999943,
+      "assessablePct": 76.87406332848128,
+      "unknownPct": 23.12593667151815,
+      "categories": [
+        "shopping",
+        "medical",
+        "education"
+      ],
+      "weights": {
+        "shopping": 0.3333333333333333,
+        "medical": 0.3333333333333333,
+        "education": 0.3333333333333333
+      }
+    },
+    "formula": {
+      "coverageLower": "100*C/A",
+      "coverageUpper": "100*(C+U)/A",
+      "assessable": "100*(C+G)/A",
+      "identity": "C+G+U=A",
+      "categoryWeights": {
+        "shopping": 0.3333333333333333,
+        "medical": 0.3333333333333333,
+        "education": 0.3333333333333333
+      }
+    }
+  },
+  "gaps": {
+    "status": "partial",
+    "gapAreaM2": 0.0,
+    "obstacleLayerAvailable": false
+  },
+  "verification": {
+    "checked": 28,
+    "failed": 5,
+    "strictConfirmed": 0,
+    "toleranceEstimated": 23,
+    "noUsableDecision": 5,
+    "spotCheckSummary": {
+      "planned": 1731,
+      "checked": 79,
+      "agree": 39,
+      "conflict": 1,
+      "resolved": 1,
+      "inconclusive": 38,
+      "beyond": 0,
+      "attempts": 80
+    }
+  },
+  "completion": {
+    "reportRevision": 5,
+    "roundNumber": 1,
+    "roundPoiLimit": 1200,
+    "roundPoiRequests": 84,
+    "cumulativePoiRequests": 84,
+    "routeRequests": 108,
+    "routeRemaining": 12,
+    "queryCompleteByMajor": {
+      "shopping": true,
+      "medical": true,
+      "education": true
+    },
+    "evaluatedCategories": 3,
+    "totalCategories": 3,
+    "evaluationStatus": "complete",
+    "canContinue": false,
+    "restartRetrieval": false,
+    "stopReason": null,
+    "limitations": []
+  },
+  "resultHash": "fb73379d16328037ba73f2297fb211f46a26f1466b736051def8278092a9a117",
+  "holdout": {
+    "taskId": "839c8e22-79b2-40ec-a666-5df0cc762ae9",
+    "planSha256": "9c86be7c9cbc966ae558814e817fef95659b3f0f3609a78e49cdf89eafec738e",
+    "requests": 32,
+    "eligible": 32,
+    "unknown": 0,
+    "unknownReasons": {},
+    "e82Agreement": 28,
+    "radius1080Agreement": 18,
+    "falsePositive": 0,
+    "falseNegative": 4,
+    "outside15SecondBand": 29,
+    "outside15SecondBandAgreement": 26,
+    "limits": "One community, boundary-stratified sample, same provider as construction, not field truth or area IoU; unknown routes excluded only from judged denominator and explicitly counted."
+  },
+  "layers": {
+    "isochrone": {
+      "httpStatus": 200
+    },
+    "facilities": {
+      "httpStatus": 200
+    },
+    "accessibility": {
+      "httpStatus": 200
+    },
+    "service_gaps": {
+      "httpStatus": 200
+    },
+    "heatmap": {
+      "httpStatus": 200
+    },
+    "verification": {
+      "httpStatus": 200
+    },
+    "report": {
+      "httpStatus": 200
+    }
+  }
+}

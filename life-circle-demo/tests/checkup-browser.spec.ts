@@ -65,7 +65,13 @@ async function settle(request: APIRequestContext, taskId: string, timeout = 1200
   const deadline = Date.now() + timeout;
   let view = await (await request.get(`${API}/api/v2/checkups/${taskId}`)).json() as TaskView;
   while (!DONE.has(view.status)) {
-    if (Date.now() > deadline) throw new Error(`task ${taskId} did not settle: ${view.status}`);
+    if (Date.now() > deadline) {
+      const state = await (await request.get(`${API}/control/state`)).json();
+      await test.info().attach('task-timeout-evidence', {
+        body: JSON.stringify({ task: view, state }, null, 2), contentType: 'application/json',
+      });
+      throw new Error(`task ${taskId} did not settle: ${view.status}, stage=${view.stage}, progress=${JSON.stringify(view.progress)}`);
+    }
     await new Promise(resolve => setTimeout(resolve, 100));
     view = await (await request.get(`${API}/api/v2/checkups/${taskId}`)).json() as TaskView;
   }
@@ -125,10 +131,17 @@ async function waitForNewTask(request: APIRequestContext, before: ControlState,
 }
 
 /** 点地图选点、开始体检；返回这一次任务的服务端标识。 */
-async function startCheckup(page: Page, request: APIRequestContext, before: ControlState): Promise<string> {
+async function startCheckup(page: Page, request: APIRequestContext, before: ControlState, maxPoiRequests?: number): Promise<string> {
+  if (maxPoiRequests !== undefined) await page.route('**/api/v2/checkups', async route => {
+    if (route.request().method() !== 'POST') return route.continue();
+    const body = route.request().postDataJSON();
+    return route.continue({ postData: JSON.stringify({ ...body,
+      facilities: { ...body.facilities, maxPoiRequests } }) });
+  });
   await page.getByTestId('checkup-map').click();
   await page.getByRole('button', { name: '开始体检', exact: true }).click();
   const taskId = await waitForNewTask(request, before);
+  await settle(request, taskId, 180000);
   await expect(page.getByTestId('checkup-report')).toBeVisible();
   return taskId;
 }
@@ -166,12 +179,12 @@ test('一次体检把设施画到图上，派发数与账本增量逐页对得�
   expect((await getState(request)).external.attempts).toBe(0);
 });
 
-test('默认预算装不下一整轮时，界面说 partial 并且保留已取到的证据', async ({ page, request }) => {
+test('显式60次预算装不下一整轮时，界面说 partial 并且保留已取到的证据', async ({ page, request }) => {
   await post(request, '/control/allowance', { placeDailyBudget: 1600 });
   await post(request, '/control/respond', { mode: 'dense' });
   const before = await getState(request);
   await serve(page);
-  const taskId = await startCheckup(page, request, before);
+  const taskId = await startCheckup(page, request, before, 60);
   const doc = await document_(request, taskId);
   const after = await getState(request);
   const group = doc.facilities!;
@@ -196,7 +209,7 @@ test('日余额为 0 时，补查复用已经付费的页面而不新增一次�
   await post(request, '/control/respond', { mode: 'dense' });
   const before = await getState(request);
   await serve(page);
-  const taskId = await startCheckup(page, request, before);
+  const taskId = await startCheckup(page, request, before, 60);
   await page.keyboard.press('Escape');
   const afterRun = await getState(request);
 

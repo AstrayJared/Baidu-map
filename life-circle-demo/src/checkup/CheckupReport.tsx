@@ -27,6 +27,7 @@ import {
 } from './report';
 import { outdatedText, recomputedText, versionView, type WaterReviewRef } from './water';
 import './checkup.css';
+import EssentialReport from './EssentialReport';
 
 /**
  * 区间条：实色是下界 C / A，斜线是未知 U / A（可能覆盖），空白是其余。
@@ -258,6 +259,8 @@ export function CheckupReport({ snapshot, stale, waterReviews = NO_REVIEWS, cont
         </div>}
       </section>
 
+      <EssentialReport value={snapshot.report?.essentialServices ?? snapshot.essentialServices} />
+      <p className="checkup-muted">总体区间分仅按购物、医疗、教育三大类等权计算，每类 1/3。</p>
       <Section id="rp-overall">
         {overall.available ? <div className="rp-overall">
           <p className="checkup-interval checkup-overall">

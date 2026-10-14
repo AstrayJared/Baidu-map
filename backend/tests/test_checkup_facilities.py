@@ -52,9 +52,8 @@ SYNTHETIC_ROUTES = "synthetic:checkup-routes"
 # 断言写在这条关系上，词典增删小类时数字跟着走，而不是把某一次运行的快照钉死。
 CORE_MINORS = len(poi_keys(list(default_analysis_majors())))
 CORE_PAGES = 4 * CORE_MINORS
-# 每个小类各回一条落在中心的记录；十四个小类里 combined_school 与 training 的样本标签
-# 不判进本类，所以被接收的是十二处 —— 这三条数字来自词典，不是来自某次运行。
-CORE_ACCEPTED = {"shopping": 3, "medical": 5, "education": 4}
+# 每个小类各回一条；一贯制已归类，只有 training 是排除类别。
+CORE_ACCEPTED = {"shopping": 3, "medical": 5, "education": 5}
 CORE_ACCEPTED_TOTAL = sum(CORE_ACCEPTED.values())
 
 
@@ -413,10 +412,9 @@ def test_both_engines_close_the_loop_over_their_own_boundary(tmp_path):
             assert group["statistics"]["livePages"] == CORE_PAGES
             assert group["statistics"]["budgetSpent"] == CORE_PAGES
             assert group["statistics"]["pageAttempts"] == CORE_PAGES
-            # 这一轮只发了主关键词（primary_queries_only），并且有一条候选需要人工
-            # 复核（classification_needs_review）：两个都记在案，不是"没有警告"。
+            # 一贯制已按当前词典归类；这份样例仅保留主关键词限制。
             assert group["stopReason"] is None
-            assert group["warnings"] == ["classification_needs_review", "primary_queries_only"]
+            assert group["warnings"] == ["primary_queries_only"]
             assert group["queryDomain"]["paddingMeters"] == 1300
             assert group["dataObtainedAt"] > 0
             # §5 B2 决策 1：全部小类都查完了，所以"共同完成"就是整个圈面 ——
@@ -428,7 +426,7 @@ def test_both_engines_close_the_loop_over_their_own_boundary(tmp_path):
             # 首轮计划与它实际的执行一致：56 页、没有缓存可复用、需要 56 次新增调用。
             assert group["initialPlan"] == {
                 "initialPageCount": CORE_PAGES, "reusableInitialPageCount": 0,
-                "estimatedNewInitialCalls": CORE_PAGES, "remainingTaskBudget": 240,
+                "estimatedNewInitialCalls": CORE_PAGES, "remainingTaskBudget": 1200,
                 "remainingDailyBudget": 1600, "blocks": 4, "minorCategories": CORE_MINORS,
                 "primaryQueriesOnly": True, "isReservation": False}
 
@@ -508,7 +506,7 @@ def test_a_facility_run_that_fails_every_page_is_a_failed_query(tmp_path):
     with TestClient(app) as client:
         # 显式钉住 60 次：这一节测的是"额度在重试中途用完时，被拒的页面按名字记下来，
         # 而不是让整轮消失"。它必须是一个会中途用完的预算，不能跟着部署默认值走 ——
-        # 默认值现在是 240，足够把 56 个序列的两次尝试都发完，那样这个分支就没人测了。
+        # 默认值现在是 1200，足够把 56 个序列的两次尝试都发完，那样这个分支就没人测了。
         task_id, view = run(client, body(facilities={"categories": CORE_MAJORS,
                                                      "maxPoiRequests": 60}))
         assert view["status"] == "completed", view
@@ -584,6 +582,10 @@ def test_a_cancelled_facility_stage_keeps_what_it_retrieved(tmp_path):
 def test_a_cached_page_costs_no_attempt_and_keeps_its_data_time(tmp_path):
     places = SyntheticPlaces(at_origin())
     app = make_app(tmp_path, places, cache_freshness_seconds=60)
+    # This case tests reuse and provenance, not wall-clock expiry. Slow disks
+    # must not expire the first task while its durable checkpoints are written.
+    obtained = time.time()
+    app.state.checkups.cache.clock = lambda: obtained
     with TestClient(app) as client:
         first_id, _view = run(client, body(clientRequestId="checkup-a"))
         first = document(client, first_id)
@@ -1224,16 +1226,16 @@ def test_an_omitted_budget_replay_survives_a_changed_default(tmp_path, monkeypat
         task_id, _view = run(client, body())
         first = submit_extension(client, task_id, "ext-default", EXTENDED)
         extension_of(client, task_id, first["extensionId"])
-        assert first["budget"]["limit"] == 240          # 省略 → 取部署默认值
+        assert first["budget"]["limit"] == DEFAULT_POI_REQUESTS
 
-        raised = DEFAULT_POI_REQUESTS * 2              # 一个比当前默认更大的新默认
-        monkeypatch.setattr("app.checkups.manager.DEFAULT_POI_REQUESTS", raised)
+        changed = DEFAULT_POI_REQUESTS // 2            # 在当前上限内改变部署默认值
+        monkeypatch.setattr("app.checkups.manager.DEFAULT_POI_REQUESTS", changed)
         replay = submit_extension(client, task_id, "ext-default", EXTENDED)
         assert replay["extensionId"] == first["extensionId"]
 
         # 同一个新默认下，新标识按新默认解析；缓存已满，所以照样受理。
         fresh = submit_extension(client, task_id, "ext-default-new", EXTENDED)
-        assert fresh["budget"]["limit"] == raised
+        assert fresh["budget"]["limit"] == changed
 
         # 显式给少了照样当场拒绝：修的是身份口径，不是把校验删了。默认值只保证
         # 首轮够用，它不会把一个显式的过小预算悄悄改大。
@@ -1305,7 +1307,7 @@ def test_a_row_written_before_the_identity_column_is_still_replayable(tmp_path):
         revision = store.revision(task_id)["revision"]
         # 旧行冻的是"当时按默认值解析出来的那个数"，所以这里必须写当前默认真正解析出的
         # 预算，而不是一个字面量：等价规则比的是这个数，不是默认值本身。默认值从 60 变成
-        # 240 之后，写死 60 会让这一行看起来"预算不同"，测的就不再是旧行的重放了。
+        # 1200 之后，写死 60 会让这一行看起来"预算不同"，测的就不再是旧行的重放了。
         frozen = app.state.checkups._extension_boundary(
             task_id, FacilityExtensionRequest(client_request_id="probe",
                                               categories=EXTENDED)).requested
@@ -1420,7 +1422,7 @@ CORE_MAJORS = list(default_analysis_majors())
 #: 单任务请求上限的默认值（60）。首轮 56 页只是"至少"，密集数据下整轮要 112 页 ——
 #: 这个差距正是本节要测的东西，所以每次请求都显式写它，不靠默认值恰好也是 60。
 #: 单任务请求上限。这一节要的是"预算会在中途用完"的那种情形（首轮 56 页、整轮 112 页、
-#: 每次只给 60），所以显式钉住 60，而不是读部署默认值 —— 默认值现在是 240，够把整轮一次
+#: 每次只给 60），所以显式钉住 60，而不是读部署默认值 —— 默认值现在是 1200，够把整轮一次
 #: 跑完，"跨日推进"这一节就不再成立了。
 REQUEST_LIMIT = 60
 

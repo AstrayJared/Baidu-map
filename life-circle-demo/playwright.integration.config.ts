@@ -28,7 +28,7 @@ const data = resolve(process.env.CHECKUP_BROWSER_DIR ?? '../.tmp/checkup-browser
 
 export default defineConfig({
   testDir: './tests', testMatch: 'checkup-browser.spec.ts', fullyParallel: false, workers: 1,
-  timeout: 180000, expect: { timeout: 30000 },
+  timeout: 240000, expect: { timeout: 10000 },
   reporter: [['list'], ['html', { open: 'never', outputFolder: resolve(artifacts, 'report') }]],
   outputDir: resolve(artifacts, 'results'),
   use: { baseURL: `http://127.0.0.1:${WEB_PORT}`, ...offlineBrowser(),

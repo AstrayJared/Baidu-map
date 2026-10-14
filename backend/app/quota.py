@@ -34,7 +34,7 @@ the daily ledger; the balance below says so.
 import asyncio
 import sqlite3
 import time
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -48,7 +48,8 @@ SHANGHAI = timezone(timedelta(hours=8))
 
 DIRECTION = "direction"
 PLACE = "place"
-SERVICES = (DIRECTION, PLACE)
+GEOCONV = "geoconv"
+SERVICES = (DIRECTION, PLACE, GEOCONV)
 
 # Per-task pools. Attempts are counted, not successes; retries are attempts.
 DEFAULT_POI_ATTEMPTS = 60
@@ -215,16 +216,32 @@ class DailyLedger:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.clock = clock
+        self._keeper = None
 
+    @contextmanager
     def _connection(self):
         connection = sqlite3.connect(self.path, timeout=30, isolation_level=None)
         connection.row_factory = sqlite3.Row
-        connection.execute("PRAGMA journal_mode=WAL")
-        return connection
+        try:
+            connection.execute("PRAGMA journal_mode=WAL")
+            yield connection
+        finally:
+            connection.close()
 
     def initialize(self) -> None:
         with self._connection() as connection:
             connection.executescript(LEDGER_SCHEMA)
+            if self._keeper is None:
+                # Keep WAL alive without retaining every short-lived connection.
+                self._keeper = sqlite3.connect(self.path, check_same_thread=False, isolation_level=None)
+
+    def close(self):
+        if getattr(self, '_keeper', None) is not None:
+            self._keeper.close()
+            self._keeper = None
+
+    def __del__(self):
+        self.close()
 
     def day(self, now: float | None = None) -> str:
         moment = self.clock() if now is None else now
@@ -373,6 +390,20 @@ class ServicePool:
             self.gate.attempt_lock.release()
 
 
+class CoordinatePool(ServicePool):
+    """Conversion has its own app ceiling, independent of place/walking tiers."""
+    def __init__(self, settings, ledger, tier):
+        self.qps = settings.baidu_geoconv_qps
+        self.daily = settings.baidu_geoconv_daily_budget
+        super().__init__(GEOCONV, RateGate(self.qps), ledger, tier)
+
+    def ceiling(self):
+        return self.qps
+
+    def _daily_budget(self):
+        return self.daily
+
+
 class Quota:
     """The single allocation entry for both algorithms and every facility stage."""
 
@@ -393,12 +424,15 @@ class Quota:
         self.place = ServicePool(
             PLACE, TieredGate(lambda: self.tiers.active().place_qps, cap=cap), self.ledger,
             self.tiers, max_inflight=settings.baidu_place_max_inflight)
+        self.geoconv = CoordinatePool(settings, self.ledger, self.tiers)
 
     def pool(self, name: str) -> ServicePool:
         if name == DIRECTION:
             return self.direction
         if name == PLACE:
             return self.place
+        if name == GEOCONV:
+            return self.geoconv
         raise KeyError(name)
 
     def task_budget(self, *, isochrone: int, poi: int | None = None, route: int | None = None,
@@ -422,6 +456,10 @@ class Quota:
             "tierAppliesFrom": self.tiers.switch_at.isoformat(),
             "day": day,
             "services": {
+                GEOCONV: {"qps": self.geoconv.qps, "maxInflight": 1,
+                          "dailyBudget": self.geoconv.daily,
+                          "spentToday": self.ledger.spent(GEOCONV, day=day),
+                          "remainingToday": self.geoconv.remaining_today()},
                 DIRECTION: {"qps": active.direction_qps,
                             "maxInflight": self.direction.max_inflight,
                             "dailyBudget": None, "spentToday": None, "remainingToday": None},

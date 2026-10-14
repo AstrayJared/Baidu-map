@@ -1,118 +1,32 @@
-# OSM 离线数据与可复现准备
+# OSM 离线运行包
 
-Map data © OpenStreetMap contributors. 数据按 [Open Database License (ODbL)](https://www.openstreetmap.org/copyright) 提供。正式前端展示 OSM Produced Work 时必须显示 **© OpenStreetMap contributors** 并链接版权页；当前 API diagnostics 已提供 attribution，前端展示接入是 TODO。
+当前评审包使用固定上海快照 `geofabrik-shanghai-20260912`，EPSG:32651，步速 1.3 m/s。源码仅跟踪说明；图缓存、边界、风险和障碍层由离线附件交付，不进入 Git。
 
-OSM 是独立算法基线，**不是 ground truth**。可能缺道路、门禁、校园出口、小区内部连接。原始可达结果是一维道路片段；buffer 面仅用于显示，不能解释为额外离路步行权限。
+Map data © OpenStreetMap contributors，数据许可为 [ODbL](https://www.openstreetmap.org/copyright)。数据来源与原始 PBF/各文件 SHA256 见附件 manifest。OSM 是路网模型，不是实地真值。
 
-数据源：[Geofabrik Shanghai](https://download.geofabrik.de/asia/china/shanghai.html)。本次固定快照文件名为 `shanghai-latest.osm.pbf`，数据版本 `geofabrik-shanghai-260913`，下载日期 2026-09-14；不要每日自动更新。PBF SHA256：
+## 导入与校验
 
-```text
-11e420b2fe24176856b31c26da308e3ec41a9a7f5a2b849d91c34f7069837c12
-```
-
-覆盖范围使用同次下载的 Geofabrik `shanghai.poly`（extract 范围，不是从路网死端推断）。SHA256：
-
-```text
-c34d551f02a2d42f327e2f123fd2f28399fd914b36ab46f0c099e15b68ae0f59
-```
-
-`.poly` 链接会更新；复现实验应保存本地原件并核对上述哈希。使用其他快照时必须一起归档其边界和来源，并重新构图。构图将 coverage SHA256 写入 cache，启动时校验匹配。不匹配时不声称有覆盖完整性检查，quality 降为 partial。
-
-文件均保存在本目录并被 Git 忽略：PBF、`.poly`、GeoJSON、`*.osm-cache`、`graph_metadata.json`。不要提交大数据。项目保留此 README 和 `.gitkeep`。
-
-## 1. 安装
-
-在仓库 `backend` 目录，使用现有环境：
+将成果附件 ZIP 及同名 `.sha256` 放在同一目录，从仓库根目录执行：
 
 ```powershell
-$osmPython = (Resolve-Path .venv/Scripts/python.exe).Path
-& $osmPython -m pip install -r requirements.lock.txt -e ../life-circle-algorithm
+python dev.py setup --sample-package "附件所在目录/shanghai-20260912-runtime.zip"
+python dev.py doctor
 ```
 
-运行阶段只需要上述依赖（新增 NetworkX 3.6.1、PyProj 3.7.2；Shapely 2.1.2 已存在）。准备阶段额外需要 Pyrosm 0.13.1、OSMnx 2.0.7、GeoPandas，版本见 `backend/requirements-osm-build.txt`：
+工具只使用 Python 标准库，不需要 Pyrosm；真实运行所需依赖由启动器安装。也可使用 `python backend/scripts/setup_osm_region.py import <runtime.zip>`。`verify <已安装目录>` 重新核对角色、哈希、版本、CRS、步速、覆盖快照与障碍来源；`clear` 只清 OSM 配置，不删文件。
+
+默认安装在 `data/osm/regions/<region>-<archive-hash>/`，路径可迁移或含空格。导入失败不改原环境配置；成功时只更新 OSM 字段并备份 `.env`，不改服务端 AK 或额度。完整体检需要图、边界、风险和障碍层；只有百度成圈不依赖该包。
+
+## 生成附件
+
+维护者可从现有、已验证的一套同版本文件生成附件：
 
 ```powershell
-& $osmPython -m pip install -r requirements-osm-build.txt
+python backend/scripts/setup_osm_region.py pack --source data/osm --output output/submission/shanghai-20260912-runtime.zip
 ```
 
-Windows 上 cykhash 的 PyPI 源码包可能需要 MSVC。没有编译器时优先使用 [Pyrosm 官方建议的 conda-forge 安装方式](https://pyrosm.readthedocs.io/en/latest/faq.html)：
+源目录需有 `shanghai.osm-cache`、`graph_metadata.json`、`shanghai.poly`、`shanghai.risks.geojson`、`shanghai.obstacles.geojson`。`reviews/` 中适用同版本的复核可一并打包。不包含原始 PBF、密钥、百度 POI 或历史体检。
 
-```powershell
-conda create -n osm-build -c conda-forge python=3.12 pyrosm=0.13.1 cykhash=2.0.1 geopandas osmnx=2.0.7
-conda activate osm-build
-python -m pip install -r requirements-osm-build.txt -e ../life-circle-algorithm
-```
+本轮没有在线下载、list/select、多城市自动构建接口。手工构图使用 `prepare_osm_graph.py`，风险/障碍导出使用现有 `tools/export_hybrid_risks.py` 与 `tools/export_hybrid_obstacles.py`；准备依赖见 `backend/requirements-osm-build.txt`。运行阶段不用安装这些准备依赖。
 
-本次 Windows 测试环境使用 conda-forge 的 `cykhash-2.0.1-py312hbb81ca0_3.conda` 预编译扩展，下载后校验 SHA256，再安装到项目虚拟环境；没有安装系统编译器，也没有改算法来绕过 Pyrosm。准备环境建议使用完整 conda 环境。缓存是数据格式，可以跨准备/运行环境使用。
-
-## 2. 下载、构建和激活
-
-已有部署方提供的运行包时，从仓库根目录执行一条命令即可下载、校验、解压并激活：
-
-```powershell
-python backend/scripts/setup_osm_region.py download --url '<runtime-package-url>' --region '<region-id>' --sha256 '<archive-sha256>'
-```
-
-ZIP 必须包含 `data/osm/manifest.json`。已经解压到本地时，使用 `list` 和 `select`；不使用 OSM 时使用 `clear`。这些命令会统一写入 `backend/.env`，不需要手工拼接路径。
-
-如果需要自定义地区或重建快照，先从对应地区的 Geofabrik 页面下载 `.osm.pbf` 与 `.poly`，安装一次准备依赖，然后执行：
-
-```powershell
-python -m pip install -r backend/requirements-osm-build.txt
-python backend/scripts/setup_osm_region.py build --region '<region-id>' --pbf '<path-to-pbf>' --coverage '<path-to-poly>' --version '<snapshot-id>' --metric-crs '<metric-crs>' --source '<pbf-url>' --downloaded-at '<yyyy-mm-dd>'
-```
-
-构建命令会生成图缓存、`graph_metadata.json`、风险层、障碍层和 `manifest.json`，校验后直接激活地区。生成包位于 `data/osm/regions/<region-id>/`；`--no-simplify` 可保留所有节点，替换已有地区时追加 `--force`。如果 Geofabrik 日快照已经清理，请使用已有归档；改用其他版本时应更新版本号、来源、下载日期和 SHA256。
-
-## 3. 构图细节
-
-`setup_osm_region.py build` 内部调用 `prepare_osm_graph.py` 的同一构图逻辑。构图脚本**不会下载**，只读取本地 PBF，通过 Pyrosm `get_network(network_type="walking", nodes=True)`，投影 GeoDataFrames 到米制 CRS，构造保留全部组件的 MultiDiGraph。一般步行道路双向；显式 `oneway:foot`、`foot:forward=no`、`foot:backward=no` 限制方向，汽车 oneway 不自动限制行人。
-
-OSMnx 简化时在 `osmid/highway/foot/access/bridge/tunnel/service/oneway:foot` 变化处保留节点；已有曲线的端点和 barrier 节点也保留；`remove_rings=False`。检查总道路长度、组件数量及属性一致性。`--no-simplify` 可保留所有原节点，默认启用简化。
-
-输出 `shanghai.osm-cache` 与 `graph_metadata.json`：来源、下载日期、文件名、SHA256、构图时间、节点/边数、CRS、速度、简化配置、依赖版本。缓存采用 **gzip 压缩 JSON v1，几何为 WKT**，不会执行 pickle；保存后原子替换文件。加载校验 CRS、版本、cost、geometry、关键属性。速度或数据版本变化必须重建缓存。
-
-缺少 PBF/依赖、无步行道路、损坏几何或零长度道路会使准备失败，并给出明确原因；不会在请求时临时读 PBF 或在线补数据。
-
-## 4. 启动与调用
-
-```powershell
-& $osmPython -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1 --no-access-log
-```
-
-应用启动不读取缓存。首次显式调用离线 OSM 或旧 Hybrid 接口时，进程内线程安全地加载一次缓存、校验并建立 STRtree/组件索引；请求只读共享图。缺 OSM 缓存不影响默认百度路网 2.0、健康检查或前端启动。
-
-在另一个 PowerShell 窗口请求：
-
-```powershell
-$body = @{origin=@{lng=121.51108;lat=31.20415};coordinate_system='bd09ll';algorithm='osm_offline';threshold=900} | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:8000/api/v1/analysis/osm_offline' -ContentType 'application/json' -Body $body
-```
-
-请求 Pydantic 模型继承共享 `AnalysisRequest`。响应复用 `AnalysisResponse`、`Data`、`Geometry`、Issue、Rules。算法标识在 `algorithm.algorithm`，质量在 `algorithm.quality`，性能与版本在 `algorithm.diagnostics`。所有输出坐标是 BD09LL，始终 `[longitude, latitude]`。OpenAPI 与 TypeScript 由 `python -m tools.export_contract` 生成，不手工维护重复 Schema。
-
-算法可用且覆盖检查通过：quality=`usable`；边界截断、无可靠 coverage、极小组件或几何直线 fallback：quality=`partial`；没有足够数据、超范围、snap 超限/耗尽预算、缓存错误或几何计算失败：quality=`insufficient`、geometry=null。业务 status 复用既有映射：设施未运行时为 partial，insufficient 时为 failed，**不会把数据缺失映射为 empty**。HTTP 422/500 保持既有 envelope。
-
-## 5. 测试与调试
-
-```powershell
-& $osmPython -m pytest tests/test_osm_offline_core.py tests/test_osm_offline_api.py tests/test_osm_offline_prepare.py -q
-& $osmPython scripts/smoke_osm_offline.py
-& $osmPython -m pytest -q
-```
-
-默认 CI 使用合成图，不下载数据；仅在 `OSM_PBF_PATH` 指向实际文件时运行完整 PBF 集成测试。可单独运行 `python -m pytest tests/test_osm_offline_prepare.py::test_real_shanghai_pbf_smoke -q`。真实缓存 smoke 连续发出 5 次 FastAPI 测试客户端请求，禁止 socket 连接，检查几何完全相同并保存性能到 `.tmp/osm-smoke.json`。不需要百度密钥，也不需要启动外部 HTTP 服务。
-
-内部 `OsmComputation` 返回 metric `reachable_network` 和 `snap_point`，`result.local_geometry` 为 metric polygon，可用于调试导出和未来 Comparator；未添加重复公共 API。`data.unknown_region` 等插值特有空间证据为空值，不把未计算的未知范围画成不可达。内部共享 `IsochroneResult` 的这些区域使用空占位，**不表示没有 OSM 未知区域**。
-
-## 6. 解释与限制
-
-1. BD09→GCJ02→WGS84 是近似转换；PyProj 仅负责 WGS84 与当地米制投影。禁止宣称测绘级精确。
-2. 起点到最近道路的直线 snap 消耗时间，但无法验证墙、河流或门禁是否阻挡这一离路连接；max distance 只是拒绝过远连接。
-3. 可达区间遵守拓扑与图方向，几何相交不自动连通；步行 turn restrictions、条件通行、门禁开放时段等尚未建模。缺失 OSM 标签无法推断。
-4. buffer 是展示参数；可能覆盖障碍物、连接很近的道路走廊或掩盖窄小不可达间隙。路由判定应看 reachable network，不能把 buffered 面当作点的真实步行时间证据。
-5. 正式实验只能在 development set 调整 buffer；held-out evaluation 冻结参数，禁止以最大化测试集 IoU 调参。
-6. Coverage 是 PBF extract 边界，不能证明边界内部 OSM 数据完整。无边界文件时不宣称检查完整，结果降级。
-7. 第一版常数速度，无红绿灯/台阶/坡度 penalty；长路中心可能没有可达端点，但仍能输出有效路段。
-8. 共享图只在启动时处理。NetworkX 冻结结构，请求不修改节点/边属性；所有 seeds、heap 和 intervals 均为请求局部。城市图占内存较大，多 worker 会重复占用。
-9. 本任务未改插值算法、未实现 Comparator/hybrid。未来在算法外比较独立结果；用 held-out 百度验证点同时评价两算法，OSM 不作为真值。
+完整评审流程见 [评审启动指南](../../docs/评审启动指南.md)。首次载入与校验路网较慢，服务端在后台预载，界面按真实进度展示；健康检查不代表路网已经加载就绪。

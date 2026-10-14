@@ -262,7 +262,6 @@ async def collect_facilities(payload: CheckupRequest, snapshot, *, settings, con
                                 # pages the cache can still answer.
                                 limits=RunLimits(processing_steps=PROCESSING_STEP_LIMIT,
                                                  drain_after_budget_refusal=True))
-        pages = fetch
         if progress is not None:
             progress(0, limit)
         result = await planner.run(pages)

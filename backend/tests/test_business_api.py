@@ -46,7 +46,7 @@ def test_full_http_business_chain_and_server_owned_route_ids(monkeypatch, shift,
         TaskResultResponse.model_validate(result)
         assert result["facilityAnalysis"]["assessed_points"]==9
         assert {f["category"] for f in result["data"]["facilities"]} == {
-            c.key for c in catalog.CATEGORIES if not c.negative} and result["data"]["report"]
+            c.key for c in catalog.CATEGORIES if not c.negative and c.major in catalog.default_analysis_majors()} and result["data"]["report"]
         assert result["status"]=="partial" and "test-secret" not in str(result)
         before=len(calls)
         cached=next(iter(result["facilityAnalysis"]["routes"]))

@@ -125,3 +125,40 @@ def _scratch_deployment_paths(tmp_path_factory):
         yield root
     finally:
         patcher.undo()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item):
+    """Keep portable slow-test evidence without native stack unwinding.
+
+    Windows crashed while the native faulthandler timer inspected a GEOS worker.
+    Python frames are sufficient to locate the stage and retain the test node;
+    reading them under the GIL avoids that diagnostic path. This is not a timeout
+    extension or a substitute for assertions on completion.
+    """
+    import sys
+    import traceback
+
+    def dump():
+        import hashlib
+        from pathlib import Path
+        import os
+
+        directory = Path(__file__).resolve().parents[1]/'logs'/'slow-tests'
+        directory.mkdir(parents=True, exist_ok=True)
+        name = hashlib.sha256(item.nodeid.encode()).hexdigest()[:16]
+        path = directory/f'{os.getpid()}-{name}.log'
+        with path.open('w', encoding='utf-8') as stream:
+            print(f"Slow test after 120 seconds: {item.nodeid}", file=stream)
+            for thread_id, frame in sys._current_frames().items():
+                print(f"Thread {thread_id}:", file=stream)
+                traceback.print_stack(frame, file=stream)
+        print(f"\nSlow-test Python stacks: {path}", file=sys.stderr, flush=True)
+
+    timer = threading.Timer(120, dump)
+    timer.daemon = True
+    timer.start()
+    try:
+        yield
+    finally:
+        timer.cancel()

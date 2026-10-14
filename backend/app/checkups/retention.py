@@ -119,6 +119,11 @@ def summary_of(snapshot: dict) -> dict:
         'facilities': _facility_summary(facilities),
         'accessibility': _accessibility_summary(snapshot.get('accessibility')),
         'scores': _score_summary(snapshot.get('scores')),
+        'essentialServices': (None if not snapshot.get('essentialServices') else {
+            'ruleVersion': snapshot['essentialServices'].get('ruleVersion'),
+            'verificationStatus': snapshot['essentialServices'].get('verificationStatus'),
+            'accessibility': _accessibility_summary(snapshot['essentialServices'].get('accessibility')),
+            'gaps': _gaps_summary(snapshot['essentialServices'].get('serviceGaps'))}),
         'verification': _verification_summary(verification),
         'gaps': _gaps_summary((snapshot.get('service_gaps') or {})) or _gaps_summary(report.get('gaps')),
         'heatmap': _scalars({key: (snapshot.get('heatmap') or {}).get(key)

@@ -53,3 +53,7 @@ data/osm/*.poly
 data/osm/*.md5
 data/osm/*.geojson
 data/osm/graph_metadata.json
+data/osm/regions/
+output/
+**/.env.osm-backup-*
+**/.env.osm-tmp

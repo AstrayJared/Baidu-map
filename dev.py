@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import getpass
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -25,6 +26,7 @@ import time
 import urllib.error
 import urllib.request
 import webbrowser
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -683,6 +685,35 @@ def doctor(backend_port: int, frontend_port: int) -> int:
     for label, port in (("backend", backend_port), ("frontend", frontend_port)):
         if port_open("127.0.0.1", port):
             problems.append(f"端口 {port} 已被占用，{label} 无法启动")
+    osm = read_env(BACKEND / '.env')
+    cache_value = os.environ.get('OSM_GRAPH_CACHE_PATH', osm.get('OSM_GRAPH_CACHE_PATH', '')).strip()
+    if cache_value:
+        try:
+            if cache_value.startswith('"'):
+                cache_value = json.loads(cache_value)
+            cache_path = Path(cache_value)
+            cache_path = cache_path if cache_path.is_absolute() else BACKEND / cache_path
+            from backend.scripts.setup_osm_region import verify
+            package = verify(cache_path.parent)
+            for role, key in {'graph':'OSM_GRAPH_CACHE_PATH', 'coverage':'OSM_COVERAGE_BOUNDARY_PATH',
+                              'risk':'HYBRID_RISK_PATH', 'obstacle':'HYBRID_OBSTACLE_PATH'}.items():
+                value = os.environ.get(key, osm.get(key, '')).strip()
+                if value.startswith('"'):
+                    value = json.loads(value)
+                elif value.startswith("'") and value.endswith("'"):
+                    value = value[1:-1]
+                actual = Path(value)
+                actual = actual if actual.is_absolute() else BACKEND / actual
+                if not value or actual.resolve() != (cache_path.parent / package['files'][role]['path']).resolve():
+                    raise ValueError(key + ' 未指向已校验附件')
+                log('ok', f'OSM {role}：存在；版本 {package["dataVersion"]}；校验通过')
+            if os.environ.get('OSM_DATA_VERSION', osm.get('OSM_DATA_VERSION')) != package['dataVersion']:
+                raise ValueError('OSM_DATA_VERSION 与附件不符')
+            log('ok', f'OSM 运行包就绪：{package["regionId"]}；{package["metricCrs"]}；步速 {package["walkingSpeedMps"]} m/s（尚未加载）')
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            log('warn', f'OSM 未具备完整样例环境：{exc}；请用 --sample-package 重新导入。覆盖与灰区可能降级。')
+    else:
+        log('warn', '未配置 OSM 路网；可成圈，但覆盖与灰区未具备完整样例环境。')
     for problem in problems:
         log("err", problem)
     if not problems:
@@ -706,8 +737,17 @@ def main() -> int:
     parser.add_argument("--no-browser", action="store_true", help="不自动打开浏览器")
     parser.add_argument("--index-url", metavar="URL", help="pip 换源，例如 https://pypi.tuna.tsinghua.edu.cn/simple")
     parser.add_argument("--no-fallback-index", action="store_true", help="只用 --index-url 指定的源，不自动换源")
+    parser.add_argument("--sample-package", type=Path, help="校验并导入成果附带的离线路网 ZIP（需同名 .sha256）")
     args = parser.parse_args()
     options = Options(index_url=args.index_url, no_fallback_index=args.no_fallback_index)
+    if args.sample_package:
+        try:
+            from backend.scripts.setup_osm_region import import_package
+            installed = import_package(args.sample_package)
+            log('ok', f'离线路网包已校验并配置：{installed}')
+        except (OSError, ValueError, KeyError, zipfile.BadZipFile) as exc:
+            log('err', f'离线路网包导入失败：{exc}')
+            return 1
 
     if args.command == "doctor":
         return doctor(args.backend_port, args.frontend_port)

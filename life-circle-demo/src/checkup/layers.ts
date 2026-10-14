@@ -32,6 +32,9 @@ export type LayerStyle = {
 };
 
 export const LAYER_STYLES: Record<LayerId, LayerStyle> = {
+  essential_accessibility: { label: '专项评估域', strokeColor: '#8a94a6', fillColor: '#8a94a6', fillOpacity: 0, strokeWeight: 1, note: '基础三项专项的固定评估域。' },
+  essential_gaps: { label: '基础三项疑似缺口', strokeColor: '#545b66', fillColor: '#8a94a6', fillOpacity: .38, strokeWeight: 1, note: '菜市场、独立药店、小学的疑似缺口；目录未经独立核实。' },
+  essential_heatmap: { label: '基础三项覆盖热力', strokeColor: '#fff', fillColor: '#8a94a6', fillOpacity: 1, strokeWeight: 1, note: '基础三项的路网模型覆盖，灰色疑似不足、淡紫未知；不是大类核验。' },
   isochrone: { label: '步行等时圈', strokeColor: '#3366ff', fillColor: '#3366ff',
     fillOpacity: 0.26, strokeWeight: 2, note: '按相同步行预算圈出的边界，不是服务覆盖结论。' },
   accessibility: { label: '评估域', strokeColor: '#8a94a6', fillColor: '#8a94a6',

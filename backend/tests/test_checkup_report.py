@@ -176,9 +176,9 @@ def test_the_scores_are_intervals_over_the_frozen_domain(tmp_path):
             assert item["assessablePct"] + item["unknownPct"] == pytest.approx(100, abs=1e-6)
             assert item["assessablePct"] > item["coverageLowerPct"]
         overall = scores["overall"]
-        assert overall["available"] is False
-        assert overall["reason"] == "categories_not_analysed"
-        assert len(overall["missingCategories"]) == 7
+        assert overall["available"] is True
+        assert overall["missingCategories"] == []
+        assert overall["weights"] == {key: pytest.approx(1 / 3) for key in MAJORS}
 
 
 def test_every_grey_zone_explains_itself_and_the_layer_draws_the_counted_geometry(tmp_path):

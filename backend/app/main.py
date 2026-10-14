@@ -20,6 +20,7 @@ from .analyses import AnalysisManager, analysis_router
 from .hybrid_api import HybridManager, hybrid_router
 from .osm_api import router as osm_router
 from .quota import Quota
+from .coordinates_api import coordinates_router
 from .catalog import catalog_payload
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,8 @@ class HealthResponse(BaseModel):
 
 
 def create_app(settings: Settings | None = None, *, provider_factory=None,
-               hybrid_provider_factory=None, place_factory=None, route_factory=None) -> FastAPI:
+               hybrid_provider_factory=None, place_factory=None, route_factory=None,
+               coordinate_transport=None) -> FastAPI:
     config = settings if settings is not None else load_settings()
     # One allocation entry for the whole application: every walking-route request
     # (both engines, the legacy endpoints, verification, click-detail routes) paces
@@ -90,6 +92,7 @@ def create_app(settings: Settings | None = None, *, provider_factory=None,
             await checkups.close()
             await hybrid.close()
             await manager.close()
+            quota.ledger.close()
             if preload_task is not None:
                 await preload_task
 
@@ -106,6 +109,7 @@ def create_app(settings: Settings | None = None, *, provider_factory=None,
     app.include_router(hybrid_router(hybrid))
     app.include_router(checkup_router(checkups))
     app.include_router(capabilities_router(checkups, config, offline))
+    app.include_router(coordinates_router(config, quota, coordinate_transport))
     app.add_middleware(
         CORSMiddleware,
         allow_origins=config.cors_origins,

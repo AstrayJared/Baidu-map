@@ -37,7 +37,7 @@ const oneOf = <T extends string>(value: unknown, allowed: readonly T[]): value i
 export const TASK_STATUSES = ['queued', 'running', 'cancelling', 'completed', 'failed', 'cancelled'] as const;
 export const STAGES = ['isochrone', 'poi', 'accessibility', 'verification', 'reporting', 'ready'] as const;
 export const LAYER_IDS = ['isochrone', 'facilities', 'accessibility', 'service_gaps', 'heatmap',
-  'verification', 'report'] as const;
+  'verification', 'report', 'essential_accessibility', 'essential_gaps', 'essential_heatmap'] as const;
 const BUSINESS = ['complete', 'partial', 'insufficient'] as const;
 const EVIDENCE_STATUS = ['not_integrated', 'complete', 'partial', 'failed'] as const;
 
@@ -207,6 +207,7 @@ function validReport(value: unknown): value is ReportEvidence {
     || !Array.isArray(value.limitations) || value.limitations.length === 0
     || !value.limitations.every(text) || !object(value.gaps) || !object(value.verification)) return false;
   if (!validCompletion(value.completion)) return false;
+  if (!validEssentialServices(value.essentialServices)) return false;
   const domain = value.domainAreaM2;
   if (domain !== null && !finite(domain)) return false;
   for (const row of value.categories) {
@@ -262,9 +263,33 @@ function validVerification(value: unknown): boolean {
     && object(value.queries) && Array.isArray(value.notes) && value.notes.every(text);
 }
 
+export function validEssentialServices(value: unknown): boolean {
+  if (value === undefined || value === null) return true;
+  if (!object(value) || value.ruleVersion !== 'essential-services-v1'
+    || value.catalogCompleteness !== 'unverified' || value.verificationStatus !== 'model_only'
+    || !Array.isArray(value.directory) || value.directory.length !== 3
+    || !object(value.accessibility) || !Array.isArray(value.accessibility.categories)
+    || !object(value.serviceGaps) || !Array.isArray(value.serviceGaps.zones)
+    || !value.serviceGaps.zones.every(validZone) || !object(value.heatmap)
+    || !object(value.heatmap.categories) || !Array.isArray(value.notes)) return false;
+  const domain = value.accessibility.domainAreaM2;
+  const keys = new Set(['market', 'pharmacy', 'primary_school']);
+  if (value.accessibility.categories.length !== 3) return false;
+  for (const row of value.accessibility.categories) {
+    if (!object(row) || typeof row.category !== 'string' || !keys.delete(row.category)
+      || typeof row.supported !== 'boolean') return false;
+    if (row.supported) {
+      if (!finite(domain) || domain <= 0 || ![row.coveredM2, row.gapM2, row.unknownM2].every(v => finite(v) && v >= 0)) return false;
+      if (Math.abs(Number(row.coveredM2) + Number(row.gapM2) + Number(row.unknownM2) - domain) > areaTolerance(domain)) return false;
+    }
+  }
+  return true;
+}
+
 export function validSnapshot(value: unknown): value is CheckupSnapshot {
   if (!object(value) || value.schemaVersion !== 'checkup-v1' || !text(value.taskId)) return false;
   if (!validCompletion(value.completion)) return false;
+  if (!validEssentialServices(value.essentialServices)) return false;
   const revision = value.revision;
   if (!count(revision) || revision < 1 || !finite(value.generatedAt)
     || !point(value.center) || value.coordinateSystem !== 'bd09ll'

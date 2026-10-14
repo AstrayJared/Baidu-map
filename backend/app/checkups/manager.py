@@ -88,7 +88,7 @@ VERIFICATION_NOTICE = "本修订尚未包含现实核验：这一版的灰区只
 ANALYSIS_FIELDS = ("accessibility", "service_gaps", "heatmap", "scores", "verification", "report")
 #: Published with the analysis group and covered by its digest, but only when
 #: present: revisions frozen before water reviews existed keep their identity.
-OPTIONAL_ANALYSIS_FIELDS = ("water",)
+OPTIONAL_ANALYSIS_FIELDS = ("water", "essential_services")
 #: 按任务保存的详情桶上限。它记在进程内：保护账户的是持久账本（每次尝试都先预约），
 #: 重启或淘汰之后这个任务的详情额度从 20 重新计起，账本上的消耗不会被抹掉。任务记录的
 #: 累计计数写的是整趟流水线的用量，点击详情不改写它 —— 让它和正在跑的阶段互相覆盖，
@@ -215,8 +215,9 @@ def _assessment_progress(report):
     """
     def progress(step: str, *, major: str | None = None, index: int | None = None,
                  total: int | None = None, cells: int | None = None) -> None:
-        if step == "category":
-            report("category", key=major, count=cells, label=category_label(major, index, total),
+        if step in ("category", "essential_category"):
+            report(step, key=major, count=cells, label=(category_label(major, index, total)
+                   if step == 'category' else f'基础三项专项 · {major}（{index}/{total}）'),
                    throttle=bool(cells))
         else:
             report(step)
@@ -737,6 +738,8 @@ class CheckupManager(ContinuationMixin):
                           data_versions=_data_versions(self.settings.osm_data_version,
                                                        snapshot.engine_version, analysis),
                           budgets=budgets, extra_rule_versions=extra_rules)
+        if analysis.get('essential_services') is not None:
+            trace.rule_versions['essentialServices'] = analysis['essential_services'].rule_version
         if recomputed is not None:
             trace = trace.model_copy(update={"recomputed": recomputed})
         if retried is not None:
@@ -867,7 +870,8 @@ class CheckupManager(ContinuationMixin):
         return {"accessibility": assessment.accessibility, "service_gaps": assessment.service_gaps,
                 "heatmap": assessment.heatmap, "scores": assessment.scores,
                 "verification": None if verification is None else verification.evidence,
-                "report": report, "water": assessment.water}
+                "report": report, "water": assessment.water,
+                "essential_services": assessment.essential_services}
 
     async def _publish_accessibility(self, task_id: str, payload: CheckupRequest, snapshot,
                                      budget, outcome: FacilityOutcome, *,
@@ -902,7 +906,7 @@ class CheckupManager(ContinuationMixin):
             store=None if resolved is None else resolved.store,
             coverage=None if resolved is None else resolved.coverage,
             version=self.settings.osm_data_version, settings=self.settings,
-            progress=progress, incomplete=_incomplete(outcome.group))
+            progress=progress, incomplete=_incomplete(outcome.group), essential_context=group)
         objects = self._analysis_objects(assessment)
         revision = self.store.get(task_id).revision + 1
         isochrone = snapshot.model_dump(mode="json", by_alias=True)
@@ -999,7 +1003,8 @@ class CheckupManager(ContinuationMixin):
                 query_status=outcome.status, majors=tuple(payload.facilities.categories),
                 store=resolved.store, coverage=resolved.coverage,
                 version=self.settings.osm_data_version, settings=self.settings,
-                progress=progress, verified=verified, incomplete=_incomplete(outcome.group))
+                progress=progress, verified=verified, incomplete=_incomplete(outcome.group),
+                essential_context=None if outcome.group is None else outcome.group.model_dump(mode='json', by_alias=True))
         except AssessmentCancelled:
             return None
 
@@ -1055,7 +1060,7 @@ class CheckupManager(ContinuationMixin):
             requested_categories=payload.facilities.categories,
             verification=None if verification is None or verification.evidence is None
                          else verification.evidence.model_dump(mode="json", by_alias=True),
-            water=dump(assessment.water))
+            water=dump(assessment.water), essential_services=dump(assessment.essential_services))
         objects = self._analysis_objects(assessment, report, verification)
         report.completion = self._completion(task_id, {'facilities': group, 'revision': revision,
             'isochrone': isochrone, 'report': report.model_dump(mode='json', by_alias=True)}, frozen=True)
@@ -1143,7 +1148,8 @@ class CheckupManager(ContinuationMixin):
             store=None if resolved is None else resolved.store,
             coverage=None if resolved is None else resolved.coverage,
             version=self.settings.osm_data_version, settings=self.settings,
-            verified=overrides or None, incomplete=_incomplete(group))
+            verified=overrides or None, incomplete=_incomplete(group),
+            essential_context=None if group is None else group.model_dump(mode='json', by_alias=True))
         verification = (None if previous.verification is None
                         else carried_over(previous.verification, entrances=assessment.entrances,
                                           revision=previous.revision))
@@ -1714,7 +1720,8 @@ class CheckupManager(ContinuationMixin):
             store=None if resolved is None else resolved.store,
             coverage=None if resolved is None else resolved.coverage,
             version=self.settings.osm_data_version, settings=self.settings,
-            verified=overrides or None, incomplete=_incomplete(outcome.group))
+            verified=overrides or None, incomplete=_incomplete(outcome.group),
+            essential_context=None if outcome.group is None else outcome.group.model_dump(mode='json', by_alias=True))
         # 核验路线是上一轮真实问过路的证据，沿用它、并只重读它依赖的入口层：重试不是
         # "重新核验"，一条都不该重发（发了就要另算额度，而这次重试只有 POI 预算）。
         verification = (None if previous.verification is None

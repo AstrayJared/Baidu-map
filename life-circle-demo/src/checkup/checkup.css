@@ -366,3 +366,8 @@
 .wb-extension-counts{color:var(--ink-3)}
 /* 诊断行各占一行：它们是几个不同的数，挤在一行里会被读成一个数。 */
 .wb-extension-facts{flex-basis:100%;margin:0;color:var(--ink-3)}
+.rp-sec[data-testid="essential-report"] table{width:100%;border-collapse:collapse;font-size:12px}
+.rp-sec[data-testid="essential-report"] td,.rp-sec[data-testid="essential-report"] th{padding:6px 4px;text-align:left;border-bottom:1px solid var(--rule)}
+[data-testid="coordinate-conversion"]{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+[data-testid="coordinate-conversion"]>.ant-select{flex:1;min-width:180px}
+[data-testid="coordinate-conversion"]>.wb-coords{flex-basis:100%}

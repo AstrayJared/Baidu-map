@@ -145,7 +145,8 @@ def _scope_limitations(scores: dict | None) -> tuple[str, ...]:
 
 def build_report(*, task_id: str, revision: int, source_result_hash: str, generated_at: float,
                  domain, domain_area_m2, accessibility, service_gaps, heatmap, scores,
-                 facilities, verification=None, water=None, requested_categories=None) -> ReportEvidence:
+                 facilities, verification=None, water=None, requested_categories=None,
+                 essential_services=None) -> ReportEvidence:
     """组装报告。``revision`` 是**将要发布**的那一版：报告描述的是它自己所在的那一版。
 
     ``source_result_hash`` 是报告所汇总的那一版（可达性/核验阶段的那一版）的结果摘要，
@@ -154,6 +155,7 @@ def build_report(*, task_id: str, revision: int, source_result_hash: str, genera
     """
     return ReportEvidence(
         report_id=f"{task_id}:{revision}", generated_at=generated_at,
+        essential_services=essential_services,
         domain=domain, domain_area_m2=domain_area_m2,
         categories=_merge_categories(accessibility, scores, requested_categories,
                                      (facilities or {}).get('queryStatus')),

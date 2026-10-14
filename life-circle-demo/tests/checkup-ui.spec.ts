@@ -10,12 +10,80 @@
  */
 import { test, expect, type Page } from '@playwright/test';
 import { installMapSdk } from './mapSdk';
+import { essentialFixture } from '../src/checkup/essentialFixture';
 import type { CheckupCompletion } from '../src/checkup/contract';
 import { capabilities, collection, feature, layer, point, polygon, report, retainedView, retentionView, retryView, snapshot, task, zone }
   from '../src/checkup/fixtures';
 
 const REVISION = 5;
 const HASH = 'hash-5';
+
+for (const width of [1440, 390]) {
+  test(`named essential services remain independent and readable at ${width}px`, async ({ page }, info) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await setup(page);
+    const essential = essentialFixture();
+    essential.accessibility.domain = polygon();
+    essential.heatmap.domain = polygon();
+    essential.serviceGaps.zones = ['market', 'pharmacy', 'primary_school'].map((category, i) =>
+      zone({ id: `essential-${i}`, categories: [category], geometry: polygon(i * .001), displayGeometry: polygon(i * .001) }));
+    await page.route('**/result*', route => {
+      const value = snapshotFor({}, { center: { lng: 116.405, lat: 39.916 } });
+      return route.fulfill({ json: { ...value, essentialServices: essential,
+        report: { ...value.report, essentialServices: essential } } });
+    });
+    let gapLoads = 0;
+    await page.route('**/layers/essential_*', route => {
+      const id = new URL(route.request().url()).pathname.split('/').pop()!;
+      if (id === 'essential_gaps') gapLoads++;
+      return route.fulfill({ json: { ...layer(), layerId: id, revision: REVISION, resultHash: HASH,
+        geometry: collection(essential.serviceGaps.zones.map(z => feature(z.displayGeometry!, { ...z }))), document: null } });
+    });
+    await page.goto('/');
+    await page.getByTestId('checkup-map').click();
+    await page.getByRole('button', { name: '开始体检', exact: true }).click();
+    const report = page.getByTestId('essential-report');
+    await expect(report).toContainText('菜市场'); await expect(report).toContainText('药店'); await expect(report).toContainText('小学');
+    await expect(report.locator('tbody tr')).toHaveCount(3);
+    await expect(report).toContainText('不进入三大类总体分');
+    await page.screenshot({ path: info.outputPath('essential-report.png'), fullPage: true });
+    await page.keyboard.press('Escape');
+    await expect.poll(() => gapLoads).toBe(1);
+    await openTab(page, '图层备注');
+    await page.getByRole('combobox', { name: '专项类别' }).click();
+    await page.getByTitle('药店', { exact: true }).click();
+    await expect(page.getByRole('checkbox', { name: '基础三项疑似缺口', exact: true })).toBeChecked();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.reload();
+    await expect(page.locator('.ant-select').filter({ has: page.getByRole('combobox', { name: '专项类别' }) })).toContainText('药店');
+    await page.getByRole('button', { name: '查看体检报告', exact: true }).click();
+    await expect(page.getByTestId('essential-report')).toBeVisible();
+  });
+}
+
+test('official conversion preserves the center on failure and ignores a late reply after map selection', async ({ page }) => {
+  await setup(page);
+  let reply: (() => void) | undefined;
+  let requests = 0;
+  await page.route('**/api/v2/coordinates/convert', async route => {
+    requests++;
+    if (requests === 1) return route.fulfill({ status: 502, json: { message: '坐标转换权限不足' } });
+    await new Promise<void>(resolve => { reply = resolve; });
+    return route.fulfill({ json: { coordinateSystem: 'bd09ll', provider: 'baidu_geoconv_v2', point: { lng: 121.5, lat: 31.3 } } });
+  });
+  await page.goto('/');
+  await page.getByRole('combobox', { name: '来源坐标系' }).click();
+  await page.getByTitle('WGS84（GPS）', { exact: true }).click();
+  const original = await page.getByRole('spinbutton', { name: '经度', exact: true }).inputValue();
+  await page.getByRole('button', { name: '应用坐标', exact: true }).click();
+  await expect(page.getByText('坐标转换权限不足')).toBeVisible();
+  await expect(page.getByRole('spinbutton', { name: '经度', exact: true })).toHaveValue(original);
+  await page.getByRole('button', { name: '应用坐标', exact: true }).click();
+  await expect.poll(() => requests).toBe(2);
+  await page.getByTestId('checkup-map').click();
+  reply!();
+  await expect(page.getByRole('spinbutton', { name: '经度', exact: true })).toHaveValue('116.405000');
+});
 
 for (const width of [1440, 390]) {
   test(`manual continuation preserves report and restores the same round at ${width}px`, async ({ page }) => {

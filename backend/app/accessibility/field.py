@@ -86,8 +86,9 @@ class ServiceField:
                  verification_conflict: Callable[[object], bool] | None = None,
                  attachments: PointAttachments | None = None,
                  verified: Sequence[VerifiedPoint] = (),
-                 query_incomplete=None):
+                 query_incomplete=None, confirmed_empty: bool = False):
         self.category = category
+        self.confirmed_empty = confirmed_empty
         self.verified = tuple(verified)
         # 检索没有查完的区域（米制）；给了就按格判断，代替整个任务一个开关。
         self.query_incomplete = query_incomplete
@@ -189,6 +190,12 @@ class ServiceField:
                 (sample for sample in assessed if sample.allowed_m is not None),
                 key=lambda sample: sample.allowed_m).nearest_facility
         if not self.seeds:
+            if (self.confirmed_empty and self.query_complete
+                    and all(sample.attachment_m is not None for sample in assessed)
+                    and assessed and not self._query_incomplete_near(cell)):
+                assessment.status = GAP
+                assessment.reason = "query_complete_no_facility"
+                return assessment
             # 没有可用入口：整类别未知。不能把"设施位置不明"写成"没有服务"。
             assessment.reason = "no_valid_entrance"
             return assessment
@@ -294,13 +301,13 @@ class ServiceField:
         return verdict, reason
 
     def _model_verdict(self, cell, samples, assessment) -> tuple[str, str | None]:
-        if not self.seeds or not assessment.has_legal_attachment:
+        if (not self.seeds and not self.confirmed_empty) or not assessment.has_legal_attachment:
             return UNKNOWN, assessment.reason
         reason = self.refine_reason(cell, samples, assessment)
         if reason:
             return REFINE, reason
         if assessment.status in (COVERED, GAP):
-            return assessment.status, None
+            return assessment.status, assessment.reason
         return UNKNOWN, assessment.reason
 
     def _verified_in(self, cell) -> VerifiedPoint | None:

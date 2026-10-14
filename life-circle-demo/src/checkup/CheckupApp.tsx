@@ -41,12 +41,14 @@ import { nearestEmptyNote } from './nearest';
 import { queryCoverageLine, queryCoverageRetryLine } from './queryCoverage';
 import { WeatherCard } from './WeatherCard';
 import { SERVICE_COMPOSITE } from '../map/layers/serviceField';
+import CoordinateInput from './CoordinateInput';
+import { ESSENTIAL_LABELS } from './EssentialReport';
 import { outdatedText, recomputedText, versionView, waterView } from './water';
 import { CompletionSummary } from './CompletionSummary';
 import { duration, liveView, TICKING_PHASES, type LiveKind } from './live';
 import './checkup.css';
 
-/** 地图上的六层；报告是文档，不占图层开关，从这里打开。 */
+/** 地图图层；报告是文档，不占图层开关，从这里打开。 */
 const MAP_LAYERS = LAYER_IDS.filter(id => id !== 'report') as LayerId[];
 
 /** 两种热力各自要先取到的图层：打开热力时，即使这些图层本身没勾选也要取。 */
@@ -263,6 +265,8 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
   const [view, setView] = useState<CapabilityView | null>(null);
   const [capabilityError, setCapabilityError] = useState<string | null>(null);
   const [toggles, setToggles] = useState<CheckupLayerToggles>({ ...DEFAULT_CHECKUP_LAYERS, ...saved.toggles });
+  const [essentialCategory, setEssentialCategory] = useState(
+    ['market', 'pharmacy', 'primary_school'].includes(saved.essentialCategory ?? '') ? saved.essentialCategory! : 'all');
   const [serviceMode, setServiceMode] = useState<string>(known(SERVICE_MODES, saved.serviceMode, SERVICE_COMPOSITE));
   const [densityCategory, setDensityCategory] = useState<string>(
     known(DENSITY_CATEGORIES, saved.densityCategory, DENSITY_ALL));
@@ -301,8 +305,8 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
   // 界面偏好随改随存：刷新或切回来时，图层开关、热力模式、报告开合都按离开时的样子。
   useEffect(() => {
     session.setPrefs({ draft: center, ...(budget === null ? {} : { budget }),
-      toggles: toggles as Record<string, boolean>, serviceMode, densityCategory, reportOpen, tab });
-  }, [session, center, budget, toggles, serviceMode, densityCategory, reportOpen, tab]);
+      toggles: toggles as Record<string, boolean>, serviceMode, densityCategory, essentialCategory, reportOpen, tab });
+  }, [session, center, budget, toggles, serviceMode, densityCategory, essentialCategory, reportOpen, tab]);
 
   useEffect(() => {
     const abort = new AbortController();
@@ -390,6 +394,7 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
     const pending = MAP_LAYERS.find(id => (toggles[id] || id === 'facilities'
       || (Object.keys(HEAT_DEPENDENCIES) as HeatLayer[])
         .some(heat => toggles[heat] && HEAT_DEPENDENCIES[heat].includes(id)))
+      && (!id.startsWith('essential_') || !!snapshot.essentialServices)
       && state.layers?.[id]?.revision !== revision && failed[id] !== revision);
     if (pending === undefined) return;
     controller.layer(pending).catch((error: unknown) => {
@@ -406,18 +411,23 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
       // 修订对不上的一律不画：图上画着上一版的灰区、面板写着这一版的面积，是最难发现的错。
       if (!layer || layer.revision !== revision) continue;
       result[id] = drawableLayer(id, layer);
+      if (id.startsWith('essential_') && essentialCategory !== 'all') {
+        result[id] = { ...result[id]!, shapes: result[id]!.shapes.filter(shape =>
+          !Array.isArray(shape.properties.categories) || shape.properties.categories.includes(essentialCategory)) };
+      }
     }
     return result;
-  }, [state.layers, revision]);
+  }, [state.layers, revision, essentialCategory]);
 
   /** 服务覆盖热力的输入：同样只认这一版的模型网格。 */
-  const heatmapLayer = state.layers?.heatmap;
+  const heatmapLayer = toggles.essential_heatmap ? state.layers?.essential_heatmap : state.layers?.heatmap;
   const coverage = useMemo(() => heatmapLayer && heatmapLayer.revision === revision
     ? serviceSamples(heatmapLayer) : null, [heatmapLayer, revision]);
 
   /** 两种热力互斥（§8.1）：打开一种就关掉另一种，两张半透明画布叠在一起谁也读不清。 */
   function toggleHeat(heat: HeatLayer, on: boolean) {
     setToggles(current => ({ ...current, [heat]: on,
+      ...(on ? { essential_heatmap: false } : {}),
       ...(on ? { [heat === 'service' ? 'density' : 'service']: false } : {}) }));
   }
 
@@ -638,6 +648,9 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
                 onChange={value => edit('lat', value)} precision={6} controls={false} />
             </div>
             {!valid && <Alert type="error" title="坐标无效：经度 −180～180，纬度 −85～85" />}
+            <CoordinateInput center={center} onPick={choose} />
+            <Button size="small" onClick={() => choose({ lng: 121.513925, lat: 31.313079 })}>国定一社区样例</Button>
+            <p className="wb-hint">样例需导入上海运行包；首次加载路网较慢，进度会持续显示。</p>
           </section>
         </div>
 
@@ -709,6 +722,10 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
           aria-labelledby="checkup-tab-layers" hidden={tab !== 'layers'}>
           <nav className="wb-dir" aria-label="图层与备注">
             <Fold title="图层" defaultOpen className="wb-layers">
+              <p className="wb-group">基础三项专项</p>
+              <Select aria-label="专项类别" value={essentialCategory} onChange={setEssentialCategory}
+                options={[{ value: 'all', label: '全部三项' }, ...Object.entries(ESSENTIAL_LABELS).map(([value, label]) => ({ value, label }))]} />
+              {!snapshot?.essentialServices && <p className="wb-hint">本修订尚未评估专项。</p>}
               <p className="wb-group">热力 · 二选一</p>
               <div className="wb-layer">
                 <Checkbox checked={!!toggles.service}
@@ -731,7 +748,8 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
               </div>
               {MAP_LAYERS.map(id => <div className="wb-layer" key={id}>
                 <Checkbox checked={!!toggles[id]}
-                  onChange={event => setToggles({ ...toggles, [id]: event.target.checked })}>
+                  onChange={event => setToggles({ ...toggles, [id]: event.target.checked,
+                    ...(id === 'essential_heatmap' && event.target.checked ? { service: false, density: false } : {}) })}>
                   <i className="api-swatch" style={layerSwatch(id)} />
                   {LAYER_STYLES[id].label}</Checkbox>
                 {layerErrors[id] && <p className="wb-layer-error">{layerErrors[id]}</p>}
@@ -773,7 +791,8 @@ export default function CheckupApp({ engine, algorithmSwitch }: { engine: string
       data-drawn-revisions={[...new Set(MAP_LAYERS.filter(id => drawables[id])
         .map(id => state.layers?.[id]?.revision))].join(',')}>
       <CheckupMap center={center} onPick={choose} resultCenter={taskCenter}
-        layers={toggles} drawables={drawables} coverage={coverage} serviceMode={serviceMode}
+        layers={toggles} drawables={drawables} coverage={coverage}
+        serviceMode={toggles.essential_heatmap ? (essentialCategory === 'all' ? SERVICE_COMPOSITE : essentialCategory) : serviceMode}
         categoryDirectory={directory} legendStyle={legendStyle} onLegendHeightChange={setLegendHeight}
         densityCategory={densityCategory} water={water}
         selectedId={selected} onSelect={setSelected} />

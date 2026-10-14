@@ -153,6 +153,17 @@ export type EngineRef = {
   label: string;
 };
 
+export type EssentialServicesEvidence = {
+  ruleVersion: string;
+  catalogCompleteness: "unverified";
+  verificationStatus: "model_only";
+  directory: Array<Record<string, unknown>>;
+  accessibility: AccessibilityEvidence;
+  serviceGaps: ServiceGapsEvidence;
+  heatmap: HeatmapEvidence;
+  notes: Array<string>;
+};
+
 export type FacilityGroup = {
   queryStatus: "completed" | "partial" | "failed" | "cancelled";
   catalogCompleteness: "unverified";
@@ -207,6 +218,7 @@ export type OverallScore = {
 
 export type ReportEvidence = {
   reportId: string;
+  essentialServices?: EssentialServicesEvidence | null;
   generatedAt: number;
   schemaVersion: "checkup-v1";
   domain: Record<string, unknown> | null;
@@ -378,6 +390,7 @@ export type WaterDataEvidence = {
 
 export type CheckupSnapshot = {
   schemaVersion: "checkup-v1";
+  essentialServices?: EssentialServicesEvidence | null;
   taskId: string;
   revision: number;
   generatedAt: number;
@@ -445,6 +458,7 @@ export type FacilityRoute = {
 };
 
 export type CheckupCapabilities = {
+  essentialServices: Record<string, unknown>;
   schemaVersion: string;
   engines: Array<Record<string, unknown>>;
   rules: Record<string, unknown>;
@@ -556,4 +570,16 @@ export type RetainedCheckupView = {
 export type ContinueCheckupRequest = {
   clientRequestId: string;
   baseRevision: number;
+};
+
+export type CoordinateRequest = {
+  point: Origin;
+  sourceCoordinateSystem: "wgs84" | "gcj02" | "bd09ll";
+};
+
+export type CoordinateResult = {
+  point: Origin;
+  coordinateSystem: "bd09ll";
+  sourceCoordinateSystem: "wgs84" | "gcj02" | "bd09ll";
+  provider: "identity" | "baidu_geoconv_v2";
 };

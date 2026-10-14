@@ -89,6 +89,7 @@ class AccessibilityOutcome:
     entrances: dict = dataclass_field(default_factory=dict)
     #: 这一版用到的水体障碍的来源与复核范围。
     water: WaterDataEvidence | None = None
+    essential_services: object | None = None
 
 
 def _polygonal(geometry):
@@ -324,14 +325,16 @@ def metric_incomplete(regions, projection, *, major: str):
 
 def evaluate_category(major: str, facilities, *, store, views, domain, rule, query_complete,
                       obstacles: _Obstacles, attachments=None, on_cell=None,
-                      verified=(), query_incomplete=None) -> CategoryEvaluation:
+                     verified=(), query_incomplete=None, facility_filter=None,
+                     confirmed_empty=False) -> CategoryEvaluation:
     """一个类别的完整评估：入口 → 服务场 → 网格 → 面积 → 灰区输入与热力点。
 
     ``query_complete`` 为假时 :func:`category_service` 永远不会给出 gap —— 检索没跑完
     时"没查到"不是"没有"。同理，没有可用入口的类别整类未知。
     """
+    selected = facilities if facility_filter is None else [f for f in facilities if facility_filter(f)]
     entrances = resolve_entrances(
-        metric_facilities(facilities, store.projection, major=major), store=store,
+        metric_facilities(selected, store.projection, major=major if facility_filter is None else None), store=store,
         category_of=lambda item: item["category"],
         guard=(obstacles.connector_blocked
                if obstacles.available or obstacles.conflicts is not None else None),
@@ -342,7 +345,8 @@ def evaluate_category(major: str, facilities, *, store, views, domain, rule, que
                          obstacle_intersects=obstacles.intersects if obstacles.available else None,
                          data_conflict=(obstacles.conflict_intersects
                                         if obstacles.conflicts is not None else None),
-                         verified=verified, query_incomplete=query_incomplete)
+                         verified=verified, query_incomplete=query_incomplete,
+                         confirmed_empty=confirmed_empty and not selected)
     # 判定与证据一次算完：网格只拿结论，评估对象留在这里给热力与灰区用。
     assessed: dict = {}
 
@@ -530,7 +534,7 @@ def _status_of(evaluated, query_complete: bool, obstacles_available: bool,
 def assess_accessibility(*, geometry, facilities, query_status: str, majors, store,
                          version: str, coverage=None, unknown_region=None, obstacles=None,
                          rule=DISTANCE_RULE, settings=None, progress=None,
-                         verified=None, incomplete=None) -> AccessibilityOutcome:
+                         verified=None, incomplete=None, essential_context=None) -> AccessibilityOutcome:
     """跑完可达性阶段（§5–§7.1）。
 
     ``store`` 为 None 表示没有 OSM 图，``facilities`` 为 None 表示设施阶段没有建立
@@ -663,8 +667,16 @@ def assess_accessibility(*, geometry, facilities, query_status: str, majors, sto
         domain=domain_public, categories={item.category: list(item.heat) for item in evaluated},
         notes=["模型估计：格到最近设施入口的步行路网距离，不是实测，也不代表人口覆盖。",
                *notes])
+    essential = None
+    if essential_context is not None:
+        from .essential import assess_essential
+        essential = assess_essential(
+            context=essential_context, facilities=facilities, store=store, views=views,
+            domain=domain, excluded=excluded, obstacles=obstacles, attachments=attachments,
+            rule=rule, progress=report)
     return AccessibilityOutcome(
         accessibility=evidence, service_gaps=gaps, heatmap=heatmap,
+        essential_services=essential,
         scores=_score(evaluated, domain_area_m2), status=status, issues=issues, water=water,
         # 一个设施只属于一个大类（按类别过滤过），所以 ID 之间不会互相覆盖。
         entrances={entrance.facility_id: entrance

@@ -140,6 +140,11 @@ def merge_entities(records, request, plan=None, *, within=None, nearby=None):
         if is_outside:
             if status == 'accepted':
                 nearby.append({**item, 'countingRegion': 'outside'})
+            elif status == 'needs_review':
+                # An ambiguous nearby candidate can still serve the assessment
+                # domain. Preserve it as evidence; it must never become proof of
+                # an empty directory merely because it lies outside the circle.
+                review.append({**item, 'countingRegion': 'outside'})
             continue
         {'accepted': accepted, 'needs_review': review, 'excluded': excluded}[status].append(item)
     mark_duplicates(accepted + review, projection)

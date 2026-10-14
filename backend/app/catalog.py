@@ -63,6 +63,7 @@ def _read() -> dict:
 
 DATA = _read()
 VERSION: str = DATA["version"]
+ESSENTIAL_SERVICES = tuple(DATA["essentialServices"])
 
 
 @dataclass(frozen=True)
