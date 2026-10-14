@@ -15,6 +15,7 @@
  */
 import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
 import { EXTENSION_STOP_LABELS } from '../src/checkup/extensions';
+import type { CheckupTaskView } from '../src/checkup/contract';
 import { installMapSdk } from './mapSdk';
 
 const API = `http://127.0.0.1:${process.env.CHECKUP_BROWSER_API_PORT ?? 8022}`;
@@ -31,8 +32,7 @@ type ControlState = {
   external: { attempts: number; targets: string[] };
   tasks: { taskId: string; clientRequestId: string; status: string; revision: number }[];
 };
-type TaskView = { taskId: string; status: string; stage: string | null; revision: number;
-  facilitiesStatus: string | null };
+type TaskView = CheckupTaskView;
 type FacilityGroup = {
   queryStatus: string; stopReason: string | null; facilities: unknown[];
   countsByCategory: Record<string, number>; statistics: Record<string, number>;
