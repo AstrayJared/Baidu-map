@@ -3,8 +3,12 @@
   "date": "2026-10-14",
   "baseCommit": "ce689c189f8f1e7537bd1d84ecd98500ccb3e1de",
   "uncommittedImplementation": true,
-  "implementationFilesSha256": "2e658720717d5b01c8e533012ee8deb0f3286bf8e59b687ecd220f776106c085",
+  "implementationFilesSha256": "323e9aad7efa332cc6f14d3abe64f6d8bc6df71f8f75ef8bd9dbf0f21046ac00",
   "implementationFiles": [
+    {
+      "path": ".gitattributes",
+      "sha256": "c8d29640c31e13845652b1e6d788975d54dca1ce79defdfa9c8b95997bce74a6"
+    },
     {
       "path": ".github/workflows/ci.yml",
       "sha256": "6e250917eeec46c807df0bed289c0e3ff970fd28078b553bec92df2cf83c10a1"

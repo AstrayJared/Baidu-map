@@ -5,3 +5,12 @@
 
 # Windows 批处理必须保持 CRLF。
 *.bat text eol=crlf
+
+# Generated outputs are byte-pinned by backend/tools/export_contract.py.
+# Preserve the historical CRLF blobs; v2 TypeScript is always LF, even when
+# the checkout machine enables core.autocrlf.
+/backend/docs/openapi.json -text
+/backend/docs/analysis-response.schema.json -text
+/backend/mocks/*.json -text
+/life-circle-demo/src/api-contract.ts -text
+/life-circle-demo/src/checkup/contract.ts text eol=lf
