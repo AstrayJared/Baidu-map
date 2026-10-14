@@ -13,6 +13,10 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Keep HEAD's parent so `git show --check HEAD` checks this commit,
+          # rather than treating a shallow checkout as a new root commit.
+          fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
